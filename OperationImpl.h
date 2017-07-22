@@ -13,21 +13,27 @@ public:
     virtual double negate(double right) = 0;
 };
 
-class ZadehClassic : public OperationImpl
+namespace
 {
-public:
-    double s_norm(double left, double right)
+    class ZadehClassic : public OperationImpl
     {
-        return left > right ? left : right;
-    }
-    double t_norm(double left, double right)
-    {
-        return left < right ? left : right;
-    }
-    double negate(double right)
-    {
-        return 1 - right;
-    }
-};
+    public:
+        double s_norm(double left, double right)
+        {
+            return left > right ? left : right;
+        }
+        double t_norm(double left, double right)
+        {
+            return left < right ? left : right;
+        }
+        double negate(double right)
+        {
+            return 1 - right;
+        }
+    };
+}
+
+ZadehClassic ZADEH_CLASSIC;
+//TODO: zrobic singleton
 
 #endif //FUZZY_MINIMIZE_OPERATIONIMPL_H

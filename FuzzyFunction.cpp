@@ -6,27 +6,36 @@
 
 using namespace std;
 
-double SymbInstance::calc(vector<double> args, OperationImpl opImpl = ZadehClassic())
+double SymbInstance::calc(vector<double> args, OperationImpl* opImpl)
 {
-    return negative ? opImpl.negate(args[tableIndex]) : args[tableIndex];
+    return negative ? opImpl->negate(args[tableIndex]) : args[tableIndex];
 }
 
-double Kos::calc(vector<double> args, OperationImpl opImpl)
+SymbInstance::SymbInstance(unsigned int tableIndex, bool negative) : tableIndex(tableIndex), negative(negative)
+{}
+
+double Kos::calc(vector<double> args, OperationImpl* opImpl)
 {
     double acc = 1;
     for(auto& i : content)
     {
-        acc = opImpl.t_norm(acc, i.calc(args, opImpl));
+        acc = opImpl->t_norm(acc, i.calc(args, opImpl));
     }
     return acc;
 }
 
-double FuzzyFunction::calc(vector<double> args, OperationImpl opImpl)
+Kos::Kos(const list <SymbInstance> &content) : content(content)
+{}
+
+double FuzzyFunction::calc(vector<double> args, OperationImpl* opImpl)
 {
     double acc = 0;
     for(auto& i : body)
     {
-        acc = opImpl.s_norm(acc, i.calc(args, opImpl));
+        acc = opImpl->s_norm(acc, i.calc(args, opImpl));
     }
     return acc;
 }
+
+FuzzyFunction::FuzzyFunction(const list <Kos> &body) : body(body)
+{}
