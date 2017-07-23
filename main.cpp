@@ -11,7 +11,7 @@ using namespace std;
 
 int main()
 {
-    //FuzzyFunction f(list<Kos>{Kos(list<SymbInstance>{SymbInstance(0, true), SymbInstance(0, false)}), Kos(list<SymbInstance>{SymbInstance(1, true), SymbInstance(0, true)})});
+    //FuzzyFunction f(list<Implic>{Implic(list<SymbInstance>{SymbInstance(0, true), SymbInstance(0, false)}), Implic(list<SymbInstance>{SymbInstance(1, true), SymbInstance(0, true)})});
     SymbInstance a(1, true), b(1, false), c(1, false), d(0, true);
     list<SymbInstance> dave;
     dave.push_back(a);
@@ -19,8 +19,8 @@ int main()
     list<SymbInstance> connor;
     connor.push_back(c);
     connor.push_back(d);
-    Kos alpha(dave), beta(connor);
-    list<Kos> steve;
+    Implic alpha(dave), beta(connor);
+    list<Implic> steve;
     steve.push_back(alpha);
     steve.push_back(beta);
     FuzzyFunction f(steve);

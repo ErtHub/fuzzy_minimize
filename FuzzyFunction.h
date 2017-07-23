@@ -9,32 +9,37 @@
 #include <vector>
 #include "OperationImpl.h"
 
+//TODO: namespace FuzzyLogic maybe?
+
 class SymbInstance
 {
     unsigned tableIndex;
     bool negative;
 public:
-    double calc(std::vector<double> args, OperationImpl* opImpl = &ZADEH_CLASSIC);
+    double calc(std::vector<double> args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
+    void appendToTable(std::vector<int>& target) const;
 
     SymbInstance(unsigned int tableIndex, bool negative);
 };
 
-class Kos
+class Implic
 {
     std::list<SymbInstance> content;
 public:
-    double calc(std::vector<double> args, OperationImpl* opImpl = &ZADEH_CLASSIC);
+    double calc(const std::vector<double> &args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
+    std::vector<int> tabulate() const;
 
-    explicit Kos(const std::list<SymbInstance> &content);
+    explicit Implic(const std::list<SymbInstance> &content);
 };
 
 class FuzzyFunction
 {
-    std::list<Kos> body;
+    std::list<Implic> body;
 public:
-    double calc(std::vector<double> args, OperationImpl* opImpl = &ZADEH_CLASSIC);
+    double calc(const std::vector<double> &args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
+    std::list<std::vector<int>> tabulate() const;
 
-    explicit FuzzyFunction(const std::list<Kos> &body);
+    explicit FuzzyFunction(const std::list<Implic> &body);
 };
 
 

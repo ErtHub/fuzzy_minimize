@@ -20,7 +20,7 @@ namespace
     public:
         double s_norm(double left, double right)
         {
-            return left > right ? left : right;
+            return left > right ? left : right;//TODO: czy nie daloby sie wykorzystac czegos w rodzaju min-max?
         }
         double t_norm(double left, double right)
         {
