@@ -20,6 +20,8 @@ public:
     void appendToTable(std::vector<int>& target) const;
 
     SymbInstance(unsigned int tableIndex, bool negative);
+
+    bool operator==(const SymbInstance& another) const;
 };
 
 class Implic
@@ -28,6 +30,8 @@ class Implic
 public:
     double calc(const std::vector<double> &args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
     std::vector<int> tabulate() const;
+    bool covers(const Implic& another) const;
+    bool hasSymbol(const SymbInstance& symb) const;
 
     explicit Implic(const std::list<SymbInstance> &content);
 };

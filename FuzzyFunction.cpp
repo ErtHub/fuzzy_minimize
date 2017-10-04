@@ -21,6 +21,13 @@ void SymbInstance::appendToTable(std::vector<int> &target) const
 SymbInstance::SymbInstance(unsigned int tableIndex, bool negative) : tableIndex(tableIndex), negative(negative)
 {}
 
+bool SymbInstance::operator==(const SymbInstance &another) const
+{
+    if(&another == this)
+        return true;
+    return (tableIndex == another.tableIndex && negative == another.negative);
+}
+
 double Implic::calc(const vector<double> &args, OperationImpl* opImpl) const
 {
     double acc = 1;
@@ -35,6 +42,22 @@ vector<int> Implic::tabulate() const
     for(auto& i : content)
         i.appendToTable(res);
     return res;
+}
+
+bool Implic::covers(const Implic& another) const
+{
+    for(auto& i : content)
+        if(!another.hasSymbol(i))
+            return false;
+    return true;
+}
+
+bool Implic::hasSymbol(const SymbInstance& symb) const
+{
+    for(auto& i : content)
+        if(i == symb)
+            return true;
+    return false;
 }
 
 Implic::Implic(const list <SymbInstance> &content) : content(content)
