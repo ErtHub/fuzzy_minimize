@@ -8,6 +8,7 @@
 #include "FuzzyFunction.h"
 #include <list>
 #include <vector>
+#include <algorithm>
 
 class ImplicTable
 {
@@ -19,6 +20,7 @@ public:
     void sweepCovered();
     void sweepCovered(std::list<std::vector<int>>::iterator i);
     bool checkCover(std::list<std::vector<int>>::iterator covering, std::list<std::vector<int>>::iterator covered) const;
+    ImplicTable generateK1() const;
 };
 
 
