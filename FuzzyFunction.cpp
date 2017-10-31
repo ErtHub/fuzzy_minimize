@@ -15,7 +15,7 @@ void SymbInstance::appendToTable(std::vector<int> &target) const
 {
     while(tableIndex <= target.size())
         target.push_back(0);
-    target[tableIndex] |= 1 << (1 & negative);
+    target[tableIndex] |= 1 << (1 & !negative);
 }
 
 SymbInstance::SymbInstance(unsigned int tableIndex, bool negative) : tableIndex(tableIndex), negative(negative)

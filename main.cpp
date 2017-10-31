@@ -5,6 +5,7 @@
 #include <iostream>
 #include <unordered_map>
 #include "FuzzyFunction.h"
+#include "ImplicTable.h"
 
 using namespace std;
 
@@ -12,7 +13,7 @@ using namespace std;
 int main()
 {
     //FuzzyFunction f(list<Implic>{Implic(list<SymbInstance>{SymbInstance(0, true), SymbInstance(0, false)}), Implic(list<SymbInstance>{SymbInstance(1, true), SymbInstance(0, true)})});
-    SymbInstance a(1, true), b(1, false), c(1, false), d(0, true);
+    /*SymbInstance a(1, true), b(1, false), c(1, false), d(0, true);
     list<SymbInstance> dave;
     dave.push_back(a);
     dave.push_back(b);
@@ -24,7 +25,27 @@ int main()
     steve.push_back(alpha);
     steve.push_back(beta);
     FuzzyFunction f(steve);
-    cout << f.calc(vector<double>{0.5, 0.25}) << endl;
+    cout << f.calc(vector<double>{0.5, 0.25}) << endl;*/
+
+    vector<int> v1, v2, v3;
+    list<vector<int>> l;
+    v1.push_back(2);
+    v1.push_back(0);
+    v1.push_back(3);
+    v2.push_back(1);
+    v2.push_back(2);
+    v2.push_back(0);
+    v3.push_back(0);
+    v3.push_back(1);
+    v3.push_back(2);
+    l.push_back(v1);
+    l.push_back(v2);
+    l.push_back(v3);
+
+    ImplicTable i(l);
+    i.minimizeExact();
+    i.print();
+
 /*    vector<double> v{0.5, 0.75};
     cout << v[0] << endl;
     cout << v[1] << endl;
