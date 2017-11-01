@@ -19,6 +19,7 @@ public:
     ImplicTable() = default;
     explicit ImplicTable(const std::list<std::vector<int>> &content);
     explicit ImplicTable(const FuzzyFunction &func);
+    void sweepCovered(ImplicTable& another);
     void sweepCovered();
     void sweepCovered(std::list<std::vector<int>>::iterator i);
     void append(const std::vector<int>& item);

@@ -12,6 +12,16 @@ ImplicTable::ImplicTable(const std::list<std::vector<int>> &content) : content(c
 ImplicTable::ImplicTable(const FuzzyFunction &func) : content(func.tabulate())
 {}
 
+void ImplicTable::sweepCovered(ImplicTable& another)
+{
+    sweepCovered();
+    another.sweepCovered();
+    for(auto i = content.begin(); i != content.end(); ++i)
+        another.sweepCovered(i);
+    for(auto i = another.content.begin(); i != another.content.end(); ++i)
+        sweepCovered(i);
+}
+
 void ImplicTable::sweepCovered()
 {
     for(auto i = content.begin(); i != content.end(); ++i)
@@ -142,11 +152,12 @@ void ImplicTable::minimizeExact()
     do
     {
         k1 = generateK1();
+        sweepCovered(k1);
         wasEmpty = k1.empty();
         merge(k1);
         print();
         cout << "----------------" << endl;
-        sweepCovered();
+        //sweepCovered();
     } while(!wasEmpty);
     chooseCoveringSubset();
 }

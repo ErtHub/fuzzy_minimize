@@ -27,20 +27,43 @@ int main()
     FuzzyFunction f(steve);
     cout << f.calc(vector<double>{0.5, 0.25}) << endl;*/
 
-    vector<int> v1, v2, v3;
+    vector<int> v1, v2, v3, v4, v5, v6, v7;
     list<vector<int>> l;
-    v1.push_back(2);
     v1.push_back(0);
-    v1.push_back(3);
-    v2.push_back(1);
+    v1.push_back(1);
+    v1.push_back(0);
+    v1.push_back(1);
     v2.push_back(2);
+    v2.push_back(2);
+    v2.push_back(1);
     v2.push_back(0);
-    v3.push_back(0);
     v3.push_back(1);
     v3.push_back(2);
+    v3.push_back(0);
+    v3.push_back(2);
+    v4.push_back(2);
+    v4.push_back(1);
+    v4.push_back(2);
+    v4.push_back(2);
+    v5.push_back(1);
+    v5.push_back(2);
+    v5.push_back(3);
+    v5.push_back(1);
+    v6.push_back(3);
+    v6.push_back(1);
+    v6.push_back(1);
+    v6.push_back(2);
+    v7.push_back(2);
+    v7.push_back(2);
+    v7.push_back(2);
+    v7.push_back(3);
     l.push_back(v1);
     l.push_back(v2);
     l.push_back(v3);
+    l.push_back(v4);
+    l.push_back(v5);
+    l.push_back(v6);
+    l.push_back(v7);
 
     ImplicTable i(l);
     i.minimizeExact();
