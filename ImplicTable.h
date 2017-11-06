@@ -10,10 +10,16 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include <tuple>
 
 class ImplicTable
 {
     std::list<std::vector<int>> content;
+
+    std::list<unsigned long> localize1_2(const std::vector<int>& row, bool& found3) const;
+    bool findRi(ImplicTable& sideList);
+    std::list<std::tuple<unsigned long, unsigned long, std::vector<int>>> findR(std::vector<int>& r, ImplicTable& sideList, ImplicTable& ki);
+
 public:
 
     ImplicTable() = default;
@@ -28,6 +34,7 @@ public:
     void chooseCoveringSubset();
     bool recursiveCover(std::vector<int>& implic, const std::list<std::vector<int>>& subset, std::list<unsigned long> positions0) const;
     void minimizeExact();
+    void minimizeHeuristic();
     bool empty() const;
     void merge(ImplicTable& another);
     void print();
