@@ -66,7 +66,8 @@ int main()
     l.push_back(v7);
 
     ImplicTable i(l);
-    i.minimizeExact();
+//    i.minimizeExact();
+    i.minimizeHeuristic();
     i.print();
 
 /*    vector<double> v{0.5, 0.75};

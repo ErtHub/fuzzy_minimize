@@ -30,6 +30,7 @@ public:
     void sweepCovered(std::list<std::vector<int>>::iterator i);
     void append(const std::vector<int>& item);
     bool checkCover(const std::vector<int> & covering, const std::vector<int>& covered) const;
+    bool checkCover(std::list<std::vector<int>>::iterator covered) const;
     ImplicTable generateK1() const;
     void chooseCoveringSubset();
     bool recursiveCover(std::vector<int>& implic, const std::list<std::vector<int>>& subset, std::list<unsigned long> positions0) const;
@@ -37,6 +38,7 @@ public:
     void minimizeHeuristic();
     bool empty() const;
     void merge(ImplicTable& another);
+    unsigned long long countLiterals(const std::vector<int>& implic) const;
     void print();
 };
 
