@@ -131,17 +131,17 @@ void ImplicTable::chooseCoveringSubset()
         }
         vector<int> halfImplic1 = implic;
         vector<int> halfImplic2 = implic;
-        unsigned long divisionPos = *positions0.begin();
-        positions0.pop_front();
-        halfImplic1[divisionPos] = 1;
-        halfImplic2[divisionPos] = 2;
-        if(!(recursiveCover(halfImplic1, subset, positions0) && recursiveCover(halfImplic2, subset, positions0)))
+        auto divisionPos = positions0.begin();
+        auto pos0End = positions0.end();
+        halfImplic1[*divisionPos] = 1;
+        halfImplic2[*divisionPos] = 2;
+        if(!(recursiveCover(halfImplic1, subset, ++divisionPos, pos0End) && recursiveCover(halfImplic2, subset, divisionPos, pos0End)))
             subset.push_back(implic);
     }
     content = subset;//TODO std::move
 }
 
-bool ImplicTable::recursiveCover(vector<int>& implic, const list<vector<int>>& subset, list<unsigned long> positions0) const
+bool ImplicTable::recursiveCover(vector<int>& implic, const list<vector<int>>& subset, list<unsigned long>::iterator pos0, list<unsigned long>::iterator& pos0End) const
 {
     for(auto& i : content)
         if(checkCover(i, implic))
@@ -149,14 +149,12 @@ bool ImplicTable::recursiveCover(vector<int>& implic, const list<vector<int>>& s
     for(auto& i : subset)
         if(checkCover(i, implic))
             return true;
-    if(positions0.empty())
+    if(pos0 == pos0End)
         return false;
-    unsigned long pos = *positions0.begin();
-    positions0.pop_front();
     vector<int> implic2 = implic;
-    implic[pos] = 1;
-    implic2[pos] = 2;
-    return recursiveCover(implic, subset, positions0) && recursiveCover(implic2, subset, positions0);//TODO zmienic tam gdzie trzeba na unsigned long i poprawic to kopiowanie calej listy bo to jest dramat kurwa
+    implic[*pos0] = 1;
+    implic2[*pos0] = 2;
+    return recursiveCover(implic, subset, ++pos0, pos0End) && recursiveCover(implic2, subset, pos0, pos0End);
 }
 
 void ImplicTable::minimizeExact()

@@ -33,7 +33,7 @@ public:
     bool checkCover(const std::vector<int>& covered) const;
     ImplicTable generateK1() const;
     void chooseCoveringSubset();
-    bool recursiveCover(std::vector<int>& implic, const std::list<std::vector<int>>& subset, std::list<unsigned long> positions0) const;
+    bool recursiveCover(std::vector<int>& implic, const std::list<std::vector<int>>& subset, std::list<unsigned long>::iterator pos0, std::list<unsigned long>::iterator& pos0End) const;
     void minimizeExact();
     void minimizeHeuristic();
     bool empty() const;
