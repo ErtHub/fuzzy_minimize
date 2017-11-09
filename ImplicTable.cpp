@@ -16,23 +16,23 @@ void ImplicTable::sweepCovered(ImplicTable& another)
 {
     sweepCovered();
     another.sweepCovered();
-    for(auto i = content.begin(); i != content.end(); ++i)
+    for(auto& i : content)
         another.sweepCovered(i);
-    for(auto i = another.content.begin(); i != another.content.end(); ++i)
+    for(auto& i : another.content)
         sweepCovered(i);
 }
 
 void ImplicTable::sweepCovered()
 {
-    for(auto i = content.begin(); i != content.end(); ++i)
+    for(auto& i : content)
         sweepCovered(i);
 }
 
-void ImplicTable::sweepCovered(list<vector<int>>::iterator i)
+void ImplicTable::sweepCovered(const vector<int>& i)
 {
     for(auto k = content.begin(); k != content.end();)
     {
-        if(k != i && checkCover(*i, *k))
+        if(addressof(*k) != addressof(i) && checkCover(i, *k))
             k = content.erase(k);
         else
             ++k;
@@ -52,10 +52,10 @@ bool ImplicTable::checkCover(const vector<int>& covering, const vector<int>& cov
     return true;
 }
 
-bool ImplicTable::checkCover(list<vector<int>>::iterator covered) const
+bool ImplicTable::checkCover(const vector<int>& covered) const
 {
-    for(auto i = content.begin(); i != content.end(); ++i)
-        if(i != covered && checkCover(*i, *covered))
+    for(auto& i : content)
+        if(addressof(i) != addressof(covered) && checkCover(i, covered))
             return true;
     return false;
 }
@@ -91,7 +91,7 @@ ImplicTable ImplicTable::generateK1() const
         {
             for(auto &pos : positions1_2)
             {
-                cout << (i->at(pos) ^ j->at(pos)) << endl;
+//                cout << (i->at(pos) ^ j->at(pos)) << endl;
                 if((i->at(pos) ^ j->at(pos)) == 3 && (found3 || (find(j->begin(), j->end(), 3) != j->end())))
                 {
                     vector<int> v(j->size());
@@ -184,14 +184,15 @@ void ImplicTable::minimizeHeuristic()
     ImplicTable history;
     while(findRi(sideList))
     {
-        vector<int> r = *sideList.content.begin();
+        vector<int> r;
+        r = sideList.content.back();
         list<tuple<unsigned long, unsigned long, vector<int>>> R = findR(r, sideList, ki);
         unsigned long long rLiteralsCount = countLiterals(r);
         while(!R.empty())
         {
             unsigned long pos1_2 = get<1>(*R.begin());
-            //TODO moze cos zrobic z tymi referencjami?
-            vector<int> rj = get<2>(*R.begin());
+            vector<int> rj;
+            rj = get<2>(R.front());
             R.pop_front();
             vector<int> rk(rj.size());
             for(unsigned long i = 0; i < rk.size(); ++i) {
@@ -199,24 +200,24 @@ void ImplicTable::minimizeHeuristic()
                 cout << "(" << r.at(i) << ", " << rj.at(i) << ")";}
             cout << endl;
             rk[pos1_2] = 0;
-            ki.content.push_front(rk);
-            sweepCovered(ki.content.begin());
-            sideList.sweepCovered(ki.content.begin());
-            ki.sweepCovered(ki.content.begin());
-            if(checkCover(ki.content.begin()) || sideList.checkCover(ki.content.begin()) || ki.checkCover(ki.content.begin()))
+            ki.content.push_back(rk);
+            sweepCovered(ki.content.back());
+            sideList.sweepCovered(ki.content.back());
+            ki.sweepCovered(ki.content.back());
+            if(checkCover(ki.content.back()) || sideList.checkCover(ki.content.back()) || ki.checkCover(ki.content.back()))
             {
-                ki.content.pop_front();
+                ki.content.pop_back();
                 continue;
             }
             bool found3 = false;
             if(localize1_2(rk, found3).empty())
                 break;
-            if(rLiteralsCount < countLiterals(rk) || history.checkCover(ki.content.begin()))
+            if(rLiteralsCount < countLiterals(rk) || history.checkCover(ki.content.back()))
             {
-                ki.content.pop_front();
+                ki.content.pop_back();
                 break;
             }
-            cout << "Otwieram Matlaba!" << endl;
+//            cout << "Otwieram Matlaba!" << endl;
             history.content.push_front(rk);
             r = rk;
             R = findR(r, sideList, ki);
@@ -260,9 +261,9 @@ bool ImplicTable::findRi(ImplicTable& sideList)
     while(!content.empty())
     {
         vector<int> v;
-        v = *content.begin();
+        v = content.front();
         content.pop_front();
-        sideList.content.push_front(v);
+        sideList.content.push_back(v);
         bool found3 = false;
         if(!localize1_2(v, found3).empty() && found3)
             return true;
@@ -270,16 +271,63 @@ bool ImplicTable::findRi(ImplicTable& sideList)
     return false;
 }
 
-bool tupleCompare(tuple<unsigned long, unsigned long, vector<int>>& first, tuple<unsigned long, unsigned long, vector<int>>& second)
+/*bool tupleCompare(tuple<unsigned long, unsigned long, vector<int>>& first, tuple<unsigned long, unsigned long, vector<int>>& second)
 {
     return get<0>(first) > get<0>(second);
-}
+}*/
 
 list<tuple<unsigned long, unsigned long, vector<int>>> ImplicTable::findR(vector<int>& r, ImplicTable& sideList, ImplicTable& ki)
 {
-    //TODO lambda?
     list<tuple<unsigned long, unsigned long, vector<int>>> result;
-    for(auto& rn : content)
+    auto loop = [&](list<vector<int>>& l)
+    {
+        for(auto& rn : l)
+        {
+            unsigned long zeroPairs = 0;
+            unsigned long pos1_2 = 0;
+            bool seen1_2 = false;
+            bool seenCross3 = false;
+            for(unsigned long i = 0; i < rn.size(); ++i)
+            {
+                if(rn.at(i))
+                {
+                    if(rn.at(i) == 3)
+                    {
+                        if(r.at(i) != 3)
+                        {
+                            seenCross3 = true;
+                            break;
+                        }
+                    }
+                    else if((rn.at(i) ^ r.at(i)) == 3)
+                    {
+//                        cout << r.at(i) << " " << rn.at(i) << endl;
+                        if(seen1_2)
+                        {
+                            seen1_2 = false;
+                            break;
+                        }
+                        else
+                        {
+                            seen1_2 = true;
+                            pos1_2 = i;
+                        }
+                    }
+                }
+                else if(!(r.at(i)))
+                    ++zeroPairs;
+            }
+            if(seen1_2 && !seenCross3){
+                result.push_back(make_tuple(zeroPairs, pos1_2, rn));
+//                cout << pos1_2 << " " << zeroPairs << endl;
+            }
+        }
+    };
+    /*auto tupleCompare = [&](tuple<unsigned long, unsigned long, vector<int>>& first, tuple<unsigned long, unsigned long, vector<int>>& second)
+    {
+        return get<0>(first) > get<0>(second);
+    };*/
+    /*for(auto& rn : content)
     {
         unsigned long zeroPairs = 0;
         unsigned long pos1_2 = 0;
@@ -325,6 +373,7 @@ list<tuple<unsigned long, unsigned long, vector<int>>> ImplicTable::findR(vector
         unsigned long zeroPairs = 0;
         unsigned long pos1_2 = 0;
         bool seen1_2 = false;
+        bool seenCross3 = false;
         for(unsigned long i = 0; i < rn.size(); ++i)
         {
             if(rn.at(i))
@@ -332,12 +381,15 @@ list<tuple<unsigned long, unsigned long, vector<int>>> ImplicTable::findR(vector
                 if(rn.at(i) == 3)
                 {
                     if(r.at(i) != 3)
-                        continue;
+                    {
+                        seenCross3 = true;
+                        break;
+                    }
                 }
                 else if((rn.at(i) ^ r.at(i)) == 3)
                 {
                     if(seen1_2)
-                        continue;
+                        break;
                     else
                     {
                         seen1_2 = true;
@@ -347,15 +399,16 @@ list<tuple<unsigned long, unsigned long, vector<int>>> ImplicTable::findR(vector
             }
             else if(!(r.at(i)))
                 ++zeroPairs;
-            if(seen1_2)
-                result.push_back(make_tuple(zeroPairs, pos1_2, rn));
         }
+        if(seen1_2 && !seenCross3)
+            result.push_back(make_tuple(zeroPairs, pos1_2, rn));
     }
     for(auto& rn : ki.content)
     {
         unsigned long zeroPairs = 0;
         unsigned long pos1_2 = 0;
         bool seen1_2 = false;
+        bool seenCross3 = false;
         for(unsigned long i = 0; i < rn.size(); ++i)
         {
             if(rn.at(i))
@@ -363,12 +416,15 @@ list<tuple<unsigned long, unsigned long, vector<int>>> ImplicTable::findR(vector
                 if(rn.at(i) == 3)
                 {
                     if(r.at(i) != 3)
-                        continue;
+                    {
+                        seenCross3 = true;
+                        break;
+                    }
                 }
                 else if((rn.at(i) ^ r.at(i)) == 3)
                 {
                     if(seen1_2)
-                        continue;
+                        break;
                     else
                     {
                         seen1_2 = true;
@@ -378,11 +434,19 @@ list<tuple<unsigned long, unsigned long, vector<int>>> ImplicTable::findR(vector
             }
             else if(!(r.at(i)))
                 ++zeroPairs;
-            if(seen1_2)
-                result.push_back(make_tuple(zeroPairs, pos1_2, rn));
         }
-    }
-    result.sort(tupleCompare);
+        if(seen1_2 && !seenCross3)
+            result.push_back(make_tuple(zeroPairs, pos1_2, rn));
+    }*/
+    loop(content);
+    loop(sideList.content);
+    loop(ki.content);
+    result.sort(
+            [&](tuple<unsigned long, unsigned long, vector<int>>& first, tuple<unsigned long, unsigned long, vector<int>>& second)
+                {
+                    return get<0>(first) > get<0>(second);
+                }
+    );
     return result;
 }
 
