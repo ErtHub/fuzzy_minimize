@@ -219,6 +219,7 @@ void ImplicTable::minimizeHeuristic()
             history.content.push_front(rk);
             r = rk;
             R = findR(r, sideList, ki);
+            rLiteralsCount = countLiterals(r);
             print();
             cout << endl;
             sideList.print();
