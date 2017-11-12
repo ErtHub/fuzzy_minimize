@@ -8,6 +8,7 @@
 #include <list>
 #include <vector>
 #include "OperationImpl.h"
+#include "ImplicRow.h"
 
 //TODO: namespace FuzzyLogic maybe?
 
@@ -17,7 +18,7 @@ class SymbInstance
     bool negative;
 public:
     double calc(std::vector<double> args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
-    void appendToTable(std::vector<int>& target) const;
+    void appendToTable(std::vector<unsigned char>& target) const;
 
     SymbInstance(unsigned int tableIndex, bool negative);
 
@@ -29,7 +30,7 @@ class Implic
     std::list<SymbInstance> content;
 public:
     double calc(const std::vector<double> &args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
-    std::vector<int> tabulate() const;
+    std::vector<unsigned char> tabulate() const;
     bool covers(const Implic& another) const;
     bool hasSymbol(const SymbInstance& symb) const;
 
@@ -41,7 +42,7 @@ class FuzzyFunction
     std::list<Implic> body;
 public:
     double calc(const std::vector<double> &args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
-    std::list<std::vector<int>> tabulate() const;
+    std::list<ImplicRow> tabulate() const;
 
     explicit FuzzyFunction(const std::list<Implic> &body);
 };

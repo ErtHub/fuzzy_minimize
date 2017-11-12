@@ -6,7 +6,7 @@
 
 using namespace std;
 
-ImplicTable::ImplicTable(const std::list<std::vector<int>> &content) : content(content)
+ImplicTable::ImplicTable(const std::list<ImplicRow> &content) : content(content)
 {}
 
 ImplicTable::ImplicTable(const FuzzyFunction &func) : content(func.tabulate())
@@ -28,39 +28,39 @@ void ImplicTable::sweepCovered()
         sweepCovered(i);
 }
 
-void ImplicTable::sweepCovered(const vector<int>& i)
+void ImplicTable::sweepCovered(const ImplicRow& i)
 {
     for(auto k = content.begin(); k != content.end();)
     {
-        if(addressof(*k) != addressof(i) && checkCover(i, *k))
+        if(addressof(*k) != addressof(i) && i.covers(*k))
             k = content.erase(k);
         else
             ++k;
     }
 }
 
-void ImplicTable::append(const vector<int>& item)
+void ImplicTable::append(const ImplicRow& item)
 {
     content.push_back(item);
 }
 
-bool ImplicTable::checkCover(const vector<int>& covering, const vector<int>& covered) const
+/*bool ImplicTable::checkCover(const vector<int>& covering, const vector<int>& covered) const
 {
     for(unsigned pos = 0; pos < covering.size(); ++pos)
         if((covered.at(pos) & covering.at(pos)) != covering.at(pos))
             return false;
     return true;
-}
+}*/
 
-bool ImplicTable::checkCover(const vector<int>& covered) const
+bool ImplicTable::checkCover(const ImplicRow& covered) const
 {
     for(auto& i : content)
-        if(addressof(i) != addressof(covered) && checkCover(i, covered))
+        if(addressof(i) != addressof(covered) && i.covers(covered))
             return true;
     return false;
 }
 
-list<unsigned long> ImplicTable::localize1_2(const vector<int>& row, bool& found3) const
+/*list<unsigned long> ImplicTable::localize1_2(const vector<int>& row, bool& found3) const
 {
     list<unsigned long> positions1_2;
     for(unsigned long pos = 0; pos < row.size(); ++pos)
@@ -74,7 +74,7 @@ list<unsigned long> ImplicTable::localize1_2(const vector<int>& row, bool& found
         }
     }
     return positions1_2;
-}
+}*/
 
 ImplicTable ImplicTable::generateK1() const
 {
@@ -82,25 +82,27 @@ ImplicTable ImplicTable::generateK1() const
 
     for(auto i = content.begin(); i != content.end(); ++i)
     {
-        bool found3 = false;
-        list<unsigned long> positions1_2 = localize1_2(*i, found3);
+        list<unsigned long> positions1_2 = i->localize1_2();
         if(positions1_2.empty())
             continue;
         auto j = i;
         for(++j; j != content.end(); ++j)
         {
-            for(auto &pos : positions1_2)
+            if(i->get_meta_phase_number(3) || j->get_meta_phase_number(3))
             {
-//                cout << (i->at(pos) ^ j->at(pos)) << endl;
-                if((i->at(pos) ^ j->at(pos)) == 3 && (found3 || (find(j->begin(), j->end(), 3) != j->end())))
+                for(auto &pos : positions1_2)
                 {
-                    vector<int> v(j->size());
-                    for(unsigned long p = 0; p < v.size(); ++p) {
-                        v[p] = i->at(p) | j->at(p);
-                    cout << "(" << i->at(p) << ", " << j->at(p) << ")";}
-                    cout << endl;
-                    v[pos] = 0;
-                    result.append(v);
+//                cout << (i->at(pos) ^ j->at(pos)) << endl;
+                    if((i->get(pos) ^ j->get(pos)) == 3)
+                    {
+                        ImplicRow v(j->size());
+                        for(unsigned long p = 0; p < v.size(); ++p) {
+                            v.set(i->get(p) | j->get(p), p);
+                            cout << "(" << (int)i->get(p) << ", " << (int)j->get(p) << ")";}
+                        cout << endl;
+                        v.set(0, pos);
+                        result.append(v);
+                    }
                 }
             }
         }
@@ -110,50 +112,55 @@ ImplicTable ImplicTable::generateK1() const
 
 void ImplicTable::chooseCoveringSubset()
 {
-    list<vector<int>> subset;
+    list<ImplicRow> subset;
     while(!content.empty())
     {
-        vector<int> implic = *content.begin();
+        ImplicRow implic = *content.begin();
         content.pop_front();
         list<unsigned long> positions0;
-        bool found3 = false;
-        for(unsigned long i = 0; i < implic.size(); ++i)
-        {
-            if(implic.at(i) == 0)
-                positions0.push_back(i);
-            if(implic.at(i) == 3)
-                found3 = true;
-        }
-        if(positions0.empty() || !found3)
+        if(!implic.get_meta_phase_number(0) || !implic.get_meta_phase_number(3))
         {
             subset.push_back(implic);
             continue;
         }
-        vector<int> halfImplic1 = implic;
-        vector<int> halfImplic2 = implic;
+        for(unsigned long i = 0; i < implic.size(); ++i)
+            if(implic.get(i) == 0)
+                positions0.push_back(i);
         auto divisionPos = positions0.begin();
         auto pos0End = positions0.end();
-        halfImplic1[*divisionPos] = 1;
-        halfImplic2[*divisionPos] = 2;
+        ImplicRow halfImplic1 = implic;
+        ImplicRow halfImplic2 = halfImplic1.expand(*divisionPos);
         if(!(recursiveCover(halfImplic1, subset, ++divisionPos, pos0End) && recursiveCover(halfImplic2, subset, divisionPos, pos0End)))
             subset.push_back(implic);
     }
     content = subset;//TODO std::move
 }
 
-bool ImplicTable::recursiveCover(vector<int>& implic, const list<vector<int>>& subset, list<unsigned long>::iterator pos0, list<unsigned long>::iterator& pos0End) const
+bool ImplicTable::recursiveCover(ImplicRow& implic, const list<ImplicRow>& subset, list<unsigned long>::iterator pos0, list<unsigned long>::iterator& pos0End) const
 {
+//    cout << "wchodze!" << endl;
     for(auto& i : content)
-        if(checkCover(i, implic))
+        if(i.covers(implic))
+        {
+//            cout << "wychodze! 1" << endl;
             return true;
+        }
     for(auto& i : subset)
-        if(checkCover(i, implic))
+        if(i.covers(implic))
+        {
+//            cout << "wychodze! 2" << endl;
             return true;
+        }
     if(pos0 == pos0End)
+    {
+//        cout << "wychodze! 3" << endl;
         return false;
-    vector<int> implic2 = implic;
-    implic[*pos0] = 1;
-    implic2[*pos0] = 2;
+    }
+    ImplicRow implic2 = implic.expand(*pos0);
+    /*implic.print();
+    cout << endl << "----------------------------" << endl;
+    implic2.print();
+    cout << endl;*/
     return recursiveCover(implic, subset, ++pos0, pos0End) && recursiveCover(implic2, subset, pos0, pos0End);
 }
 
@@ -182,22 +189,22 @@ void ImplicTable::minimizeHeuristic()
     ImplicTable history;
     while(findRi(sideList))
     {
-        vector<int> r;
+        ImplicRow r;
         r = sideList.content.back();
-        list<tuple<unsigned long, unsigned long, vector<int>>> R = findR(r, sideList, ki);
-        unsigned long long rLiteralsCount = countLiterals(r);
+        list<tuple<unsigned long, unsigned long, ImplicRow>> R = findR(r, sideList, ki);
+        unsigned long long rLiteralsCount = r.countLiterals();
         while(!R.empty())
         {
             unsigned long pos1_2 = get<1>(*R.begin());
-            vector<int> rj;
+            ImplicRow rj;
             rj = get<2>(R.front());
             R.pop_front();
-            vector<int> rk(rj.size());
+            ImplicRow rk(rj.size());
             for(unsigned long i = 0; i < rk.size(); ++i) {
-                rk[i] = r.at(i) | rj.at(i);
-                cout << "(" << r.at(i) << ", " << rj.at(i) << ")";}
+                rk.set(r.get(i) | rj.get(i), i);
+                cout << "(" << (int)r.get(i) << ", " << (int)rj.get(i) << ")";}
             cout << endl;
-            rk[pos1_2] = 0;
+            rk.set(0, pos1_2);
             ki.content.push_back(rk);
             sweepCovered(ki.content.back());
             sideList.sweepCovered(ki.content.back());
@@ -208,9 +215,9 @@ void ImplicTable::minimizeHeuristic()
                 continue;
             }
             bool found3 = false;
-            if(localize1_2(rk, found3).empty())
+            if(!rk.get_meta_phase_number(1) && !rk.get_meta_phase_number(2))
                 break;
-            if(rLiteralsCount < countLiterals(rk) || history.checkCover(ki.content.back()))
+            if(rLiteralsCount < rk.countLiterals() || history.checkCover(ki.content.back()))
             {
                 ki.content.pop_back();
                 break;
@@ -219,7 +226,7 @@ void ImplicTable::minimizeHeuristic()
             history.content.push_front(rk);
             r = rk;
             R = findR(r, sideList, ki);
-            rLiteralsCount = countLiterals(r);
+            rLiteralsCount = r.countLiterals();
             print();
             cout << endl;
             sideList.print();
@@ -247,10 +254,7 @@ void ImplicTable::print()
 {
     for(auto& row : content)
     {
-        for(auto& elem : row)
-        {
-            cout << elem << " ";
-        }
+        row.print();
         cout << endl;
     }
 }
@@ -259,12 +263,11 @@ bool ImplicTable::findRi(ImplicTable& sideList)
 {
     while(!content.empty())
     {
-        vector<int> v;
+        ImplicRow v;
         v = content.front();
         content.pop_front();
         sideList.content.push_back(v);
-        bool found3 = false;
-        if(!localize1_2(v, found3).empty() && found3)
+        if((v.get_meta_phase_number(1) || v.get_meta_phase_number(2)) && v.get_meta_phase_number(3))
             return true;
     }
     return false;
@@ -275,48 +278,48 @@ bool ImplicTable::findRi(ImplicTable& sideList)
     return get<0>(first) > get<0>(second);
 }*/
 
-list<tuple<unsigned long, unsigned long, vector<int>>> ImplicTable::findR(vector<int>& r, ImplicTable& sideList, ImplicTable& ki)
+list<tuple<unsigned long, unsigned long, ImplicRow>> ImplicTable::findR(ImplicRow& r, ImplicTable& sideList, ImplicTable& ki)
 {
-    list<tuple<unsigned long, unsigned long, vector<int>>> result;
-    auto loop = [&](list<vector<int>>& l)
+    list<tuple<unsigned long, unsigned long, ImplicRow>> result;
+    auto loop = [&](list<ImplicRow>& l)
     {
         for(auto& rn : l)
         {
             unsigned long zeroPairs = 0;
             unsigned long pos1_2 = 0;
-            bool seen1_2 = false;
+            bool seenOnlyOne1_2 = false;
             bool seenCross3 = false;
             for(unsigned long i = 0; i < rn.size(); ++i)
             {
-                if(rn.at(i))
+                if(rn.get(i))
                 {
-                    if(rn.at(i) == 3)
+                    if(rn.get(i) == 3)
                     {
-                        if(r.at(i) != 3)
+                        if(r.get(i) != 3)
                         {
                             seenCross3 = true;
                             break;
                         }
                     }
-                    else if((rn.at(i) ^ r.at(i)) == 3)
+                    else if((rn.get(i) ^ r.get(i)) == 3)
                     {
 //                        cout << r.at(i) << " " << rn.at(i) << endl;
-                        if(seen1_2)
+                        if(seenOnlyOne1_2)
                         {
-                            seen1_2 = false;
+                            seenOnlyOne1_2 = false;
                             break;
                         }
                         else
                         {
-                            seen1_2 = true;
+                            seenOnlyOne1_2 = true;
                             pos1_2 = i;
                         }
                     }
                 }
-                else if(!(r.at(i)))
+                else if(!(r.get(i)))
                     ++zeroPairs;
             }
-            if(seen1_2 && !seenCross3){
+            if(seenOnlyOne1_2 && !seenCross3){
                 result.push_back(make_tuple(zeroPairs, pos1_2, rn));
 //                cout << pos1_2 << " " << zeroPairs << endl;
             }
@@ -441,7 +444,7 @@ list<tuple<unsigned long, unsigned long, vector<int>>> ImplicTable::findR(vector
     loop(sideList.content);
     loop(ki.content);
     result.sort(
-            [&](tuple<unsigned long, unsigned long, vector<int>>& first, tuple<unsigned long, unsigned long, vector<int>>& second)
+            [&](tuple<unsigned long, unsigned long, ImplicRow>& first, tuple<unsigned long, unsigned long, ImplicRow>& second)
                 {
                     return get<0>(first) > get<0>(second);
                 }
@@ -449,6 +452,7 @@ list<tuple<unsigned long, unsigned long, vector<int>>> ImplicTable::findR(vector
     return result;
 }
 
+/*
 unsigned long long ImplicTable::countLiterals(const vector<int>& implic) const
 {
     unsigned long long result = 0;
@@ -460,4 +464,4 @@ unsigned long long ImplicTable::countLiterals(const vector<int>& implic) const
             ++result;
     }
     return result;
-}
+}*/

@@ -4,7 +4,6 @@
 
 #include <iostream>
 #include <unordered_map>
-#include "FuzzyFunction.h"
 #include "ImplicTable.h"
 
 using namespace std;
@@ -27,8 +26,8 @@ int main()
     FuzzyFunction f(steve);
     cout << f.calc(vector<double>{0.5, 0.25}) << endl;*/
 
-    vector<int> v1, v2, v3, v4, v5, v6, v7;
-    list<vector<int>> l;
+    vector<unsigned char> v1, v2, v3, v4, v5, v6, v7;
+    list<ImplicRow> l;
     v1.push_back(0);
     v1.push_back(1);
     v1.push_back(0);
@@ -57,13 +56,13 @@ int main()
     v7.push_back(2);
     v7.push_back(2);
     v7.push_back(3);
-    l.push_back(v1);
-    l.push_back(v2);
-    l.push_back(v3);
-    l.push_back(v4);
-    l.push_back(v5);
-    l.push_back(v6);
-    l.push_back(v7);
+    l.emplace_back(ImplicRow(v1));
+    l.emplace_back(ImplicRow(v2));
+    l.emplace_back(ImplicRow(v3));
+    l.emplace_back(ImplicRow(v4));
+    l.emplace_back(ImplicRow(v5));
+    l.emplace_back(ImplicRow(v6));
+    l.emplace_back(ImplicRow(v7));
 
     ImplicTable i(l);
 //    i.minimizeExact();

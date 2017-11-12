@@ -11,7 +11,7 @@ double SymbInstance::calc(vector<double> args, OperationImpl* opImpl) const
     return negative ? opImpl->negate(args[tableIndex]) : args[tableIndex];
 }
 
-void SymbInstance::appendToTable(std::vector<int> &target) const
+void SymbInstance::appendToTable(std::vector<unsigned char> &target) const
 {
     while(tableIndex <= target.size())
         target.push_back(0);
@@ -36,9 +36,9 @@ double Implic::calc(const vector<double> &args, OperationImpl* opImpl) const
     return acc;
 }
 
-vector<int> Implic::tabulate() const
+vector<unsigned char> Implic::tabulate() const
 {
-    vector<int> res;
+    vector<unsigned char> res;
     for(auto& i : content)
         i.appendToTable(res);
     return res;
@@ -71,20 +71,25 @@ double FuzzyFunction::calc(const vector<double> &args, OperationImpl* opImpl) co
     return acc;
 }
 
-list<vector<int>> FuzzyFunction::tabulate() const
+list<ImplicRow> FuzzyFunction::tabulate() const
 {
-    list<vector<int>> res;
-    vector<int> partialRes;
+    list<ImplicRow> res;
+    list<vector<unsigned char>> rawRes;
+    vector<unsigned char> partialRes;
     unsigned long maxLen = 0;
     for(auto& i : body)
     {
         partialRes = i.tabulate();
-        res.push_back(partialRes);
+        rawRes.push_back(partialRes);
         maxLen = partialRes.size() > maxLen ? partialRes.size() : maxLen;
     }
-    for(auto& i : res)
+    for(auto& i : rawRes)
+    {
         while(i.size() < maxLen)
             i.push_back(0);
+        res.emplace_back(ImplicRow(i));
+    }
+    return res;
 }
 
 FuzzyFunction::FuzzyFunction(const list <Implic> &body) : body(body)
