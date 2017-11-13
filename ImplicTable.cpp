@@ -82,7 +82,7 @@ ImplicTable ImplicTable::generateK1() const
 
     for(auto i = content.begin(); i != content.end(); ++i)
     {
-        list<unsigned long> positions1_2 = i->localize1_2();
+        list<unsigned long> positions1_2 = move(i->localize1_2());
         if(positions1_2.empty())
             continue;
         auto j = i;
@@ -115,12 +115,12 @@ void ImplicTable::chooseCoveringSubset()
     list<ImplicRow> subset;
     while(!content.empty())
     {
-        ImplicRow implic = *content.begin();
+        ImplicRow implic = move(content.front());
         content.pop_front();
         list<unsigned long> positions0;
         if(!implic.get_meta_phase_number(0) || !implic.get_meta_phase_number(3))
         {
-            subset.push_back(implic);
+            subset.push_back(move(implic));
             continue;
         }
         for(unsigned long i = 0; i < implic.size(); ++i)
@@ -129,11 +129,11 @@ void ImplicTable::chooseCoveringSubset()
         auto divisionPos = positions0.begin();
         auto pos0End = positions0.end();
         ImplicRow halfImplic1 = implic;
-        ImplicRow halfImplic2 = halfImplic1.expand(*divisionPos);
+        ImplicRow halfImplic2 = move(halfImplic1.expand(*divisionPos));
         if(!(recursiveCover(halfImplic1, subset, ++divisionPos, pos0End) && recursiveCover(halfImplic2, subset, divisionPos, pos0End)))
-            subset.push_back(implic);
+            subset.push_back(move(implic));
     }
-    content = subset;//TODO std::move
+    content = move(subset);
 }
 
 bool ImplicTable::recursiveCover(ImplicRow& implic, const list<ImplicRow>& subset, list<unsigned long>::iterator pos0, list<unsigned long>::iterator& pos0End) const
@@ -156,7 +156,7 @@ bool ImplicTable::recursiveCover(ImplicRow& implic, const list<ImplicRow>& subse
 //        cout << "wychodze! 3" << endl;
         return false;
     }
-    ImplicRow implic2 = implic.expand(*pos0);
+    ImplicRow implic2 = move(implic.expand(*pos0));
     /*implic.print();
     cout << endl << "----------------------------" << endl;
     implic2.print();
@@ -171,7 +171,7 @@ void ImplicTable::minimizeExact()
     bool wasEmpty = true;
     do
     {
-        k1 = generateK1();
+        k1 = move(generateK1());
         k1.content.sort();
         sweepCovered(k1);
         wasEmpty = k1.empty();
@@ -200,7 +200,7 @@ void ImplicTable::minimizeHeuristic()
         {
             unsigned long pos1_2 = get<1>(*R.begin());
             ImplicRow rj;
-            rj = get<2>(R.front());
+            rj = move(get<2>(R.front()));
             R.pop_front();
             ImplicRow rk(rj.size());
             for(unsigned long i = 0; i < rk.size(); ++i) {
@@ -217,7 +217,6 @@ void ImplicTable::minimizeHeuristic()
                 ki.content.pop_back();
                 continue;
             }
-            bool found3 = false;
             if(!rk.get_meta_phase_number(1) && !rk.get_meta_phase_number(2))
                 break;
             if(rLiteralsCount < rk.countLiterals() || history.checkCover(ki.content.back()))
@@ -268,7 +267,7 @@ bool ImplicTable::findRi(ImplicTable& sideList)
     while(!content.empty())
     {
         ImplicRow v;
-        v = content.front();
+        v = move(content.front());
         content.pop_front();
         sideList.content.push_back(v);
         if((v.get_meta_phase_number(1) || v.get_meta_phase_number(2)) && v.get_meta_phase_number(3))
