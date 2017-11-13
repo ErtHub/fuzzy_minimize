@@ -166,11 +166,13 @@ bool ImplicTable::recursiveCover(ImplicRow& implic, const list<ImplicRow>& subse
 
 void ImplicTable::minimizeExact()
 {
+    content.sort();
     ImplicTable k1;
     bool wasEmpty = true;
     do
     {
         k1 = generateK1();
+        k1.content.sort();
         sweepCovered(k1);
         wasEmpty = k1.empty();
         merge(k1);
@@ -183,6 +185,7 @@ void ImplicTable::minimizeExact()
 
 void ImplicTable::minimizeHeuristic()
 {
+    content.sort();
     sweepCovered();
     ImplicTable sideList;
     ImplicTable ki;
@@ -237,6 +240,7 @@ void ImplicTable::minimizeHeuristic()
     }
     merge(sideList);
     merge(ki);
+    content.sort();
     chooseCoveringSubset();
 }
 
