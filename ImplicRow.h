@@ -19,7 +19,6 @@ public:
     explicit ImplicRow();
     explicit ImplicRow(std::vector<unsigned char>& content);
     explicit ImplicRow(unsigned long size);
-//    ImplicRow(const ImplicRow& another) = default;
     void set(unsigned char what, unsigned long where);
     std::list<unsigned long> localize1_2() const;
     bool covers(const ImplicRow& covered) const;
