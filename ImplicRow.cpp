@@ -42,10 +42,10 @@ list<unsigned long> ImplicRow::localize1_2() const
 
 bool ImplicRow::covers(const ImplicRow& covered) const
 {
-    if(meta_phase_numbers[3] > covered.meta_phase_numbers[3] || meta_phase_numbers[0] < covered.meta_phase_numbers[0])
+    if(meta_phase_numbers[3] > covered.meta_phase_numbers[3] || meta_phase_numbers[0] < covered.meta_phase_numbers[0] || countLiterals() > covered.countLiterals())
         return false;
     for(unsigned pos = 0; pos < content.size(); ++pos)
-        if((covered.content[pos] & content[pos]) != content[pos])
+        if(content[pos] && (covered.content[pos] & content[pos]) != content[pos])
             return false;
     return true;
 }
