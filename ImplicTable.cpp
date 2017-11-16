@@ -92,15 +92,12 @@ void ImplicTable::chooseCoveringSubset()
     {
         ImplicRow implic = move(content.front());
         content.pop_front();
-        list<unsigned long> positions0;
         if(!implic.get_meta_phase_number(0) || !implic.get_meta_phase_number(3))
         {
             subset.push_back(move(implic));
             continue;
         }
-        for(unsigned long i = 0; i < implic.size(); ++i)
-            if(implic.get(i) == 0)
-                positions0.push_back(i);
+        list<unsigned long> positions0 = move(implic.localize0());
         auto divisionPos = positions0.begin();
         auto pos0End = positions0.end();
         ImplicRow halfImplic1 = implic;
@@ -124,6 +121,21 @@ bool ImplicTable::recursiveCover(ImplicRow& implic, const list<ImplicRow>& subse
     ImplicRow implic2 = move(implic.expand(*pos0));
 
     return recursiveCover(implic, subset, ++pos0, pos0End) && recursiveCover(implic2, subset, pos0, pos0End);
+}
+
+bool ImplicTable::omissionAllowed(ImplicRow &implic, unsigned long position) const
+{
+    ImplicRow twin = move(implic.phaseSwitchedTwin(position));
+    return checkCover(twin);
+}
+
+bool ImplicTable::omissionAllowedRecursively(ImplicRow &implic, unsigned long position,
+                                             std::list<unsigned long>::iterator pos0,
+                                             std::list<unsigned long>::iterator &pos0End) const
+{
+    ImplicRow twin1 = move(implic.phaseSwitchedTwin(position));
+    ImplicRow twin2 = twin1.expand(*pos0);
+    return recursiveCover(twin1, list<ImplicRow>(), ++pos0, pos0End) && recursiveCover(twin2, list<ImplicRow>(), pos0, pos0End);
 }
 
 void ImplicTable::minimizeExact()
@@ -203,6 +215,53 @@ void ImplicTable::minimizeHeuristic()
     merge(ki);
     content.sort();
     chooseCoveringSubset();
+}
+
+void ImplicTable::minimizeMukaidono()
+{
+    content.sort();
+    sweepCovered();
+    for(auto& i : content)
+    {
+        if(!i.get_meta_phase_number(3))
+            continue;
+        print();
+        cout << endl;
+        cout << "---------------";
+        cout << endl;
+        auto pos1_2List = i.localize1_2();
+        auto pos1_2 = pos1_2List.begin();
+        while(pos1_2 != pos1_2List.end())
+        {
+            if(omissionAllowed(i, *pos1_2))
+            {
+                i.set(0, *pos1_2);
+                pos1_2 = pos1_2List.erase(pos1_2);
+            }
+            else
+                ++pos1_2;
+        }
+        if(pos1_2List.empty())
+        {
+            sweepCovered(i);
+            continue;
+        }
+        auto pos0List = i.localize0();
+        auto pos0 = pos0List.begin();
+        auto pos0End = pos0List.end();
+        pos1_2 = pos1_2List.begin();
+        while(pos1_2 != pos1_2List.end())
+        {
+            if(omissionAllowedRecursively(i, *pos1_2, pos0, pos0End))
+            {
+                i.set(0, *pos1_2);
+                pos1_2 = pos1_2List.erase(pos1_2);
+            }
+            else
+                ++pos1_2;
+        }
+        sweepCovered(i);
+    }
 }
 
 bool ImplicTable::empty() const
@@ -293,4 +352,4 @@ list<tuple<unsigned long, unsigned long, ImplicRow>> ImplicTable::findR(ImplicRo
                 }
     );
     return result;
-}
+}//TODO optymizacja, std::algorithm?

@@ -29,6 +29,17 @@ void ImplicRow::set(unsigned char what, unsigned long where)
     ++meta_phase_numbers[content[where]];
 }
 
+list<unsigned long> ImplicRow::localize0() const
+{
+    if(!meta_phase_numbers[0])
+        return list<unsigned long>();
+    list<unsigned long> positions0;
+    for(unsigned long i = 0; i < content.size(); ++i)
+        if(!get(i))
+            positions0.push_back(i);
+    return positions0;
+}
+
 list<unsigned long> ImplicRow::localize1_2() const
 {
     if(!meta_phase_numbers[1] && !meta_phase_numbers[2])
@@ -78,6 +89,13 @@ ImplicRow ImplicRow::expand(unsigned long by)
     set(1, by);
     child.set(2, by);
     return child;
+}
+
+ImplicRow ImplicRow::phaseSwitchedTwin(unsigned long where) const
+{
+    ImplicRow twin(*this);
+    twin.set(twin.get(where) ^ (unsigned char)3, where);
+    return twin;
 }
 
 void ImplicRow::print() const

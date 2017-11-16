@@ -105,7 +105,8 @@ int main()
 
     ImplicTable i(l);
 //    i.minimizeExact();
-    i.minimizeHeuristic();
+//    i.minimizeHeuristic();
+    i.minimizeMukaidono();
     i.print();
 
 /*    vector<double> v{0.5, 0.75};

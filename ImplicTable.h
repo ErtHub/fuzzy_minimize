@@ -32,8 +32,11 @@ public:
     ImplicTable generateK1() const;
     void chooseCoveringSubset();
     bool recursiveCover(ImplicRow& implic, const std::list<ImplicRow>& subset, std::list<unsigned long>::iterator pos0, std::list<unsigned long>::iterator& pos0End) const;
+    bool omissionAllowed(ImplicRow& implic, unsigned long position) const;
+    bool omissionAllowedRecursively(ImplicRow& implic, unsigned long position, std::list<unsigned long>::iterator pos0, std::list<unsigned long>::iterator& pos0End) const;
     void minimizeExact();
     void minimizeHeuristic();
+    void minimizeMukaidono();
     bool empty() const;
     void merge(ImplicTable& another);
     void print();
