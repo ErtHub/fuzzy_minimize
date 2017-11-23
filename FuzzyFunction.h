@@ -7,6 +7,7 @@
 
 #include <list>
 #include <vector>
+#include <unordered_map>
 #include "OperationImpl.h"
 #include "ImplicRow.h"
 
@@ -14,37 +15,43 @@
 
 class SymbInstance
 {
-    unsigned tableIndex;
+    std::string varName;
     bool negative;
+    double calc(const std::unordered_map<std::string, unsigned long>& varTable, const std::vector<double>& args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
+    void appendToTable(const std::unordered_map<std::string, unsigned long>& varTable, std::vector<unsigned char>& target) const;
 public:
-    double calc(std::vector<double> args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
-    void appendToTable(std::vector<unsigned char>& target) const;
-
-    SymbInstance(unsigned int tableIndex, bool negative);
+    SymbInstance(std::string varName, bool negative);
 
     bool operator==(const SymbInstance& another) const;
+    friend class Implic;
+    friend std::ostream& operator<<(std::ostream& os, const SymbInstance& s);
 };
 
 class Implic
 {
     std::list<SymbInstance> content;
+    double calc(const std::unordered_map<std::string, unsigned long>& varTable, const std::vector<double>& args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
+    std::vector<unsigned char> tabulate(const std::unordered_map<std::string, unsigned long>& varTable) const;
 public:
-    double calc(const std::vector<double> &args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
-    std::vector<unsigned char> tabulate() const;
     bool covers(const Implic& another) const;
     bool hasSymbol(const SymbInstance& symb) const;
 
     explicit Implic(const std::list<SymbInstance> &content);
+
+    friend class FuzzyFunction;
+    friend std::ostream& operator<<(std::ostream& os, const Implic& i);
 };
 
 class FuzzyFunction
 {
+    std::unordered_map<std::string, unsigned long> varTable;
     std::list<Implic> body;
 public:
     double calc(const std::vector<double> &args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
     std::list<ImplicRow> tabulate() const;
 
-    explicit FuzzyFunction(const std::list<Implic> &body);
+    explicit FuzzyFunction(std::unordered_map<std::string, unsigned long> varTable, std::list<Implic> body);
+    friend std::ostream& operator<<(std::ostream& os, const FuzzyFunction& f);
 };
 
 

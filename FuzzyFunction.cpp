@@ -6,41 +6,45 @@
 
 using namespace std;
 
-double SymbInstance::calc(vector<double> args, OperationImpl* opImpl) const
+double SymbInstance::calc(const unordered_map<string, unsigned long>& varTable, const vector<double>& args, OperationImpl* opImpl) const
 {
-    return negative ? opImpl->negate(args[tableIndex]) : args[tableIndex];
+    return negative ? opImpl->negate(args[varTable.at(varName)]) : args[varTable.at(varName)];
 }
 
-void SymbInstance::appendToTable(std::vector<unsigned char> &target) const
+void SymbInstance::appendToTable(const unordered_map<string, unsigned long>& varTable, std::vector<unsigned char> &target) const
 {
-    while(tableIndex <= target.size())
-        target.push_back(0);
-    target[tableIndex] |= 1 << (1 & !negative);
+    target[varTable.at(varName)] |= 1 << (1 & !negative);
 }
 
-SymbInstance::SymbInstance(unsigned int tableIndex, bool negative) : tableIndex(tableIndex), negative(negative)
+SymbInstance::SymbInstance(string varName, bool negative) : varName(move(varName)), negative(negative)
 {}
 
 bool SymbInstance::operator==(const SymbInstance &another) const
 {
     if(&another == this)
         return true;
-    return (tableIndex == another.tableIndex && negative == another.negative);
+    return (varName == another.varName && negative == another.negative);
 }
 
-double Implic::calc(const vector<double> &args, OperationImpl* opImpl) const
+ostream& operator<<(ostream& os, const SymbInstance& s)
+{
+    os << (s.negative ? "~" : "") << s.varName;
+    return os;
+}
+
+double Implic::calc(const unordered_map<string, unsigned long>& varTable, const vector<double> &args, OperationImpl* opImpl) const
 {
     double acc = 1;
     for(auto& i : content)
-        acc = opImpl->t_norm(acc, i.calc(args, opImpl));
+        acc = opImpl->t_norm(acc, i.calc(varTable, args, opImpl));
     return acc;
 }
 
-vector<unsigned char> Implic::tabulate() const
+vector<unsigned char> Implic::tabulate(const std::unordered_map<std::string, unsigned long>& varTable) const
 {
-    vector<unsigned char> res;
+    vector<unsigned char> res(varTable.size(), 0);
     for(auto& i : content)
-        i.appendToTable(res);
+        i.appendToTable(varTable, res);
     return res;
 }
 
@@ -63,34 +67,43 @@ bool Implic::hasSymbol(const SymbInstance& symb) const
 Implic::Implic(const list <SymbInstance> &content) : content(content)
 {}
 
+ostream& operator<<(ostream& os, const Implic& i)
+{
+    auto iter = content.begin();
+    os << *iter;
+    for(++iter; iter != content.end(); ++iter)
+        os << "*" << *iter;
+    return os;
+}
+
 double FuzzyFunction::calc(const vector<double> &args, OperationImpl* opImpl) const
 {
     double acc = 0;
     for(auto& i : body)
-        acc = opImpl->s_norm(acc, i.calc(args, opImpl));
+        acc = opImpl->s_norm(acc, i.calc(varTable, args, opImpl));
     return acc;
 }
 
 list<ImplicRow> FuzzyFunction::tabulate() const
 {
     list<ImplicRow> res;
-    list<vector<unsigned char>> rawRes;
     vector<unsigned char> partialRes;
-    unsigned long maxLen = 0;
     for(auto& i : body)
     {
-        partialRes = i.tabulate();
-        rawRes.push_back(partialRes);
-        maxLen = partialRes.size() > maxLen ? partialRes.size() : maxLen;
-    }
-    for(auto& i : rawRes)
-    {
-        while(i.size() < maxLen)
-            i.push_back(0);
-        res.emplace_back(ImplicRow(i));
+        partialRes = move(i.tabulate(varTable));
+        res.emplace_back(ImplicRow(partialRes));
     }
     return res;
 }
 
-FuzzyFunction::FuzzyFunction(const list <Implic> &body) : body(body)
+FuzzyFunction::FuzzyFunction(unordered_map<string, unsigned long> varTable, list<Implic> body) : varTable(move(varTable)), body(move(body))
 {}
+
+ostream& operator<<(ostream& os, const FuzzyFunction& f)
+{
+    auto iter = body.begin();
+    os << *iter;
+    for(++iter; iter != body.end(); ++iter)
+        os << " + " << *iter;
+    return os;
+}
