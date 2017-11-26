@@ -1,7 +1,3 @@
-// Modu SOURCE.CPP
-// =================
-// Funkcje skadowe klasy Source.
-//
 #include "Source.h"
 
 using namespace std;
@@ -14,41 +10,39 @@ Source::Source(const string& fnam): fn(fnam)
         cout<<"fuzzy_minimize: error reading file \"" << fn << "\"" << endl;
         exit(1);
     }
-    cout << endl << "Interpreter Analang, v0.1, zadne prawa niezastrzeone" << endl;
-    cout << "Raport wykonania dla pliku: \""<<fnam<<"\"" << endl << endl;
+    cout << "Report of procedure for file: \""<<fnam<<"\"" << endl << endl;
     etotal = 0;
-    NextLine();   // Pierwszy wiersz
+    NextLine();
 }
 
 Source::~Source()
 {
-//LastMessage
-    cout << endl << "fuzzy_minimize: koniec raportu. Wykrytych bw: " << etotal << endl;
+    cout << endl << "fuzzy_minimize: End of report. Errors detected: " << etotal << endl;
     istr.close();
 }
 
-bool Source::NextLine()	// Zwraca true jeli jest nastny wiersz
+bool Source::NextLine()
 {
     if(istr.eof())
         return false;
-    getline(istr, Line);  // Pobiera wiersz (bez znaku '\n')
+    getline(istr, Line);
     Line.push_back('\n');
 
-    ++tpos.ln;	// Nastpny wiersz
-    tpos.cn=0;	// Przed pierwszym znakiem
+    ++tpos.ln;
+    tpos.cn=0;
     while(Line[tpos.cn] == ' ' || Line[tpos.cn] == '\t')
         ++tpos.cn;
     PrntLine();
 
-    einline=0;	// 0 bw w tym wierszu
+    einline=0;
     return true;
 }
 
 void Source::Error(int ec, const TextPos& tp, const string& mt, const string& at)
 {
     ++etotal;
-    if(einline == 0)	// Jest pierwszy bd w wierszu
-        cout << setw(5) << tpos.ln << ' ' << Line;	// Druk wiersza owego
+    if(einline == 0)
+        cout << setw(5) << tpos.ln << ' ' << Line;
 
     einline=1;
 

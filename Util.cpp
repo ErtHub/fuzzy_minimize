@@ -4,13 +4,13 @@ using namespace std;
 
 extern vector<string> AT;
 //===================
-SymSet::SymSet(int e) : s(vector<unsigned>(nwords, 0))				// Zbir 1-elementowy
+SymSet::SymSet(int e) : s(vector<unsigned>(nwords, 0))
 {
     if(e >= 0 && e < size)
         s[e/ubits] = (unsigned)(1 << (e % ubits));
 }
 //================================
-SymSet::SymSet(int e1, int e2,...) : s(vector<unsigned>(nwords, 0))	// Zbir wieloelementowy
+SymSet::SymSet(int e1, int e2,...) : s(vector<unsigned>(nwords, 0))
 {
     va_list ap;
     int e;
@@ -19,16 +19,16 @@ SymSet::SymSet(int e1, int e2,...) : s(vector<unsigned>(nwords, 0))	// Zbir wiel
         s[e1/ubits] = (unsigned)(1 << (e1 % ubits));
     e = e2;
     va_start(ap, e2);
-    while(e >= 0)    // Lista argumentw koczona EOS==-1;
+    while(e >= 0)
     {
-        if(e < size)	// Elementy poza zakresem ==> ignoruj
+        if(e < size)
             s[e/ubits] |= (1 << (e % ubits));
         e = va_arg(ap, int);
     }
     va_end(ap);
 }
 //============================================
-SymSet SymSet::operator+(const SymSet& t)const	// Suma: s+t
+SymSet SymSet::operator+(const SymSet& t)const
 {
     SymSet temp = *this;
     for(int i = 0; i < nwords; ++i)
@@ -36,7 +36,7 @@ SymSet SymSet::operator+(const SymSet& t)const	// Suma: s+t
     return temp;
 }
 //==========================
-bool SymSet::has(int e) const	// Naleenie: s.has(element)
+bool SymSet::has(int e) const
 {
     if(e < 0 || e >= size)
         return false;
@@ -46,16 +46,16 @@ bool SymSet::has(int e) const	// Naleenie: s.has(element)
 ostream& operator<< (ostream& os, const SymSet& t)
 {
     unsigned word, bit, value, n = 0;
-    os << '{';				// Postac wydruku: {e1,...,en}
+    os << '{';
     for(word = 0; word < t.nwords; ++word)
     {
-        bit = 0;     			// Numer bitu w sowie #i
+        bit = 0;
         value = t.s[word];
         while(value)
         {
             if(value & 1)
             {
-                if(n > 0) os << ',';	// Wyprowadz separator
+                if(n > 0) os << ',';
                 os << AT[(word * t.ubits + bit)];
                 ++n;
             }
@@ -66,9 +66,6 @@ ostream& operator<< (ostream& os, const SymSet& t)
     return os << '}';
 }
 
-// =========================================
-// Definicje funkcji skadowych klasy Trace.
-//
 Trace::Trace(const string& text, const SymSet& s)
 {
     if(trace_on)

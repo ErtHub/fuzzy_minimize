@@ -5,11 +5,25 @@
 #ifndef FUZZY_MINIMIZE_MINIMIZEALGORITHMS_H
 #define FUZZY_MINIMIZE_MINIMIZEALGORITHMS_H
 
-#include "ImplicTable.h"
+#include "FuzzyFunction.h"
+
+
+
+
+/*
 
 namespace MinimizeAlgorithms
 {
-    ImplicTable minimize7_2(ImplicTable &function);
+
+    enum AlgorithmTypes
+    {
+        EXACT = 0,
+        HEURISTIC,
+        HEURISTIC_MUKAIDONO
+    };
+
+    FuzzyFunction minimize(FuzzyFunction& function, int fashion = EXACT);
 }
+*/
 
 #endif //FUZZY_MINIMIZE_MINIMIZEALGORITHMS_H

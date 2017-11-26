@@ -1,23 +1,16 @@
-// Modu Scan.cpp
-// =================
-// Defnicje funkcji skadowych klasy Scan, tabeli leksemw AT
-// i tabeli sw kluczowych.
-//
 #include "Scan.h"
 
 using namespace std;
 
-vector<string> AT // Tabela Atomw (dla komunikatw o bdach
+vector<string> AT
 {
 		"F", "input",
         "intconst", "varname",
         "=", "*", "+", "~", "others"
 };
 
-unordered_map<string, SymType> Scan::KT	// Kolejno wg funkcji hash(keyword)
+unordered_map<string, SymType> Scan::KT
 {
-// Keyword		 Atom			hash(keyword)
-//-------------------------------------------
     { "input", inputsy },
     { "F", fsy }
 };
@@ -26,13 +19,12 @@ SymType Scan::NextSymbol()
 {
 
     while(isspace(c))
-        Nextc();	// Pomi znaki biae
+        Nextc();
     if(c==EOF)
         return others;
 
-    atompos=src.GetPos(); // Bdzie jaki atom leksykalny
+    atompos=src.GetPos();
 
-    //---Identyfikator lub sowo kluczowe
     if(isalpha(c))
     {
         spell.clear();
@@ -67,7 +59,6 @@ SymType Scan::NextSymbol()
 	case '=':
         Nextc();
         return becomes;
-    //----Operatory 1 znakowe
     case '+':
         Nextc();
         return orop;

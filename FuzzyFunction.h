@@ -10,8 +10,18 @@
 #include <unordered_map>
 #include "OperationImpl.h"
 #include "ImplicRow.h"
+#include "ImplicTable.h"
 
 //TODO: namespace FuzzyLogic maybe?
+
+class ImplicTable;
+
+enum MinimizeAlgorithms
+{
+    EXACT = 0,
+    HEURISTIC,
+    HEURISTIC_MUKAIDONO
+};
 
 class SymbInstance
 {
@@ -49,8 +59,11 @@ class FuzzyFunction
 public:
     double calc(const std::vector<double> &args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
     std::list<ImplicRow> tabulate() const;
+    FuzzyFunction minimize(int fashion = EXACT) const;
 
-    explicit FuzzyFunction(std::unordered_map<std::string, unsigned long> varTable, std::list<Implic> body);
+    FuzzyFunction() = default;
+    FuzzyFunction(std::unordered_map<std::string, unsigned long> varTable, std::list<Implic> body);
+    FuzzyFunction(const std::unordered_map<std::string, unsigned long>& varTable, const ImplicTable& tab);
     friend std::ostream& operator<<(std::ostream& os, const FuzzyFunction& f);
 };
 

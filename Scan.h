@@ -1,7 +1,3 @@
-// Modu SCAN.H
-// ===============
-// Definicja klasy Scan i typu SymType.
-//
 #ifndef SCAN_H
 #define SCAN_H
 
@@ -13,7 +9,7 @@
 
 enum SymType
 {
-    fsy, inputsy,// Keywords
+    fsy, inputsy,
 
     NKEYS, MAXKEY=inputsy,
 
@@ -24,22 +20,17 @@ enum ScanErrors { ICONST2BIG = 1 };
 
 class Scan
 {
-    struct KeyRec   // Pomocniczy deskryptor sowa kluczowego
-    {
-        std::string kw;		// Sowo kluczowe
-        SymType atom; // Odpowiadajcy mu atom
-    };
-    static std::unordered_map<std::string, SymType> KT;	// Tabela sw kluczowych
+    static std::unordered_map<std::string, SymType> KT;
 
-    char c;			    // Aktualny znak z src
-    TextPos atompos;	  // Pozycja atomu w tekscie
-    unsigned long intconstant;// Warto ostatniej staej liczbowej
-    std::string spell;      // Ostatnio wczytany ident
+    char c;
+    TextPos atompos;
+    unsigned long intconstant;
+    std::string spell;
 
     void Nextc()
     {
         c = src.NextChar();
-    }  // Pobieranie znakw
+    }
 
 
 public:
@@ -49,7 +40,7 @@ public:
     {
         Nextc();
     }
-    SymType NextSymbol();		// Zwraca nastpny atom leksykalny
+    SymType NextSymbol();
     unsigned long IntConst()
     {
         return intconstant;

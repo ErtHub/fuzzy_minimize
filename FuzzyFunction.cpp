@@ -64,14 +64,14 @@ bool Implic::hasSymbol(const SymbInstance& symb) const
     return false;
 }
 
-Implic::Implic(const list <SymbInstance> &content) : content(content)
+Implic::Implic(const list<SymbInstance>& content) : content(content)
 {}
 
 ostream& operator<<(ostream& os, const Implic& i)
 {
-    auto iter = content.begin();
+    auto iter = i.content.begin();
     os << *iter;
-    for(++iter; iter != content.end(); ++iter)
+    for(++iter; iter != i.content.end(); ++iter)
         os << "*" << *iter;
     return os;
 }
@@ -96,14 +96,43 @@ list<ImplicRow> FuzzyFunction::tabulate() const
     return res;
 }
 
+FuzzyFunction FuzzyFunction::minimize(int fashion) const
+{
+    ImplicTable tab(*this);
+
+    switch(fashion)
+    {
+        case EXACT:
+            tab.minimizeExact();
+            break;
+        case HEURISTIC:
+            tab.minimizeHeuristic();
+            break;
+        case HEURISTIC_MUKAIDONO:
+            tab.minimizeMukaidono();
+            break;
+        default:
+            return FuzzyFunction();
+    }
+
+    tab.print();
+
+    cout << endl;
+
+    return FuzzyFunction(varTable, tab);
+}
+
 FuzzyFunction::FuzzyFunction(unordered_map<string, unsigned long> varTable, list<Implic> body) : varTable(move(varTable)), body(move(body))
+{}
+
+FuzzyFunction::FuzzyFunction(const unordered_map<string, unsigned long>& varTable, const ImplicTable& tab) : body(move(tab.redeem(varTable))), varTable(varTable)
 {}
 
 ostream& operator<<(ostream& os, const FuzzyFunction& f)
 {
-    auto iter = body.begin();
+    auto iter = f.body.begin();
     os << *iter;
-    for(++iter; iter != body.end(); ++iter)
+    for(++iter; iter != f.body.end(); ++iter)
         os << " + " << *iter;
     return os;
 }

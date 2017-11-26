@@ -3,8 +3,27 @@
 //
 
 #include "MinimizeAlgorithms.h"
+#include "ImplicTable.h"
 
-ImplicTable MinimizeAlgorithms::minimize7_2(ImplicTable &function)
+
+/*
+FuzzyFunction MinimizeAlgorithms::minimize(FuzzyFunction &function, int fashion = EXACT)
 {
-    function.sweepCovered();
-}
+    ImplicTable tab(function);
+
+    switch(fashion)
+    {
+        case EXACT:
+            tab.minimizeExact();
+            break;
+        case HEURISTIC:
+            tab.minimizeHeuristic();
+            break;
+        case HEURISTIC_MUKAIDONO:
+            tab.minimizeMukaidono();
+        default:
+            return FuzzyFunction();
+    }
+
+    return FuzzyFunction(tab);
+}*/

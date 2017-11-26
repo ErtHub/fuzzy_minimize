@@ -12,6 +12,9 @@
 #include <iostream>
 #include <tuple>
 
+class FuzzyFunction;
+class Implic;
+
 class ImplicTable
 {
     std::list<ImplicRow> content;
@@ -40,6 +43,7 @@ public:
     bool empty() const;
     void merge(ImplicTable& another);
     void print();
+    std::list<Implic> redeem(const std::unordered_map<std::string, unsigned long>& tab) const;
 };
 
 

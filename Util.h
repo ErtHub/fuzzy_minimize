@@ -1,31 +1,31 @@
 #ifndef UTIL_H
 #define UTIL_H
 
-#include <cstdarg>		// Zmienna lista argumentow
+#include <cstdarg>
 #include "Scan.h"
 
-const int EOS=-1;			    // Oznacznik koca listy elementw
+const int EOS=-1;
 
 class SymSet
 {
     enum
     {
-        size = MAXSYM,		// Elementy zbioru: 0..(size-1)
-        ubits = (sizeof(unsigned) * CHAR_BIT),// Bity w unsigned
-        nwords = ((size-1)/ubits+1)			    // Liczba sw
+        size = MAXSYM,
+        ubits = (sizeof(unsigned) * CHAR_BIT),
+        nwords = ((size-1)/ubits+1)
     };
 
-    std::vector<unsigned> s;	// Bitowa reprezentacja zbioru
+    std::vector<unsigned> s;
 
 public:
-    SymSet() : s(std::vector<unsigned>(nwords, 0)) {};       		    // Zbir pusty
-    explicit SymSet(int e);		      // Zbir 1-elementowy
+    SymSet() : s(std::vector<unsigned>(nwords, 0)) {};
+    explicit SymSet(int e);
 
-    SymSet(int, int,...);	  // Zbir wieloelementowy
+    SymSet(int, int, ...);
 
-    SymSet operator+(const SymSet& t) const; // s + t
-    bool has(int e)const;	// Czy e naley do *this
-    friend std::ostream& operator<< (std::ostream& os, const SymSet& t);
+    SymSet operator+(const SymSet& t) const;
+    bool has(int e)const;
+    friend std::ostream& operator<<(std::ostream& os, const SymSet& t);
 };
 
 class Trace

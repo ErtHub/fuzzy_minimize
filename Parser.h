@@ -6,18 +6,18 @@
 #include "FuzzyFunction.h"
 #include <memory>
 
-extern std::vector<std::string> AT;	// Atom Tab - dla komunikatw o bdach
+extern std::vector<std::string> AT;
 
 class Parser;
 
-class Synchronize   // Do synchronizacji parsera
+class Synchronize
 {
 	friend class Parser;
     const SymSet &f;
     void skipto(const SymSet &ss);
 
 public:
-    static Parser *p;
+    static Parser* p;
     Synchronize(const SymSet& s,const SymSet& f);
     ~Synchronize();
 };
@@ -29,22 +29,22 @@ class Parser
 
     Scan& scn;
 
-    SymType symbol; // Ostatnio pobrany atom z scanner'a
-    bool can_parse;	// Jeli synchronizacja OK
+    SymType symbol;
+    bool can_parse;
     unsigned long varcount;
     std::unordered_map<std::string, unsigned long> varTable;
     std::list<Implic> funProt;
 
-    // Podzbiory atomw
-    SymSet ststart,   stseq,    stiter;
-    SymSet factstart, factiter, mulops;
-    SymSet addops,    signs,    relops, types;
+
+    SymSet ststart;
+    SymSet factstart, mulops;
+    SymSet addops;
 
 
-    void Nexts();				         // Nastpny symbol
+    void Nexts();
     void accept(SymType atom);
-    void SyntaxError(int atom);	 // Oczekiwany atom
-    void SyntaxError1(int atom); // Nieoczekiwany atom
+    void SyntaxError(int atom);
+    void SyntaxError1(int atom);
 
 
     bool VarDecl(const SymSet& fs);

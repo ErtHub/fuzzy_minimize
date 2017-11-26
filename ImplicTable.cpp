@@ -353,3 +353,26 @@ list<tuple<unsigned long, unsigned long, ImplicRow>> ImplicTable::findR(ImplicRo
     );
     return result;
 }//TODO optymizacja, std::algorithm?
+
+list<Implic> ImplicTable::redeem(const unordered_map<string, unsigned long>& tab) const
+{
+    list<Implic> result;
+
+    for(auto& row : content)
+    {
+        list<SymbInstance> partialResult;
+        for(auto& symb : tab)
+        {
+            if(row.get(symb.second))
+            {
+                if(row.get(symb.second) & 1)
+                    partialResult.emplace_back(SymbInstance(symb.first, true));
+                if(row.get(symb.second) & 2)
+                    partialResult.emplace_back(SymbInstance(symb.first, false));
+            }
+        }
+        result.emplace_back(Implic(partialResult));
+    }
+
+    return result;
+}

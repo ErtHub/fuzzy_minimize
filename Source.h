@@ -1,7 +1,3 @@
-// Modu SOURCE.H
-// ===============
-// Definicja klasy Source.
-//
 #ifndef SOURCE_H
 #define SOURCE_H
 
@@ -12,31 +8,30 @@
 #include <cstdlib>
 
 
-//extern int options;	// Definicja w funkcji main()
 
-struct TextPos	// Pomocnicza klasa: pozycja w pliku tekstowym
+struct TextPos
 {
-    int ln;     // Numer wiersza (od 1)
-    int cn;     // Numer znaku w wierszu (od 1)
+    int ln;
+    int cn;
     explicit TextPos(int l = 0, int c = 0): ln(l), cn(c) {}
 };
 
 class Source
 {
-    int etotal, einline;// Liczniki bdw: globalny, w wierszu
+    int etotal, einline;
 
-    const std::string fn;    // Nazwa pliku
+    const std::string fn;
     std::ifstream istr;
-    std::string Line;        // Bufor biecego wiersza
+    std::string Line;
 
-    TextPos tpos;     	// Bieca pozycja w pliku
+    TextPos tpos;
 
-    void PrntLine()		  // Drukowanie biecego wiersza
+    void PrntLine()
     {
         std::cout << std::setw(5) << tpos.ln << ' ' << Line;
     }
 
-    bool NextLine();		// pny wiersz do bufora
+    bool NextLine();
 
 public:
     explicit Source(const std::string& file);

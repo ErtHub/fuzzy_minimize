@@ -3,7 +3,7 @@
 using namespace std;
 
 //==================
-void Parser::Nexts()		// Pobranie nastpnego symbolu
+void Parser::Nexts()
 {
     symbol = scn.NextSymbol();
 }
@@ -16,28 +16,26 @@ void Parser::accept(SymType atom)
         SyntaxError(atom);
 }
 //================================
-void Parser::SyntaxError(int atom)	// Oczekiwany atom
+void Parser::SyntaxError(int atom)
 {
 	scn.ScanError(FirstSyntaxError + atom, "Spodziewany symbol: ", AT[atom]);
 }
 //=================================
-void Parser::SyntaxError1(int atom)	// Nieoczekiwany atom
+void Parser::SyntaxError1(int atom)
 {
     scn.ScanError(FirstSyntaxError + atom, "Nieoczekiwany symbol: ", AT[atom]);
 }
 
 Parser::Parser(Scan& sc): scn(sc), varcount(0)
-// Otwiera "GLOBAL" Scope
 {
-    Synchronize::p = this;    // Zwizanie z klas Synchronize
+    Synchronize::p = this;
 
     ststart = SymSet(fsy, EOS);
     factstart = SymSet(varname, notop, EOS);
     mulops = SymSet(andop, EOS);
-    factiter = factstart + mulops;
     addops = SymSet(orop, EOS);
 
-    Nexts();          // Pobranie 1-go atomu
+    Nexts();
 }
 //==============
 bool Parser::Program()
@@ -119,6 +117,11 @@ bool Parser::Implicant(const SymSet &fs, list<SymbInstance>& implicProt)
     }
     if(symbol == varname)
     {
+        if(varTable.find(scn.Spell()) == varTable.end())
+        {
+            SemanticError(3);
+            return false;
+        }
         implicProt.emplace_back(SymbInstance(scn.Spell(), negative));
         accept(varname);
     }
@@ -134,7 +137,12 @@ bool Parser::Implicant(const SymSet &fs, list<SymbInstance>& implicProt)
             negative = true;
         }
         if(symbol == varname)
-            implicProt.emplace_back(SymbInstance(scn.Spell(), negative));
+        {
+            if(varTable.find(scn.Spell()) == varTable.end())
+                SemanticError(3);
+            else
+                implicProt.emplace_back(SymbInstance(scn.Spell(), negative));
+        }
         accept(varname);
         negative = false;
     }
@@ -147,7 +155,8 @@ void Parser::SemanticError(int ecode)
             {
                     "Variable name collision",
                     "More variable names defined than declared",
-                    "Less variable names defined than declared"
+                    "Less variable names defined than declared",
+                    "Undefined variable"
             };
 
     scn.ScanError(FirstSemanticError + ecode, SemErr[ecode]);
@@ -164,9 +173,6 @@ void Parser::clear()
     varTable.clear();
     funProt.clear();
 }
-//================================================
-// Skadowa statyczna i funkcje  klasy Synchronize
-//
 
 Parser* Synchronize::p = nullptr;
 
@@ -174,7 +180,7 @@ Synchronize::Synchronize(const SymSet& sset, const SymSet& fset): f(fset)
 {
     if(!sset.has(p->symbol))
     {
-        p->SyntaxError1(p->symbol);	// Nieoczekiwany atom
+        p->SyntaxError1(p->symbol);
         skipto(sset + f);
     }
     p->can_parse = sset.has(p->symbol);
@@ -184,7 +190,7 @@ Synchronize::~Synchronize()
 {
     if(!f.has(p->symbol))
     {
-        p->SyntaxError1(p->symbol);   // Nieoczekiwany atom
+        p->SyntaxError1(p->symbol);
         skipto(f);
     }
 }
