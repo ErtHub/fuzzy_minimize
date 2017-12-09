@@ -50,7 +50,7 @@ SymType Scan::NextSymbol()
             Nextc();
         } while (isdigit(c));
         if (big)
-            ScanError(ICONST2BIG, "Przekroczony zakres staej cakowitej");
+            ScanError(ICONST2BIG, "Integer overflow");
         intconstant = (unsigned long)ul;
         return intconst;
     }

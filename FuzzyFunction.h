@@ -11,17 +11,13 @@
 #include "OperationImpl.h"
 #include "CubeRow.h"
 #include "CubeTable.h"
+#include "Minimizer.h"
 
 //TODO: namespace FuzzyLogic maybe?
 
 class CubeTable;
-
-enum MinimizeAlgorithms
-{
-    EXACT = 0,
-    HEURISTIC,
-    HEURISTIC_MUKAIDONO
-};
+class Minimizer;
+class ExactMinimizer;
 
 class SymbInstance
 {
@@ -56,10 +52,11 @@ class FuzzyFunction
 {
     std::unordered_map<std::string, unsigned long> varTable;
     std::list<Cube> body;
+    static ExactMinimizer defaultMinimizer;
 public:
     double calc(const std::vector<double> &args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
     std::list<CubeRow> tabulate() const;
-    FuzzyFunction minimize(int fashion = EXACT) const;
+    FuzzyFunction minimize(Minimizer* minimizer = (Minimizer*)&defaultMinimizer) const;
 
     FuzzyFunction() = default;
     FuzzyFunction(std::unordered_map<std::string, unsigned long> varTable, std::list<Cube> body);
@@ -67,6 +64,5 @@ public:
     std::unordered_map<std::string, unsigned long> getVarTable() const;
     friend std::ostream& operator<<(std::ostream& os, const FuzzyFunction& f);
 };
-
 
 #endif //FUZZY_MINIMIZE_FUZZYFUNCTION_H

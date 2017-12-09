@@ -3,11 +3,10 @@
 //
 
 #include <iostream>
+#include <memory>
 #include "CubeTable.h"
 #include "Scan.h"
-#include "Source.h"
 #include "Parser.h"
-#include "MinimizeAlgorithms.h"
 
 using namespace std;
 
@@ -19,26 +18,26 @@ int Trace::show_symbols = 0;
 int main(int argc, char* argv[])
 {
 
+    shared_ptr<Minimizer> minimizer;
+
     if (argc < 3)
     {
         cout << "Insufficient execution arguments!" << endl;
         return -1;
     }
 
-    int howToMinimize = 0;
-
     if(argv[1][0] == '-')
     {
         switch(argv[1][1])
         {
             case 'e':
-                howToMinimize = 0;
+                minimizer = shared_ptr<Minimizer>(new ExactMinimizer());
                 break;
             case 'h':
-                howToMinimize = 1;
+                minimizer = shared_ptr<Minimizer>(new HeuristicMinimizer());
                 break;
             case 'm':
-                howToMinimize = 2;
+                minimizer = shared_ptr<Minimizer>(new MukaidonoMinimizer());
                 break;
             default:
                 cout << "Unknkown option \"" << argv[1] << "\"!" << endl;
@@ -64,7 +63,7 @@ int main(int argc, char* argv[])
         /*FuzzyFunction f(par.extract());
         f.minimize();*/
 //        cout << FuzzyFunction(par.extract());
-        cout << FuzzyFunction(par.extract()).minimize(howToMinimize) << endl;
+        cout << FuzzyFunction(par.extract()).minimize(minimizer.get()) << endl;
         return 0;
     }
     else

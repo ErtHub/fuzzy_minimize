@@ -96,33 +96,12 @@ list<CubeRow> FuzzyFunction::tabulate() const
     return res;
 }
 
-FuzzyFunction FuzzyFunction::minimize(int fashion) const
+FuzzyFunction FuzzyFunction::minimize(Minimizer* minimizer) const
 {
-    CubeTable tab(*this);
-
-    switch(fashion)
-    {
-        case EXACT:
-            tab.minimizeExact();
-            break;
-        case HEURISTIC:
-            tab.minimizeHeuristic();
-            break;
-        case HEURISTIC_MUKAIDONO:
-            tab.minimizeMukaidono();
-            break;
-        default:
-            return FuzzyFunction();
-    }
-
-    tab.print();
-
-    cout << endl;
-
-    return FuzzyFunction(varTable, tab);
+    return minimizer->minimize(*this);
 }
 
-FuzzyFunction::FuzzyFunction(unordered_map<string, unsigned long> varTable, list<Cube> body) : varTable(move(varTable)), body(move(body))
+FuzzyFunction::FuzzyFunction(unordered_map<string, unsigned long> varTable, list<Cube> body) : varTable(move(varTable)), body(move(body))//move yo' body :D
 {}
 
 FuzzyFunction::FuzzyFunction(const unordered_map<string, unsigned long>& varTable, const CubeTable& tab) : body(move(tab.redeem(varTable))), varTable(varTable)
