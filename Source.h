@@ -22,10 +22,10 @@ class Source
 
     const std::string fn;
     std::ifstream istr;
-    std::string Line;
+    std::string Line;//TODO sprawdzic ograniczenie dlugosci
 
     TextPos tpos;
-
+//TODO kilka funkcji
     void PrntLine()
     {
         std::cout << std::setw(5) << tpos.ln << ' ' << Line;

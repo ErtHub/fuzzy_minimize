@@ -2,17 +2,17 @@
 // Created by hubert on 23.07.17.
 //
 
-#include "ImplicTable.h"
+#include "CubeTable.h"
 
 using namespace std;
 
-ImplicTable::ImplicTable(const std::list<ImplicRow> &content) : content(content)
+CubeTable::CubeTable(const std::list<CubeRow> &content) : content(content)
 {}
 
-ImplicTable::ImplicTable(const FuzzyFunction &func) : content(func.tabulate())
+CubeTable::CubeTable(const FuzzyFunction &func) : content(func.tabulate())
 {}
 
-void ImplicTable::sweepCovered(ImplicTable& another)
+void CubeTable::sweepCovered(CubeTable& another)
 {
     sweepCovered();
     another.sweepCovered();
@@ -22,13 +22,13 @@ void ImplicTable::sweepCovered(ImplicTable& another)
         sweepCovered(i);
 }
 
-void ImplicTable::sweepCovered()
+void CubeTable::sweepCovered()
 {
     for(auto& i : content)
         sweepCovered(i);
 }
 
-void ImplicTable::sweepCovered(const ImplicRow& i)
+void CubeTable::sweepCovered(const CubeRow& i)
 {
     for(auto k = content.begin(); k != content.end();)
     {
@@ -39,12 +39,12 @@ void ImplicTable::sweepCovered(const ImplicRow& i)
     }
 }
 
-void ImplicTable::append(const ImplicRow& item)
+void CubeTable::append(const CubeRow& item)
 {
     content.push_back(item);
 }
 
-bool ImplicTable::checkCover(const ImplicRow& covered) const
+bool CubeTable::checkCover(const CubeRow& covered) const
 {
     for(auto& i : content)
         if(addressof(i) != addressof(covered) && i.covers(covered))
@@ -52,9 +52,9 @@ bool ImplicTable::checkCover(const ImplicRow& covered) const
     return false;
 }
 
-ImplicTable ImplicTable::generateK1() const
+CubeTable CubeTable::generateK1() const
 {
-    ImplicTable result;
+    CubeTable result;
 
     for(auto i = content.begin(); i != content.end(); ++i)
     {
@@ -70,7 +70,7 @@ ImplicTable ImplicTable::generateK1() const
                 {
                     if((i->get(pos) ^ j->get(pos)) == 3)
                     {
-                        ImplicRow v(j->size());
+                        CubeRow v(j->size());
                         for(unsigned long p = 0; p < v.size(); ++p) {
                             v.set(i->get(p) | j->get(p), p);
                             cout << "(" << (int)i->get(p) << ", " << (int)j->get(p) << ")";}
@@ -85,63 +85,64 @@ ImplicTable ImplicTable::generateK1() const
     return result;
 }
 
-void ImplicTable::chooseCoveringSubset()
+void CubeTable::chooseCoveringSubset()
 {
-    list<ImplicRow> subset;
+    list<CubeRow> subset;
     while(!content.empty())
     {
-        ImplicRow implic = move(content.front());
+        CubeRow Cube = move(content.front());
         content.pop_front();
-        if(!implic.get_meta_phase_number(0) || !implic.get_meta_phase_number(3))
+        if(!Cube.get_meta_phase_number(0) || !Cube.get_meta_phase_number(3))
         {
-            subset.push_back(move(implic));
+            subset.push_back(move(Cube));
             continue;
         }
-        list<unsigned long> positions0 = move(implic.localize0());
+        list<unsigned long> positions0 = move(Cube.localize0());
         auto divisionPos = positions0.begin();
         auto pos0End = positions0.end();
-        ImplicRow halfImplic1 = implic;
-        ImplicRow halfImplic2 = move(halfImplic1.expand(*divisionPos));
-        if(!(recursiveCover(halfImplic1, subset, ++divisionPos, pos0End) && recursiveCover(halfImplic2, subset, divisionPos, pos0End)))
-            subset.push_back(move(implic));
+        CubeRow halfCube1 = Cube;
+        CubeRow halfCube2 = move(halfCube1.expand(*divisionPos));
+        if(!(recursiveCover(halfCube1, subset, ++divisionPos, pos0End) && recursiveCover(halfCube2, subset, divisionPos, pos0End)))
+            subset.push_back(move(Cube));
     }
     content = move(subset);
 }
 
-bool ImplicTable::recursiveCover(ImplicRow& implic, const list<ImplicRow>& subset, list<unsigned long>::iterator pos0, list<unsigned long>::iterator& pos0End) const
+bool CubeTable::recursiveCover(CubeRow& Cube, const list<CubeRow>& subset, list<unsigned long>::iterator pos0, list<unsigned long>::iterator& pos0End) const
 {
     for(auto& i : content)
-        if(i.covers(implic))
+        if(i.covers(Cube))
             return true;
     for(auto& i : subset)
-        if(i.covers(implic))
+        if(i.covers(Cube))
             return true;
     if(pos0 == pos0End)
         return false;
-    ImplicRow implic2 = move(implic.expand(*pos0));
+    CubeRow Cube2 = move(Cube.expand(*pos0));
 
-    return recursiveCover(implic, subset, ++pos0, pos0End) && recursiveCover(implic2, subset, pos0, pos0End);
+    return recursiveCover(Cube, subset, ++pos0, pos0End) && recursiveCover(Cube2, subset, pos0, pos0End);
 }
 
-bool ImplicTable::omissionAllowed(ImplicRow &implic, unsigned long position) const
+bool CubeTable::omissionAllowed(CubeRow &Cube, unsigned long position) const
 {
-    ImplicRow twin = move(implic.phaseSwitchedTwin(position));
-    return checkCover(twin);
+    CubeRow twin = move(Cube.phaseSwitchedTwin(position));
+    return checkCover(twin);//TODO czy trzeba naprawde tworzyc tego blizniaka?
 }
 
-bool ImplicTable::omissionAllowedRecursively(ImplicRow &implic, unsigned long position,
+bool CubeTable::omissionAllowedRecursively(CubeRow &Cube, unsigned long position,
                                              std::list<unsigned long>::iterator pos0,
                                              std::list<unsigned long>::iterator &pos0End) const
 {
-    ImplicRow twin1 = move(implic.phaseSwitchedTwin(position));
-    ImplicRow twin2 = twin1.expand(*pos0);
-    return recursiveCover(twin1, list<ImplicRow>(), ++pos0, pos0End) && recursiveCover(twin2, list<ImplicRow>(), pos0, pos0End);
+    CubeRow twin1 = move(Cube.phaseSwitchedTwin(position));
+    CubeRow twin2 = twin1.expand(*pos0);
+    return recursiveCover(twin1, list<CubeRow>(), ++pos0, pos0End) && recursiveCover(twin2, list<CubeRow>(), pos0, pos0End);
 }
 
-void ImplicTable::minimizeExact()
+void CubeTable::minimizeExact()
 {
     content.sort();
-    ImplicTable k1;
+    sweepCovered();
+    CubeTable k1;
     bool wasEmpty = true;
     do
     {
@@ -157,26 +158,26 @@ void ImplicTable::minimizeExact()
     chooseCoveringSubset();
 }
 
-void ImplicTable::minimizeHeuristic()
+void CubeTable::minimizeHeuristic()
 {
     content.sort();
     sweepCovered();
-    ImplicTable sideList;
-    ImplicTable ki;
-    ImplicTable history;
+    CubeTable sideList;
+    CubeTable ki;
+    CubeTable history;
     while(findRi(sideList))
     {
-        ImplicRow r;
+        CubeRow r;
         r = sideList.content.back();
-        list<tuple<unsigned long, unsigned long, ImplicRow>> R = findR(r, sideList, ki);
+        list<tuple<unsigned long, unsigned long, CubeRow>> R = findR(r, sideList, ki);
         unsigned long long rLiteralsCount = r.countLiterals();
         while(!R.empty())
         {
             unsigned long pos1_2 = get<1>(*R.begin());
-            ImplicRow rj;
+            CubeRow rj;
             rj = move(get<2>(R.front()));
             R.pop_front();
-            ImplicRow rk(rj.size());
+            CubeRow rk(rj.size());
             for(unsigned long i = 0; i < rk.size(); ++i) {
                 rk.set(r.get(i) | rj.get(i), i);
                 cout << "(" << (int)r.get(i) << ", " << (int)rj.get(i) << ")";}
@@ -217,7 +218,7 @@ void ImplicTable::minimizeHeuristic()
     chooseCoveringSubset();
 }
 
-void ImplicTable::minimizeMukaidono()
+void CubeTable::minimizeMukaidono()
 {
     content.sort();
     sweepCovered();
@@ -263,18 +264,17 @@ void ImplicTable::minimizeMukaidono()
         sweepCovered(i);
     }
 }
-
-bool ImplicTable::empty() const
+bool CubeTable::empty() const
 {
     return content.empty();
 }
 
-void ImplicTable::merge(ImplicTable &another)
+void CubeTable::merge(CubeTable &another)
 {
     content.merge(another.content);
 }
 
-void ImplicTable::print()
+void CubeTable::print()
 {
     for(auto& row : content)
     {
@@ -283,11 +283,11 @@ void ImplicTable::print()
     }
 }
 
-bool ImplicTable::findRi(ImplicTable& sideList)
+bool CubeTable::findRi(CubeTable& sideList)
 {
     while(!content.empty())
     {
-        ImplicRow v;
+        CubeRow v;
         v = move(content.front());
         content.pop_front();
         sideList.content.push_back(v);
@@ -297,10 +297,10 @@ bool ImplicTable::findRi(ImplicTable& sideList)
     return false;
 }
 
-list<tuple<unsigned long, unsigned long, ImplicRow>> ImplicTable::findR(ImplicRow& r, ImplicTable& sideList, ImplicTable& ki)
+list<tuple<unsigned long, unsigned long, CubeRow>> CubeTable::findR(CubeRow& r, CubeTable& sideList, CubeTable& ki)
 {
-    list<tuple<unsigned long, unsigned long, ImplicRow>> result;
-    auto loop = [&](list<ImplicRow>& l)
+    list<tuple<unsigned long, unsigned long, CubeRow>> result;
+    auto loop = [&](list<CubeRow>& l)
     {
         for(auto& rn : l)
         {
@@ -346,17 +346,17 @@ list<tuple<unsigned long, unsigned long, ImplicRow>> ImplicTable::findR(ImplicRo
     loop(sideList.content);
     loop(ki.content);
     result.sort(
-            [&](tuple<unsigned long, unsigned long, ImplicRow>& first, tuple<unsigned long, unsigned long, ImplicRow>& second)
+            [&](tuple<unsigned long, unsigned long, CubeRow>& first, tuple<unsigned long, unsigned long, CubeRow>& second)
                 {
                     return get<0>(first) > get<0>(second);
                 }
     );
     return result;
-}//TODO optymizacja, std::algorithm?
+}//TODO optymizacja, std::algorithm?, zrobic funkcje rekurencyjne iteracyjnie, zlikwidowac niepotrzebne referencje na unsigned long, pomyslec cos nad tymi strumieniami
 
-list<Implic> ImplicTable::redeem(const unordered_map<string, unsigned long>& tab) const
+list<Cube> CubeTable::redeem(const unordered_map<string, unsigned long>& tab) const
 {
-    list<Implic> result;
+    list<Cube> result;
 
     for(auto& row : content)
     {
@@ -371,7 +371,7 @@ list<Implic> ImplicTable::redeem(const unordered_map<string, unsigned long>& tab
                     partialResult.emplace_back(SymbInstance(symb.first, false));
             }
         }
-        result.emplace_back(Implic(partialResult));
+        result.emplace_back(Cube(partialResult));
     }
 
     return result;

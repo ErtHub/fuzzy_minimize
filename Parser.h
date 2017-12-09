@@ -33,7 +33,7 @@ class Parser
     bool can_parse;
     unsigned long varcount;
     std::unordered_map<std::string, unsigned long> varTable;
-    std::list<Implic> funProt;
+    std::list<Cube> funProt;
 
 
     SymSet ststart;
@@ -50,7 +50,7 @@ class Parser
     bool VarDecl(const SymSet& fs);
     bool FunDecl(const SymSet& fs);
     bool Sum(const SymSet& fs);
-    bool Implicant(const SymSet& fs, std::list<SymbInstance>& implicProt);
+    bool Implicant(const SymSet& fs, std::list<SymbInstance>& CubeProt);
 
 public:
 

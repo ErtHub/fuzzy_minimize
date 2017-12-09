@@ -9,12 +9,12 @@
 #include <vector>
 #include <unordered_map>
 #include "OperationImpl.h"
-#include "ImplicRow.h"
-#include "ImplicTable.h"
+#include "CubeRow.h"
+#include "CubeTable.h"
 
 //TODO: namespace FuzzyLogic maybe?
 
-class ImplicTable;
+class CubeTable;
 
 enum MinimizeAlgorithms
 {
@@ -33,37 +33,38 @@ public:
     SymbInstance(std::string varName, bool negative);
 
     bool operator==(const SymbInstance& another) const;
-    friend class Implic;
+    friend class Cube;
     friend std::ostream& operator<<(std::ostream& os, const SymbInstance& s);
 };
 
-class Implic
+class Cube
 {
     std::list<SymbInstance> content;
     double calc(const std::unordered_map<std::string, unsigned long>& varTable, const std::vector<double>& args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
     std::vector<unsigned char> tabulate(const std::unordered_map<std::string, unsigned long>& varTable) const;
 public:
-    bool covers(const Implic& another) const;
+    bool covers(const Cube& another) const;
     bool hasSymbol(const SymbInstance& symb) const;
 
-    explicit Implic(const std::list<SymbInstance> &content);
+    explicit Cube(const std::list<SymbInstance> &content);
 
     friend class FuzzyFunction;
-    friend std::ostream& operator<<(std::ostream& os, const Implic& i);
+    friend std::ostream& operator<<(std::ostream& os, const Cube& i);
 };
 
 class FuzzyFunction
 {
     std::unordered_map<std::string, unsigned long> varTable;
-    std::list<Implic> body;
+    std::list<Cube> body;
 public:
     double calc(const std::vector<double> &args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
-    std::list<ImplicRow> tabulate() const;
+    std::list<CubeRow> tabulate() const;
     FuzzyFunction minimize(int fashion = EXACT) const;
 
     FuzzyFunction() = default;
-    FuzzyFunction(std::unordered_map<std::string, unsigned long> varTable, std::list<Implic> body);
-    FuzzyFunction(const std::unordered_map<std::string, unsigned long>& varTable, const ImplicTable& tab);
+    FuzzyFunction(std::unordered_map<std::string, unsigned long> varTable, std::list<Cube> body);
+    FuzzyFunction(const std::unordered_map<std::string, unsigned long>& varTable, const CubeTable& tab);
+    std::unordered_map<std::string, unsigned long> getVarTable() const;
     friend std::ostream& operator<<(std::ostream& os, const FuzzyFunction& f);
 };
 

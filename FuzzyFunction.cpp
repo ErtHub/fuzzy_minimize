@@ -32,7 +32,7 @@ ostream& operator<<(ostream& os, const SymbInstance& s)
     return os;
 }
 
-double Implic::calc(const unordered_map<string, unsigned long>& varTable, const vector<double> &args, OperationImpl* opImpl) const
+double Cube::calc(const unordered_map<string, unsigned long>& varTable, const vector<double> &args, OperationImpl* opImpl) const
 {
     double acc = 1;
     for(auto& i : content)
@@ -40,7 +40,7 @@ double Implic::calc(const unordered_map<string, unsigned long>& varTable, const 
     return acc;
 }
 
-vector<unsigned char> Implic::tabulate(const std::unordered_map<std::string, unsigned long>& varTable) const
+vector<unsigned char> Cube::tabulate(const std::unordered_map<std::string, unsigned long>& varTable) const
 {
     vector<unsigned char> res(varTable.size(), 0);
     for(auto& i : content)
@@ -48,7 +48,7 @@ vector<unsigned char> Implic::tabulate(const std::unordered_map<std::string, uns
     return res;
 }
 
-bool Implic::covers(const Implic& another) const
+bool Cube::covers(const Cube& another) const
 {
     for(auto& i : content)
         if(!another.hasSymbol(i))
@@ -56,7 +56,7 @@ bool Implic::covers(const Implic& another) const
     return true;
 }
 
-bool Implic::hasSymbol(const SymbInstance& symb) const
+bool Cube::hasSymbol(const SymbInstance& symb) const
 {
     for(auto& i : content)
         if(i == symb)
@@ -64,10 +64,10 @@ bool Implic::hasSymbol(const SymbInstance& symb) const
     return false;
 }
 
-Implic::Implic(const list<SymbInstance>& content) : content(content)
+Cube::Cube(const list<SymbInstance>& content) : content(content)
 {}
 
-ostream& operator<<(ostream& os, const Implic& i)
+ostream& operator<<(ostream& os, const Cube& i)
 {
     auto iter = i.content.begin();
     os << *iter;
@@ -84,21 +84,21 @@ double FuzzyFunction::calc(const vector<double> &args, OperationImpl* opImpl) co
     return acc;
 }
 
-list<ImplicRow> FuzzyFunction::tabulate() const
+list<CubeRow> FuzzyFunction::tabulate() const
 {
-    list<ImplicRow> res;
+    list<CubeRow> res;
     vector<unsigned char> partialRes;
     for(auto& i : body)
     {
         partialRes = move(i.tabulate(varTable));
-        res.emplace_back(ImplicRow(partialRes));
+        res.emplace_back(CubeRow(partialRes));
     }
     return res;
 }
 
 FuzzyFunction FuzzyFunction::minimize(int fashion) const
 {
-    ImplicTable tab(*this);
+    CubeTable tab(*this);
 
     switch(fashion)
     {
@@ -122,11 +122,16 @@ FuzzyFunction FuzzyFunction::minimize(int fashion) const
     return FuzzyFunction(varTable, tab);
 }
 
-FuzzyFunction::FuzzyFunction(unordered_map<string, unsigned long> varTable, list<Implic> body) : varTable(move(varTable)), body(move(body))
+FuzzyFunction::FuzzyFunction(unordered_map<string, unsigned long> varTable, list<Cube> body) : varTable(move(varTable)), body(move(body))
 {}
 
-FuzzyFunction::FuzzyFunction(const unordered_map<string, unsigned long>& varTable, const ImplicTable& tab) : body(move(tab.redeem(varTable))), varTable(varTable)
+FuzzyFunction::FuzzyFunction(const unordered_map<string, unsigned long>& varTable, const CubeTable& tab) : body(move(tab.redeem(varTable))), varTable(varTable)
 {}
+
+unordered_map<string, unsigned long> FuzzyFunction::getVarTable() const
+{
+    return varTable;
+}
 
 ostream& operator<<(ostream& os, const FuzzyFunction& f)
 {

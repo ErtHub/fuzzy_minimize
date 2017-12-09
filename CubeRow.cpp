@@ -2,25 +2,25 @@
 // Created by hubert on 12.11.17.
 //
 
-#include "ImplicRow.h"
+#include "CubeRow.h"
 
 using namespace std;
 
-ImplicRow::ImplicRow() : meta_phase_numbers(vector<unsigned long>(4, 0))
+CubeRow::CubeRow() : meta_phase_numbers(vector<unsigned long>(4, 0))
 {}
 
-ImplicRow::ImplicRow(vector<unsigned char>& content) : content(content), meta_phase_numbers(vector<unsigned long>(4))
+CubeRow::CubeRow(vector<unsigned char>& content) : content(content), meta_phase_numbers(vector<unsigned long>(4))
 {
     for(auto& i : this->content)
         ++meta_phase_numbers[i];
 }
 
-ImplicRow::ImplicRow(unsigned long size) : content(vector<unsigned char>(size)), meta_phase_numbers(vector<unsigned long>(4))
+CubeRow::CubeRow(unsigned long size) : content(vector<unsigned char>(size)), meta_phase_numbers(vector<unsigned long>(4))
 {
     meta_phase_numbers[0] = size;
 }
 
-void ImplicRow::set(unsigned char what, unsigned long where)
+void CubeRow::set(unsigned char what, unsigned long where)
 {
     if(where >= content.size() || what >= meta_phase_numbers.size() || what == content[where])
         return;
@@ -29,7 +29,7 @@ void ImplicRow::set(unsigned char what, unsigned long where)
     ++meta_phase_numbers[content[where]];
 }
 
-list<unsigned long> ImplicRow::localize0() const
+list<unsigned long> CubeRow::localize0() const
 {
     if(!meta_phase_numbers[0])
         return list<unsigned long>();
@@ -40,7 +40,7 @@ list<unsigned long> ImplicRow::localize0() const
     return positions0;
 }
 
-list<unsigned long> ImplicRow::localize1_2() const
+list<unsigned long> CubeRow::localize1_2() const
 {
     if(!meta_phase_numbers[1] && !meta_phase_numbers[2])
         return list<unsigned long>();
@@ -51,7 +51,7 @@ list<unsigned long> ImplicRow::localize1_2() const
     return positions1_2;
 }
 
-bool ImplicRow::covers(const ImplicRow& covered) const
+bool CubeRow::covers(const CubeRow& covered) const
 {
     if(meta_phase_numbers[3] > covered.meta_phase_numbers[3] || meta_phase_numbers[0] < covered.meta_phase_numbers[0] || countLiterals() > covered.countLiterals())
         return false;
@@ -61,44 +61,44 @@ bool ImplicRow::covers(const ImplicRow& covered) const
     return true;
 }
 
-unsigned long long ImplicRow::countLiterals() const
+unsigned long long CubeRow::countLiterals() const
 {
     return meta_phase_numbers[1] + meta_phase_numbers[2] + meta_phase_numbers[3] + meta_phase_numbers[3];
 }
 
-unsigned char ImplicRow::get(unsigned long where) const
+unsigned char CubeRow::get(unsigned long where) const
 {
     return content[where];
 }
 
-unsigned long ImplicRow::get_meta_phase_number(unsigned char which) const
+unsigned long CubeRow::get_meta_phase_number(unsigned char which) const
 {
     return meta_phase_numbers[which];
 }
 
-unsigned long ImplicRow::size() const
+unsigned long CubeRow::size() const
 {
     return content.size();
 }
 
-ImplicRow ImplicRow::expand(unsigned long by)
+CubeRow CubeRow::expand(unsigned long by)
 {
     if(by >= size() || content[by])
-        return ImplicRow();
-    ImplicRow child(*this);
+        return CubeRow();
+    CubeRow child(*this);
     set(1, by);
     child.set(2, by);
     return child;
 }
 
-ImplicRow ImplicRow::phaseSwitchedTwin(unsigned long where) const
+CubeRow CubeRow::phaseSwitchedTwin(unsigned long where) const
 {
-    ImplicRow twin(*this);
+    CubeRow twin(*this);
     twin.set(twin.get(where) ^ (unsigned char)3, where);
     return twin;
 }
 
-void ImplicRow::print() const
+void CubeRow::print() const
 {
     for(auto& i : content)
     {

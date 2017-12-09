@@ -3,13 +3,13 @@
 //
 
 #include "MinimizeAlgorithms.h"
-#include "ImplicTable.h"
+#include "CubeTable.h"
 
 
 /*
 FuzzyFunction MinimizeAlgorithms::minimize(FuzzyFunction &function, int fashion = EXACT)
 {
-    ImplicTable tab(function);
+    CubeTable tab(function);
 
     switch(fashion)
     {

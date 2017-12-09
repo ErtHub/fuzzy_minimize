@@ -3,7 +3,7 @@
 //
 
 #include <iostream>
-#include "ImplicTable.h"
+#include "CubeTable.h"
 #include "Scan.h"
 #include "Source.h"
 #include "Parser.h"
@@ -63,6 +63,7 @@ int main(int argc, char* argv[])
     {
         /*FuzzyFunction f(par.extract());
         f.minimize();*/
+//        cout << FuzzyFunction(par.extract());
         cout << FuzzyFunction(par.extract()).minimize(howToMinimize) << endl;
         return 0;
     }
@@ -71,7 +72,7 @@ int main(int argc, char* argv[])
         cout << "Syntax error reading file" << endl;
         return -2;
     }
-    //FuzzyFunction f(list<Implic>{Implic(list<SymbInstance>{SymbInstance(0, true), SymbInstance(0, false)}), Implic(list<SymbInstance>{SymbInstance(1, true), SymbInstance(0, true)})});
+    //FuzzyFunction f(list<Cube>{Cube(list<SymbInstance>{SymbInstance(0, true), SymbInstance(0, false)}), Cube(list<SymbInstance>{SymbInstance(1, true), SymbInstance(0, true)})});
     /*SymbInstance a(1, true), b(1, false), c(1, false), d(0, true);
     list<SymbInstance> dave;
     dave.push_back(a);
@@ -79,15 +80,15 @@ int main(int argc, char* argv[])
     list<SymbInstance> connor;
     connor.push_back(c);
     connor.push_back(d);
-    Implic alpha(dave), beta(connor);
-    list<Implic> steve;
+    Cube alpha(dave), beta(connor);
+    list<Cube> steve;
     steve.push_back(alpha);
     steve.push_back(beta);
     FuzzyFunction f(steve);
     cout << f.calc(vector<double>{0.5, 0.25}) << endl;*/
 
     /*vector<unsigned char> v1, v2, v3, v4, v5, v6, v7;
-    list<ImplicRow> l;
+    list<CubeRow> l;
     v1.push_back(0);
     v1.push_back(1);
     v1.push_back(0);
@@ -116,17 +117,17 @@ int main(int argc, char* argv[])
     v7.push_back(2);
     v7.push_back(2);
     v7.push_back(3);
-    l.emplace_back(ImplicRow(v1));
-    l.emplace_back(ImplicRow(v2));
-    l.emplace_back(ImplicRow(v3));
-    l.emplace_back(ImplicRow(v4));
-    l.emplace_back(ImplicRow(v5));
-    l.emplace_back(ImplicRow(v6));
-    l.emplace_back(ImplicRow(v7));*/
+    l.emplace_back(CubeRow(v1));
+    l.emplace_back(CubeRow(v2));
+    l.emplace_back(CubeRow(v3));
+    l.emplace_back(CubeRow(v4));
+    l.emplace_back(CubeRow(v5));
+    l.emplace_back(CubeRow(v6));
+    l.emplace_back(CubeRow(v7));*/
 
 
     /*vector<unsigned char> v1, v2, v3, v4, v5, v6, v7;
-    list<ImplicRow> l;
+    list<CubeRow> l;
     v1.push_back(0);
     v1.push_back(1);
     v1.push_back(0);
@@ -155,15 +156,15 @@ int main(int argc, char* argv[])
     v7.push_back(2);
     v7.push_back(2);
     v7.push_back(3);
-    l.emplace_back(ImplicRow(v1));
-    l.emplace_back(ImplicRow(v2));
-    l.emplace_back(ImplicRow(v3));
-    l.emplace_back(ImplicRow(v4));
-    l.emplace_back(ImplicRow(v5));
-    l.emplace_back(ImplicRow(v6));
-    l.emplace_back(ImplicRow(v7));
+    l.emplace_back(CubeRow(v1));
+    l.emplace_back(CubeRow(v2));
+    l.emplace_back(CubeRow(v3));
+    l.emplace_back(CubeRow(v4));
+    l.emplace_back(CubeRow(v5));
+    l.emplace_back(CubeRow(v6));
+    l.emplace_back(CubeRow(v7));
 
-    ImplicTable i(l);
+    CubeTable i(l);
 //    i.minimizeExact();
 //    i.minimizeHeuristic();
     i.minimizeMukaidono();
