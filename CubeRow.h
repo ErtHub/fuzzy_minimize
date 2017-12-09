@@ -29,11 +29,12 @@ public:
     unsigned long size() const;
     CubeRow expand(unsigned long by);
     CubeRow phaseSwitchedTwin(unsigned long where) const;
-    void print() const;
+
     friend bool operator<(CubeRow& first, CubeRow& second)
     {
         return first.countLiterals() < second.countLiterals();
     }
+    friend std::ostream& operator<<(std::ostream& os, const CubeRow& cr);
 };
 
 

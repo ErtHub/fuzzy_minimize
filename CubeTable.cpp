@@ -90,50 +90,50 @@ void CubeTable::chooseCoveringSubset()
     list<CubeRow> subset;
     while(!content.empty())
     {
-        CubeRow Cube = move(content.front());
+        CubeRow cube = move(content.front());
         content.pop_front();
-        if(!Cube.get_meta_phase_number(0) || !Cube.get_meta_phase_number(3))
+        if(!cube.get_meta_phase_number(0) || !cube.get_meta_phase_number(3))
         {
-            subset.push_back(move(Cube));
+            subset.push_back(move(cube));
             continue;
         }
-        list<unsigned long> positions0 = move(Cube.localize0());
+        list<unsigned long> positions0 = move(cube.localize0());
         auto divisionPos = positions0.begin();
         auto pos0End = positions0.end();
-        CubeRow halfCube1 = Cube;
+        CubeRow halfCube1 = cube;
         CubeRow halfCube2 = move(halfCube1.expand(*divisionPos));
         if(!(recursiveCover(halfCube1, subset, ++divisionPos, pos0End) && recursiveCover(halfCube2, subset, divisionPos, pos0End)))
-            subset.push_back(move(Cube));
+            subset.push_back(move(cube));
     }
     content = move(subset);
 }
 
-bool CubeTable::recursiveCover(CubeRow& Cube, const list<CubeRow>& subset, list<unsigned long>::iterator pos0, list<unsigned long>::iterator& pos0End) const
+bool CubeTable::recursiveCover(CubeRow& cube, const list<CubeRow>& subset, list<unsigned long>::iterator pos0, list<unsigned long>::iterator& pos0End) const
 {
     for(auto& i : content)
-        if(i.covers(Cube))
+        if(i.covers(cube))
             return true;
     for(auto& i : subset)
-        if(i.covers(Cube))
+        if(i.covers(cube))
             return true;
     if(pos0 == pos0End)
         return false;
-    CubeRow Cube2 = move(Cube.expand(*pos0));
+    CubeRow Cube2 = move(cube.expand(*pos0));
 
-    return recursiveCover(Cube, subset, ++pos0, pos0End) && recursiveCover(Cube2, subset, pos0, pos0End);
+    return recursiveCover(cube, subset, ++pos0, pos0End) && recursiveCover(Cube2, subset, pos0, pos0End);
 }
 
-bool CubeTable::omissionAllowed(CubeRow &Cube, unsigned long position) const
+bool CubeTable::omissionAllowed(CubeRow &cube, unsigned long position) const
 {
-    CubeRow twin = move(Cube.phaseSwitchedTwin(position));
-    return checkCover(twin);//TODO czy trzeba naprawde tworzyc tego blizniaka?
+    CubeRow twin = move(cube.phaseSwitchedTwin(position));
+    return checkCover(twin);
 }
 
-bool CubeTable::omissionAllowedRecursively(CubeRow &Cube, unsigned long position,
+bool CubeTable::omissionAllowedRecursively(CubeRow &cube, unsigned long position,
                                              std::list<unsigned long>::iterator pos0,
                                              std::list<unsigned long>::iterator &pos0End) const
 {
-    CubeRow twin1 = move(Cube.phaseSwitchedTwin(position));
+    CubeRow twin1 = move(cube.phaseSwitchedTwin(position));
     CubeRow twin2 = twin1.expand(*pos0);
     return recursiveCover(twin1, list<CubeRow>(), ++pos0, pos0End) && recursiveCover(twin2, list<CubeRow>(), pos0, pos0End);
 }
@@ -151,8 +151,7 @@ void CubeTable::minimizeExact()
         sweepCovered(k1);
         wasEmpty = k1.empty();
         merge(k1);
-        print();
-        cout << "----------------" << endl;
+        cout << *this << "----------------" << endl;
         //sweepCovered();
     } while(!wasEmpty);
     chooseCoveringSubset();
@@ -204,18 +203,13 @@ void CubeTable::minimizeHeuristic()
             r = rk;
             R = findR(r, sideList, ki);
             rLiteralsCount = r.countLiterals();
-            print();
-            cout << endl;
-            sideList.print();
-            cout << endl;
-            ki.print();
-            cout << "----------------" << endl;
+            cout << *this << endl << sideList << endl << ki << "----------------" << endl;
         }
     }
     merge(sideList);
     merge(ki);
     content.sort();
-    chooseCoveringSubset();
+//    chooseCoveringSubset();
 }
 
 void CubeTable::minimizeMukaidono()
@@ -226,10 +220,7 @@ void CubeTable::minimizeMukaidono()
     {
         if(!i.get_meta_phase_number(3))
             continue;
-        print();
-        cout << endl;
-        cout << "---------------";
-        cout << endl;
+        cout << *this << endl << "---------------" << endl;
         auto pos1_2List = i.localize1_2();
         auto pos1_2 = pos1_2List.begin();
         while(pos1_2 != pos1_2List.end())
@@ -274,13 +265,23 @@ void CubeTable::merge(CubeTable &another)
     content.merge(another.content);
 }
 
-void CubeTable::print()
+/*void CubeTable::print()
 {
     for(auto& row : content)
     {
         row.print();
         cout << endl;
     }
+}*/
+//TODO prywatyzacja xD
+ostream& operator<<(ostream& os, const CubeTable& ct)
+{
+    for(auto& row : ct.content)
+    {
+        os << row;
+        os << endl;
+    }
+    return os;
 }
 
 bool CubeTable::findRi(CubeTable& sideList)
@@ -352,7 +353,7 @@ list<tuple<unsigned long, unsigned long, CubeRow>> CubeTable::findR(CubeRow& r, 
                 }
     );
     return result;
-}//TODO optymizacja, std::algorithm?, zrobic funkcje rekurencyjne iteracyjnie, zlikwidowac niepotrzebne referencje na unsigned long, pomyslec cos nad tymi strumieniami
+}//TODO optymizacja, std::algorithm?, zrobic funkcje rekurencyjne iteracyjnie, zlikwidowac niepotrzebne referencje na unsigned long
 
 list<Cube> CubeTable::redeem(const unordered_map<string, unsigned long>& tab) const
 {

@@ -22,7 +22,7 @@ class Source
 
     const std::string fn;
     std::ifstream istr;
-    std::string Line;//TODO sprawdzic ograniczenie dlugosci
+    std::string Line;//TODO powiedziec doktorowi, ze sie wola max_size
 
     TextPos tpos;
 //TODO kilka funkcji

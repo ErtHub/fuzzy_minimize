@@ -98,6 +98,7 @@ CubeRow CubeRow::phaseSwitchedTwin(unsigned long where) const
     return twin;
 }
 
+/*
 void CubeRow::print() const
 {
     for(auto& i : content)
@@ -109,4 +110,14 @@ void CubeRow::print() const
     {
         cout << i << " ";
     }
+}*/
+
+ostream& operator<<(ostream& os, const CubeRow& cr)
+{
+    for(auto& i : cr.content)
+        os << (int)i << " ";
+    cout << "| ";
+    for(auto& i : cr.meta_phase_numbers)
+        os << i << " ";
+    return os;
 }

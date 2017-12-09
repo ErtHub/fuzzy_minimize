@@ -12,9 +12,7 @@ FuzzyFunction ExactMinimizer::minimize(const FuzzyFunction &input)
 
     tab.minimizeExact();
 
-    tab.print();
-
-    cout << endl;
+    cout << tab << endl;
 
     return FuzzyFunction(input.getVarTable(), tab);
 }
@@ -25,9 +23,7 @@ FuzzyFunction HeuristicMinimizer::minimize(const FuzzyFunction &input)
 
     tab.minimizeHeuristic();
 
-    tab.print();
-
-    cout << endl;
+    cout << tab << endl;
 
     return FuzzyFunction(input.getVarTable(), tab);
 }
@@ -38,9 +34,7 @@ FuzzyFunction MukaidonoMinimizer::minimize(const FuzzyFunction &input)
 
     tab.minimizeMukaidono();
 
-    tab.print();
-
-    cout << endl;
+    cout << tab << endl;
 
     return FuzzyFunction(input.getVarTable(), tab);
 }

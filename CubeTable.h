@@ -34,16 +34,17 @@ public:
     bool checkCover(const CubeRow& covered) const;
     CubeTable generateK1() const;
     void chooseCoveringSubset();
-    bool recursiveCover(CubeRow& Cube, const std::list<CubeRow>& subset, std::list<unsigned long>::iterator pos0, std::list<unsigned long>::iterator& pos0End) const;
-    bool omissionAllowed(CubeRow& Cube, unsigned long position) const;
-    bool omissionAllowedRecursively(CubeRow& Cube, unsigned long position, std::list<unsigned long>::iterator pos0, std::list<unsigned long>::iterator& pos0End) const;
+    bool recursiveCover(CubeRow& cube, const std::list<CubeRow>& subset, std::list<unsigned long>::iterator pos0, std::list<unsigned long>::iterator& pos0End) const;
+    bool omissionAllowed(CubeRow& cube, unsigned long position) const;
+    bool omissionAllowedRecursively(CubeRow& cube, unsigned long position, std::list<unsigned long>::iterator pos0, std::list<unsigned long>::iterator& pos0End) const;
     void minimizeExact();
     void minimizeHeuristic();
     void minimizeMukaidono();
     bool empty() const;
     void merge(CubeTable& another);
-    void print();
     std::list<Cube> redeem(const std::unordered_map<std::string, unsigned long>& tab) const;
+
+    friend std::ostream& operator<<(std::ostream& os, const CubeTable& f);
 };
 
 

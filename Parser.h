@@ -50,7 +50,7 @@ class Parser
     bool VarDecl(const SymSet& fs);
     bool FunDecl(const SymSet& fs);
     bool Sum(const SymSet& fs);
-    bool Implicant(const SymSet& fs, std::list<SymbInstance>& CubeProt);
+    bool Implicant(const SymSet& fs, std::list<SymbInstance>& cubeProt);
 
 public:
 

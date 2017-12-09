@@ -91,22 +91,22 @@ bool Parser::Sum(const SymSet& fs)
     Synchronize s(factstart, fs);
     if(!can_parse)
         return false;
-    list<SymbInstance> CubeProt;
-    if(!factstart.has(symbol) || !Implicant(addops, CubeProt))
+    list<SymbInstance> cubeProt;
+    if(!factstart.has(symbol) || !Implicant(addops, cubeProt))
         return false;
     else
-        funProt.emplace_back(Cube(CubeProt));
+        funProt.emplace_back(Cube(cubeProt));
     while(symbol == orop)
     {
-        CubeProt.clear();
+        cubeProt.clear();
         accept(orop);
-        if(Implicant(addops, CubeProt))
-            funProt.emplace_back(Cube(CubeProt));
+        if(Implicant(addops, cubeProt))
+            funProt.emplace_back(Cube(cubeProt));
     }
     return true;
 }
 //========================
-bool Parser::Implicant(const SymSet &fs, list<SymbInstance>& CubeProt)
+bool Parser::Implicant(const SymSet &fs, list<SymbInstance>& cubeProt)
 {
     Trace x("Implicant", fs);
     bool negative = false;
@@ -122,7 +122,7 @@ bool Parser::Implicant(const SymSet &fs, list<SymbInstance>& CubeProt)
             SemanticError(3);
             return false;
         }
-        CubeProt.emplace_back(SymbInstance(scn.Spell(), negative));
+        cubeProt.emplace_back(SymbInstance(scn.Spell(), negative));
         accept(varname);
     }
     else
@@ -141,7 +141,7 @@ bool Parser::Implicant(const SymSet &fs, list<SymbInstance>& CubeProt)
             if(varTable.find(scn.Spell()) == varTable.end())
                 SemanticError(3);
             else
-                CubeProt.emplace_back(SymbInstance(scn.Spell(), negative));
+                cubeProt.emplace_back(SymbInstance(scn.Spell(), negative));
         }
         accept(varname);
         negative = false;
