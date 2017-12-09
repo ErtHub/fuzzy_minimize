@@ -2,8 +2,8 @@
 // Created by hubert on 23.07.17.
 //
 
-#ifndef FUZZY_MINIMIZE_CubeTABLE_H
-#define FUZZY_MINIMIZE_CubeTABLE_H
+#ifndef FUZZY_MINIMIZE_CUBETABLE_H
+#define FUZZY_MINIMIZE_CUBETABLE_H
 
 #include "FuzzyFunction.h"
 #include <list>
@@ -18,15 +18,16 @@ class Cube;
 class CubeTable
 {
     std::list<CubeRow> content;
+    int write;
 
     bool findRi(CubeTable& sideList);
     std::list<std::tuple<unsigned long, unsigned long, CubeRow>> findR(CubeRow& r, CubeTable& sideList, CubeTable& ki);
 
 public:
 
-    CubeTable() = default;
-    explicit CubeTable(const std::list<CubeRow> &content);
-    explicit CubeTable(const FuzzyFunction &func);
+    CubeTable(int w = 0) : write(w){};
+    explicit CubeTable(const std::list<CubeRow> &content, int w = 0);
+    explicit CubeTable(const FuzzyFunction &func, int w = 0);
     void sweepCovered(CubeTable& another);
     void sweepCovered();
     void sweepCovered(const CubeRow& i);
@@ -48,4 +49,4 @@ public:
 };
 
 
-#endif //FUZZY_MINIMIZE_CubeTABLE_H
+#endif //FUZZY_MINIMIZE_CUBETABLE_H

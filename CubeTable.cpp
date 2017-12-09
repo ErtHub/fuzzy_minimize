@@ -6,10 +6,10 @@
 
 using namespace std;
 
-CubeTable::CubeTable(const std::list<CubeRow> &content) : content(content)
+CubeTable::CubeTable(const std::list<CubeRow> &content, int w) : content(content), write(w)
 {}
 
-CubeTable::CubeTable(const FuzzyFunction &func) : content(func.tabulate())
+CubeTable::CubeTable(const FuzzyFunction &func, int w) : content(func.tabulate()), write(w)
 {}
 
 void CubeTable::sweepCovered(CubeTable& another)
@@ -71,10 +71,14 @@ CubeTable CubeTable::generateK1() const
                     if((i->get(pos) ^ j->get(pos)) == 3)
                     {
                         CubeRow v(j->size());
-                        for(unsigned long p = 0; p < v.size(); ++p) {
+                        for(unsigned long p = 0; p < v.size(); ++p)
+                        {
                             v.set(i->get(p) | j->get(p), p);
-                            cout << "(" << (int)i->get(p) << ", " << (int)j->get(p) << ")";}
-                        cout << endl;
+                            if(write & 2)
+                                cout << "(" << (int)i->get(p) << ", " << (int)j->get(p) << ")";
+                        }
+                        if(write & 2)
+                            cout << endl;
                         v.set(0, pos);
                         result.append(v);
                     }
@@ -151,7 +155,8 @@ void CubeTable::minimizeExact()
         sweepCovered(k1);
         wasEmpty = k1.empty();
         merge(k1);
-        cout << *this << "----------------" << endl;
+        if(write)
+            cout << *this << "----------------" << endl;
         //sweepCovered();
     } while(!wasEmpty);
     chooseCoveringSubset();
@@ -177,10 +182,14 @@ void CubeTable::minimizeHeuristic()
             rj = move(get<2>(R.front()));
             R.pop_front();
             CubeRow rk(rj.size());
-            for(unsigned long i = 0; i < rk.size(); ++i) {
+            for(unsigned long i = 0; i < rk.size(); ++i)
+            {
                 rk.set(r.get(i) | rj.get(i), i);
-                cout << "(" << (int)r.get(i) << ", " << (int)rj.get(i) << ")";}
-            cout << endl;
+                if(write & 2)
+                    cout << "(" << (int)r.get(i) << ", " << (int)rj.get(i) << ")";
+            }
+            if(write & 2)
+                cout << endl;
             rk.set(0, pos1_2);
             ki.content.push_back(rk);
             sweepCovered(ki.content.back());
@@ -203,12 +212,13 @@ void CubeTable::minimizeHeuristic()
             r = rk;
             R = findR(r, sideList, ki);
             rLiteralsCount = r.countLiterals();
-            cout << *this << endl << sideList << endl << ki << "----------------" << endl;
+            if(write)
+                cout << *this << endl << sideList << endl << ki << "----------------" << endl;
         }
     }
     merge(sideList);
     merge(ki);
-    content.sort();
+//    content.sort();
 //    chooseCoveringSubset();
 }
 
@@ -220,7 +230,8 @@ void CubeTable::minimizeMukaidono()
     {
         if(!i.get_meta_phase_number(3))
             continue;
-        cout << *this << endl << "---------------" << endl;
+        if(write)
+            cout << *this << endl << "---------------" << endl;
         auto pos1_2List = i.localize1_2();
         auto pos1_2 = pos1_2List.begin();
         while(pos1_2 != pos1_2List.end())
@@ -353,7 +364,7 @@ list<tuple<unsigned long, unsigned long, CubeRow>> CubeTable::findR(CubeRow& r, 
                 }
     );
     return result;
-}//TODO optymizacja, std::algorithm?, zrobic funkcje rekurencyjne iteracyjnie, zlikwidowac niepotrzebne referencje na unsigned long
+}//TODO optymizacja, std::algorithm?, zrobic funkcje rekurencyjne iteracyjnie
 
 list<Cube> CubeTable::redeem(const unordered_map<string, unsigned long>& tab) const
 {
@@ -366,10 +377,10 @@ list<Cube> CubeTable::redeem(const unordered_map<string, unsigned long>& tab) co
         {
             if(row.get(symb.second))
             {
-                if(row.get(symb.second) & 1)
-                    partialResult.emplace_back(SymbInstance(symb.first, true));
                 if(row.get(symb.second) & 2)
                     partialResult.emplace_back(SymbInstance(symb.first, false));
+                if(row.get(symb.second) & 1)
+                    partialResult.emplace_back(SymbInstance(symb.first, true));
             }
         }
         result.emplace_back(Cube(partialResult));

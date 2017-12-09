@@ -18,42 +18,86 @@ int Trace::show_symbols = 0;
 int main(int argc, char* argv[])
 {
 
+    int options = 0;
+
+    string filename;
+
     shared_ptr<Minimizer> minimizer;
 
-    if (argc < 3)
+    enum MinimizationFashion
+    {
+        EXACT = 0, HEURISTIC, HEURISTIC_MUKAIDONO
+    };
+
+    enum Writers
+    {
+        NO_WRITER = 0, VERBOSE = 4, VERY_VERBOSE = 8
+    };
+
+    enum Options
+    {
+        ALGORITHM = 3, WRITER = 12, TIMER = 16
+    };
+
+
+    if (argc < 2)
     {
         cout << "Insufficient execution arguments!" << endl;
         return -1;
     }
 
-    if(argv[1][0] == '-')
+    for(int i = 1; i < argc; ++i)
     {
-        switch(argv[1][1])
+        if(argv[i][0] == '-')
         {
-            case 'e':
-                minimizer = shared_ptr<Minimizer>(new ExactMinimizer());
-                break;
-            case 'h':
-                minimizer = shared_ptr<Minimizer>(new HeuristicMinimizer());
-                break;
-            case 'm':
-                minimizer = shared_ptr<Minimizer>(new MukaidonoMinimizer());
-                break;
-            default:
-                cout << "Unknkown option \"" << argv[1] << "\"!" << endl;
-                return -3;
+            switch(argv[i][1])
+            {
+                case 'e':
+                    options |= EXACT;
+                    break;
+                case 'h':
+                    options |= HEURISTIC;
+                    break;
+                case 'm':
+                    options |= HEURISTIC_MUKAIDONO;
+                    break;
+                case 'v':
+                    options |= VERBOSE;
+                    break;
+                case 'V':
+                    options |= VERY_VERBOSE;
+                    break;
+                default:
+                    cout << "Unknkown option \"" << argv[1] << "\"!" << endl;
+                    return -3;
+            }
         }
+        else
+            filename = argv[i];
     }
-    else
+
+    if(filename.empty())
     {
-        cout << "Unknown option \"" << argv[1] << "\"!" << endl;
-        return -3;
+        cout << "File name not defined." << endl;
+        return -4;
     }
 
+    switch(options & ALGORITHM)
+    {
+        case EXACT:
+            minimizer = shared_ptr<Minimizer>(new ExactMinimizer((options & WRITER) / VERBOSE));
+            break;
+        case HEURISTIC:
+            minimizer = shared_ptr<Minimizer>(new HeuristicMinimizer((options & WRITER) / VERBOSE));
+            break;
+        case HEURISTIC_MUKAIDONO:
+            minimizer = shared_ptr<Minimizer>(new MukaidonoMinimizer((options & WRITER) / VERBOSE));
+            break;
+        default:
+            cout << "Algorithm option error." << endl;
+            return -5;
+    }
 
-    string filename(argv[2]);
-//    std::cout << "File name:" << endl;
-//    cin >> filename;
     Source src(filename);
     Scan scn(src);
     Parser par(scn);

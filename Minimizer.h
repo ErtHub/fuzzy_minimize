@@ -12,7 +12,10 @@ class FuzzyFunction;
 
 class Minimizer
 {
+protected:
+    int write;
 public:
+    explicit Minimizer(int w = 0) : write(w){}
     virtual ~Minimizer() = default;
     virtual FuzzyFunction minimize(const FuzzyFunction& input) = 0;
 };
@@ -20,7 +23,7 @@ public:
 class ExactMinimizer : public Minimizer
 {
 public:
-    ExactMinimizer() = default;
+    explicit ExactMinimizer(int w = 0) : Minimizer(w){};
     ~ExactMinimizer() override = default;
     FuzzyFunction minimize(const FuzzyFunction& input) override;
 };
@@ -28,7 +31,7 @@ public:
 class HeuristicMinimizer : public Minimizer
 {
 public:
-    HeuristicMinimizer() = default;
+    explicit HeuristicMinimizer(int w = 0) : Minimizer(w){};
     ~HeuristicMinimizer() override = default;
     FuzzyFunction minimize(const FuzzyFunction& input) override;
 };
@@ -36,7 +39,7 @@ public:
 class MukaidonoMinimizer : public Minimizer
 {
 public:
-    MukaidonoMinimizer() = default;
+    explicit MukaidonoMinimizer(int w = 0) : Minimizer(w){};
     ~MukaidonoMinimizer() override = default;
     FuzzyFunction minimize(const FuzzyFunction& input) override;
 };

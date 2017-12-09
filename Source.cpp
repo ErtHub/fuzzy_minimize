@@ -59,5 +59,5 @@ char Source::NextChar()
         return Line[tpos.cn++];
     else
         return EOF;
-}
+}//TODO ogarnac outputy z tych modulow!
 
