@@ -5,6 +5,7 @@
 #include "Minimizer.h"
 
 using namespace std;
+using namespace std::chrono;
 
 FuzzyFunction ExactMinimizer::minimize(const FuzzyFunction &input)
 {
@@ -40,4 +41,26 @@ FuzzyFunction MukaidonoMinimizer::minimize(const FuzzyFunction &input)
         cout << tab << endl;
 
     return FuzzyFunction(input.getVarTable(), tab);
+}
+
+FuzzyFunction Timer::minimize(const FuzzyFunction &input)
+{
+    FuzzyFunction result;
+
+    high_resolution_clock::time_point executionStart = high_resolution_clock::now();
+    result = move(wrappee->minimize(input));
+    high_resolution_clock::time_point executionEnd = high_resolution_clock::now();
+
+    duration<double, ratio<1, 1000>> executionTime = executionEnd - executionStart;
+    timeRecords.push_back(executionTime.count());
+    return result;
+}
+
+Timer::~Timer()
+{
+    unsigned long enumerator = 0;
+
+    cout << "Execution times:" << endl;
+    for(auto& t : timeRecords)
+        cout << ++enumerator << ". " << t << " ms";
 }

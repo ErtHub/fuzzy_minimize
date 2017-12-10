@@ -67,8 +67,11 @@ int main(int argc, char* argv[])
                 case 'V':
                     options |= VERY_VERBOSE;
                     break;
+                case 't':
+                    options |= TIMER;
+                    break;
                 default:
-                    cout << "Unknkown option \"" << argv[1] << "\"!" << endl;
+                    cout << "Unknown option \"" << argv[i] << "\"!" << endl;
                     return -3;
             }
         }
@@ -96,7 +99,12 @@ int main(int argc, char* argv[])
         default:
             cout << "Algorithm option error." << endl;
             return -5;
-    }
+    }//TODO poprawic te opcje bo to jest dramat kurwa
+
+    if(options & TIMER)
+        minimizer = shared_ptr<Minimizer>(new Timer(minimizer));
+
+    //TODO moze jakies rozroznienie kiedy stosowac jakie podwielokrotnosci sekundy?
 
     Source src(filename);
     Scan scn(src);
