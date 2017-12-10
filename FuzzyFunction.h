@@ -7,45 +7,62 @@
 
 #include <list>
 #include <vector>
+#include <unordered_map>
 #include "OperationImpl.h"
-#include "ImplicRow.h"
+#include "CubeRow.h"
+#include "CubeTable.h"
+#include "Minimizer.h"
 
 //TODO: namespace FuzzyLogic maybe?
 
+class CubeTable;
+class Minimizer;
+class ExactMinimizer;
+
 class SymbInstance
 {
-    unsigned tableIndex;
+    std::string varName;
     bool negative;
+    double calc(const std::unordered_map<std::string, unsigned long>& varTable, const std::vector<double>& args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
+    void appendToTable(const std::unordered_map<std::string, unsigned long>& varTable, std::vector<unsigned char>& target) const;
 public:
-    double calc(std::vector<double> args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
-    void appendToTable(std::vector<unsigned char>& target) const;
-
-    SymbInstance(unsigned int tableIndex, bool negative);
+    SymbInstance(std::string varName, bool negative);
 
     bool operator==(const SymbInstance& another) const;
+    friend class Cube;
+    friend std::ostream& operator<<(std::ostream& os, const SymbInstance& s);
 };
 
-class Implic
+class Cube
 {
     std::list<SymbInstance> content;
+    double calc(const std::unordered_map<std::string, unsigned long>& varTable, const std::vector<double>& args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
+    std::vector<unsigned char> tabulate(const std::unordered_map<std::string, unsigned long>& varTable) const;
 public:
-    double calc(const std::vector<double> &args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
-    std::vector<unsigned char> tabulate() const;
-    bool covers(const Implic& another) const;
+    bool covers(const Cube& another) const;
     bool hasSymbol(const SymbInstance& symb) const;
 
-    explicit Implic(const std::list<SymbInstance> &content);
+    explicit Cube(const std::list<SymbInstance> &content);
+
+    friend class FuzzyFunction;
+    friend std::ostream& operator<<(std::ostream& os, const Cube& i);
 };
 
 class FuzzyFunction
 {
-    std::list<Implic> body;
+    std::unordered_map<std::string, unsigned long> varTable;
+    std::list<Cube> body;
+    static ExactMinimizer defaultMinimizer;
 public:
     double calc(const std::vector<double> &args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
-    std::list<ImplicRow> tabulate() const;
+    std::list<CubeRow> tabulate() const;
+    FuzzyFunction minimize(Minimizer* minimizer = (Minimizer*)&defaultMinimizer) const;
 
-    explicit FuzzyFunction(const std::list<Implic> &body);
+    FuzzyFunction() = default;
+    FuzzyFunction(std::unordered_map<std::string, unsigned long> varTable, std::list<Cube> body);
+    FuzzyFunction(const std::unordered_map<std::string, unsigned long>& varTable, const CubeTable& tab);
+    std::unordered_map<std::string, unsigned long> getVarTable() const;
+    friend std::ostream& operator<<(std::ostream& os, const FuzzyFunction& f);
 };
-
 
 #endif //FUZZY_MINIMIZE_FUZZYFUNCTION_H
