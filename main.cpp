@@ -105,7 +105,6 @@ int main(int argc, char* argv[])
         minimizer = shared_ptr<Minimizer>(new Timer(minimizer));
 
     //TODO moze jakies rozroznienie kiedy stosowac jakie podwielokrotnosci sekundy?
-    //TODO wywalic niepotrzebne pliki
     //TODO wspolna tablica dla funkcji rozmytych
     Source src(filename);
     Scan scn(src);
