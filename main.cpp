@@ -99,7 +99,7 @@ int main(int argc, char* argv[])
         default:
             cout << "Algorithm option error." << endl;
             return -5;
-    }//TODO poprawic te opcje bo to jest dramat kurwa
+    }
 
     if(options & TIMER)
         minimizer = shared_ptr<Minimizer>(new Timer(minimizer));
