@@ -114,6 +114,11 @@ unordered_map<string, unsigned long> FuzzyFunction::getVarTable() const
 
 ostream& operator<<(ostream& os, const FuzzyFunction& f)
 {
+    if(f.body.empty())
+    {
+        os << "0";
+        return os;
+    }
     auto iter = f.body.begin();
     os << *iter;
     for(++iter; iter != f.body.end(); ++iter)

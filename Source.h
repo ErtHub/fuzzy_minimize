@@ -22,7 +22,8 @@ class Source
 
     const std::string fn;
     std::ifstream istr;
-    std::string Line;//TODO powiedziec doktorowi, ze sie wola max_size i ze history robi balagan w algorytmie h
+    std::string Line;//TODO powiedziec doktorowi, ze sie wola max_size i ze history robi balagan w algorytmie h, zapytac
+                    //czy maja byc czytane puste funkcje
 
     TextPos tpos;
 

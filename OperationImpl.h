@@ -18,15 +18,15 @@ namespace
     class ZadehClassic : public OperationImpl
     {
     public:
-        double s_norm(double left, double right)
+        double s_norm(double left, double right) override
         {
-            return left > right ? left : right;//TODO: czy nie daloby sie wykorzystac czegos w rodzaju min-max?
+            return left > right ? left : right;
         }
-        double t_norm(double left, double right)
+        double t_norm(double left, double right) override
         {
             return left < right ? left : right;
         }
-        double negate(double right)
+        double negate(double right) override
         {
             return 1 - right;
         }

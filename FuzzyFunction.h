@@ -13,7 +13,6 @@
 #include "CubeTable.h"
 #include "Minimizer.h"
 
-//TODO: namespace FuzzyLogic maybe?
 
 class CubeTable;
 class Minimizer;
