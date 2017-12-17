@@ -105,17 +105,19 @@ int main(int argc, char* argv[])
         minimizer = shared_ptr<Minimizer>(new Timer(minimizer));
 
     //TODO moze jakies rozroznienie kiedy stosowac jakie podwielokrotnosci sekundy?
-
+    //TODO wywalic niepotrzebne pliki
+    //TODO wspolna tablica dla funkcji rozmytych
     Source src(filename);
     Scan scn(src);
     Parser par(scn);
     Synchronize::p = &par;
     if(par.Program())
     {
-        /*FuzzyFunction f(par.extract());
-        f.minimize();*/
-//        cout << FuzzyFunction(par.extract());
-        cout << FuzzyFunction(par.extract()).minimize(minimizer.get()) << endl;
+        list<pair<string, FuzzyFunction>> funsToMinimize = move(par.extract());
+        for(auto& i : funsToMinimize)
+            i.second = move(i.second.minimize(minimizer.get()));
+        for(auto& i : funsToMinimize)
+            cout << i.first << " = " << i.second << endl;
         return 0;
     }
     else

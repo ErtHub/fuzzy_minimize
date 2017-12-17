@@ -4,15 +4,15 @@ using namespace std;
 
 vector<string> AT
 {
-		"F", "input",
+		"input", "output",
         "intconst", "varname",
-        "=", "*", "+", "~", "others"
+        "=", "*", "+", "~", ";", "others"
 };
 
 unordered_map<string, SymType> Scan::KT
 {
     { "input", inputsy },
-    { "F", fsy }
+    { "output", outputsy }
 };
 
 SymType Scan::NextSymbol()
@@ -68,6 +68,9 @@ SymType Scan::NextSymbol()
 	case '~':
         Nextc();
         return notop;
+    case ';':
+        Nextc();
+        return colon;
     default:
         Nextc();
         return others;

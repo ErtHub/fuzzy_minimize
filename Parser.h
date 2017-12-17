@@ -32,12 +32,17 @@ class Parser
     SymType symbol;
     bool can_parse;
     unsigned long varcount;
+    unsigned long funcount;
     std::unordered_map<std::string, unsigned long> varTable;
+	std::unordered_map<std::string, bool> funTable;
     std::list<Cube> funProt;
 
+    std::list<std::pair<std::string, FuzzyFunction>> funDefs;
 
-    SymSet ststart;
-    SymSet factstart, mulops;
+
+    SymSet instart, outstart;
+    SymSet funstart;
+    SymSet factstart;
     SymSet addops;
 
 
@@ -48,9 +53,10 @@ class Parser
 
 
     bool VarDecl(const SymSet& fs);
-    bool FunDecl(const SymSet& fs);
+	bool FunDecl(const SymSet& fs);
+    bool FunDef(const SymSet &fs);
     bool Sum(const SymSet& fs);
-    bool Implicant(const SymSet& fs, std::list<SymbInstance>& cubeProt);
+    bool Product(const SymSet &fs, std::list<SymbInstance> &cubeProt);
 
 public:
 
@@ -59,7 +65,7 @@ public:
     explicit Parser(Scan&);
     ~Parser() = default;
     void SemanticError(int ecode);
-    FuzzyFunction extract() const;
+    std::list<std::pair<std::string, FuzzyFunction>> extract();
     void clear();
 };
 #endif

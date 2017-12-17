@@ -3,7 +3,7 @@
 //
 
 #include "FuzzyFunction.h"
-
+//TODO wypisywac 0 przy pustej funkcji
 using namespace std;
 
 double SymbInstance::calc(const unordered_map<string, unsigned long>& varTable, const vector<double>& args, OperationImpl* opImpl) const

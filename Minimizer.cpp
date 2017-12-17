@@ -11,10 +11,13 @@ FuzzyFunction ExactMinimizer::minimize(const FuzzyFunction &input)
 {
     CubeTable tab(input, write);
 
+    if(write)
+        cout << "================" << endl;
+
     tab.minimizeExact();
 
     if(write)
-        cout << tab << endl;
+        cout << tab << endl << "================" << endl;
 
     return FuzzyFunction(input.getVarTable(), tab);
 }
@@ -23,10 +26,13 @@ FuzzyFunction HeuristicMinimizer::minimize(const FuzzyFunction &input)
 {
     CubeTable tab(input, write);
 
+    if(write)
+        cout << "================" << endl;
+
     tab.minimizeHeuristic();
 
     if(write)
-        cout << tab << endl;
+        cout << tab << endl << "================" << endl;
 
     return FuzzyFunction(input.getVarTable(), tab);
 }
@@ -35,10 +41,13 @@ FuzzyFunction MukaidonoMinimizer::minimize(const FuzzyFunction &input)
 {
     CubeTable tab(input, write);
 
+    if(write)
+        cout << "================" << endl;
+
     tab.minimizeMukaidono();
 
     if(write)
-        cout << tab << endl;
+        cout << tab << endl << "================" << endl;
 
     return FuzzyFunction(input.getVarTable(), tab);
 }
@@ -62,5 +71,5 @@ Timer::~Timer()
 
     cout << "Execution times:" << endl;
     for(auto& t : timeRecords)
-        cout << ++enumerator << ". " << t << " ms";
+        cout << ++enumerator << ". " << t << " ms" << endl;
 }
