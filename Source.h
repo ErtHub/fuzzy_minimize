@@ -22,10 +22,10 @@ class Source
 
     const std::string fn;
     std::ifstream istr;
-    std::string Line;//TODO powiedziec doktorowi, ze sie wola max_size
+    std::string Line;//TODO powiedziec doktorowi, ze sie wola max_size i ze history robi balagan w algorytmie h
 
     TextPos tpos;
-//TODO kilka funkcji
+
     void PrntLine()
     {
         std::cout << std::setw(5) << tpos.ln << ' ' << Line;

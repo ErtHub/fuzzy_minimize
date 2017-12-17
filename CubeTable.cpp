@@ -284,7 +284,7 @@ void CubeTable::merge(CubeTable &another)
         cout << endl;
     }
 }*/
-//TODO prywatyzacja xD
+
 ostream& operator<<(ostream& os, const CubeTable& ct)
 {
     for(auto& row : ct.content)
