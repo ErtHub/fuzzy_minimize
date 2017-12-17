@@ -11,7 +11,7 @@ double SymbInstance::calc(const unordered_map<string, unsigned long>& varTable, 
     return negative ? opImpl->negate(args[varTable.at(varName)]) : args[varTable.at(varName)];
 }
 
-void SymbInstance::appendToTable(const unordered_map<string, unsigned long>& varTable, std::vector<unsigned char> &target) const
+void SymbInstance::appendToTable(const unordered_map<string, unsigned long>& varTable, std::vector<uint8_t> &target) const
 {
     target[varTable.at(varName)] |= 1 << (1 & !negative);
 }
@@ -40,9 +40,9 @@ double Cube::calc(const unordered_map<string, unsigned long>& varTable, const ve
     return acc;
 }
 
-vector<unsigned char> Cube::tabulate(const std::unordered_map<std::string, unsigned long>& varTable) const
+vector<uint8_t> Cube::tabulate(const std::unordered_map<std::string, unsigned long>& varTable) const
 {
-    vector<unsigned char> res(varTable.size(), 0);
+    vector<uint8_t> res(varTable.size(), 0);
     for(auto& i : content)
         i.appendToTable(varTable, res);
     return res;
@@ -87,7 +87,7 @@ double FuzzyFunction::calc(const vector<double> &args, OperationImpl* opImpl) co
 list<CubeRow> FuzzyFunction::tabulate() const
 {
     list<CubeRow> res;
-    vector<unsigned char> partialRes;
+    vector<uint8_t> partialRes;
     for(auto& i : body)
     {
         partialRes = move(i.tabulate(varTable));

@@ -140,7 +140,7 @@ int main(int argc, char* argv[])
     FuzzyFunction f(steve);
     cout << f.calc(vector<double>{0.5, 0.25}) << endl;*/
 
-    /*vector<unsigned char> v1, v2, v3, v4, v5, v6, v7;
+    /*vector<uint8_t> v1, v2, v3, v4, v5, v6, v7;
     list<CubeRow> l;
     v1.push_back(0);
     v1.push_back(1);
@@ -179,7 +179,7 @@ int main(int argc, char* argv[])
     l.emplace_back(CubeRow(v7));*/
 
 
-    /*vector<unsigned char> v1, v2, v3, v4, v5, v6, v7;
+    /*vector<uint8_t> v1, v2, v3, v4, v5, v6, v7;
     list<CubeRow> l;
     v1.push_back(0);
     v1.push_back(1);

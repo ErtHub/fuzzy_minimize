@@ -24,7 +24,7 @@ class SymbInstance
     std::string varName;
     bool negative;
     double calc(const std::unordered_map<std::string, unsigned long>& varTable, const std::vector<double>& args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
-    void appendToTable(const std::unordered_map<std::string, unsigned long>& varTable, std::vector<unsigned char>& target) const;
+    void appendToTable(const std::unordered_map<std::string, unsigned long>& varTable, std::vector<uint8_t>& target) const;
 public:
     SymbInstance(std::string varName, bool negative);
 
@@ -37,7 +37,7 @@ class Cube
 {
     std::list<SymbInstance> content;
     double calc(const std::unordered_map<std::string, unsigned long>& varTable, const std::vector<double>& args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
-    std::vector<unsigned char> tabulate(const std::unordered_map<std::string, unsigned long>& varTable) const;
+    std::vector<uint8_t> tabulate(const std::unordered_map<std::string, unsigned long>& varTable) const;
 public:
     bool covers(const Cube& another) const;
     bool hasSymbol(const SymbInstance& symb) const;

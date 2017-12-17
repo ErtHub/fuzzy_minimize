@@ -9,18 +9,18 @@ using namespace std;
 CubeRow::CubeRow() : meta_phase_numbers(vector<unsigned long>(4, 0))
 {}
 
-CubeRow::CubeRow(vector<unsigned char>& content) : content(content), meta_phase_numbers(vector<unsigned long>(4))
+CubeRow::CubeRow(vector<uint8_t>& content) : content(content), meta_phase_numbers(vector<unsigned long>(4))
 {
     for(auto& i : this->content)
         ++meta_phase_numbers[i];
 }
 
-CubeRow::CubeRow(unsigned long size) : content(vector<unsigned char>(size)), meta_phase_numbers(vector<unsigned long>(4))
+CubeRow::CubeRow(unsigned long size) : content(vector<uint8_t>(size)), meta_phase_numbers(vector<unsigned long>(4))
 {
     meta_phase_numbers[0] = size;
 }
 
-void CubeRow::set(unsigned char what, unsigned long where)
+void CubeRow::set(uint8_t what, unsigned long where)
 {
     if(where >= content.size() || what >= meta_phase_numbers.size() || what == content[where])
         return;
@@ -66,12 +66,12 @@ unsigned long long CubeRow::countLiterals() const
     return meta_phase_numbers[1] + meta_phase_numbers[2] + meta_phase_numbers[3] + meta_phase_numbers[3];
 }
 
-unsigned char CubeRow::get(unsigned long where) const
+uint8_t CubeRow::get(unsigned long where) const
 {
     return content[where];
 }
 
-unsigned long CubeRow::get_meta_phase_number(unsigned char which) const
+unsigned long CubeRow::get_meta_phase_number(uint8_t which) const
 {
     return meta_phase_numbers[which];
 }
@@ -94,7 +94,7 @@ CubeRow CubeRow::expand(unsigned long by)
 CubeRow CubeRow::phaseSwitchedTwin(unsigned long where) const
 {
     CubeRow twin(*this);
-    twin.set(twin.get(where) ^ (unsigned char)3, where);
+    twin.set(twin.get(where) ^ (uint8_t)3, where);
     return twin;
 }
 
