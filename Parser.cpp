@@ -13,15 +13,15 @@ void Parser::accept(SymType atom)
     if(symbol == atom)
         Nexts();
     else
-        SyntaxError(atom);
+        SyntaxErrorExpectedSymbol(atom);
 }
 //================================
-void Parser::SyntaxError(int atom)
+void Parser::SyntaxErrorExpectedSymbol(int atom)
 {
 	scn.ScanError(FirstSyntaxError + atom, "Expected symbol: ", AT[atom]);
 }
 //=================================
-void Parser::SyntaxError1(int atom)
+void Parser::SyntaxErrorUnexpectedSymbol(int atom)
 {
     scn.ScanError(FirstSyntaxError + atom, "Unexpected symbol: ", AT[atom]);
 }
@@ -242,7 +242,7 @@ Synchronize::Synchronize(const SymSet& sset, const SymSet& fset): f(fset)
 {
     if(!sset.has(p->symbol))
     {
-        p->SyntaxError1(p->symbol);
+        p->SyntaxErrorUnexpectedSymbol(p->symbol);
         skipto(sset + f);
     }
     p->can_parse = sset.has(p->symbol);
@@ -252,7 +252,7 @@ Synchronize::~Synchronize()
 {
     if(!f.has(p->symbol))
     {
-        p->SyntaxError1(p->symbol);
+        p->SyntaxErrorUnexpectedSymbol(p->symbol);
         skipto(f);
     }
 }

@@ -48,8 +48,8 @@ class Parser
 
     void Nexts();
     void accept(SymType atom);
-    void SyntaxError(int atom);
-    void SyntaxError1(int atom);
+    void SyntaxErrorExpectedSymbol(int atom);
+    void SyntaxErrorUnexpectedSymbol(int atom);
 
 
     bool VarDecl(const SymSet& fs);
