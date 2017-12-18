@@ -370,17 +370,22 @@ list<Cube> CubeTable::redeem(const unordered_map<string, unsigned long>& tab) co
 {
     list<Cube> result;
 
+    vector<string> symbRow(tab.size(), "");
+
+    for(auto& i : tab)
+        symbRow[i.second] = i.first;
+
     for(auto& row : content)
     {
         list<SymbInstance> partialResult;
-        for(auto& symb : tab)
+        for(unsigned long i = 0; i < symbRow.size(); ++i)
         {
-            if(row.get(symb.second))
+            if(row.get(i))
             {
-                if(row.get(symb.second) & 2)
-                    partialResult.emplace_back(SymbInstance(symb.first, false));
-                if(row.get(symb.second) & 1)
-                    partialResult.emplace_back(SymbInstance(symb.first, true));
+                if(row.get(i) & 2)
+                    partialResult.emplace_back(SymbInstance(symbRow[i], false));
+                if(row.get(i) & 1)
+                    partialResult.emplace_back(SymbInstance(symbRow[i], true));
             }
         }
         result.emplace_back(Cube(partialResult));
