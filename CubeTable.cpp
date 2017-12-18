@@ -46,10 +46,11 @@ void CubeTable::append(const CubeRow& item)
 
 bool CubeTable::checkCover(const CubeRow& covered) const
 {
-    for(auto& i : content)
-        if(addressof(i) != addressof(covered) && i.covers(covered))
+    /*for(auto& i : content)
+        if((addressof(i) != addressof(covered)) && i.covers(covered))
             return true;
-    return false;
+    return false;*/
+    return any_of(content.begin(), content.end(), [&](const CubeRow& c){ return (addressof(c) != addressof(covered)) && c.covers(covered); });
 }
 
 CubeTable CubeTable::generateK1() const
@@ -114,12 +115,15 @@ void CubeTable::chooseCoveringSubset()
 
 bool CubeTable::recursiveCover(CubeRow& cube, const list<CubeRow>& subset, list<unsigned long>::iterator pos0, list<unsigned long>::iterator& pos0End) const
 {
-    for(auto& i : content)
+    /*for(auto& i : content)
         if(i.covers(cube))
             return true;
     for(auto& i : subset)
         if(i.covers(cube))
-            return true;
+            return true;*/
+    function<bool(const CubeRow&)> checkFun = [&](const CubeRow& c) { return c.covers(cube); };
+    if(any_of(content.begin(), content.end(), checkFun) || any_of(subset.begin(), subset.end(), checkFun))
+        return true;
     if(pos0 == pos0End)
         return false;
     CubeRow Cube2 = move(cube.expand(*pos0));
