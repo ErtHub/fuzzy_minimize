@@ -110,7 +110,7 @@ int main(int argc, char* argv[])
     Scan scn(src);
     Parser par(scn);
     Synchronize::p = &par;
-    if(par.Program())
+    if(par.parseProgram())
     {
         list<pair<string, FuzzyFunction>> funsToMinimize = move(par.extract());
         for(auto& i : funsToMinimize)

@@ -46,25 +46,25 @@ class Parser
     SymSet addops;
 
 
-    void Nexts();
+    void nexts();
     void accept(SymType atom);
-    void SyntaxErrorExpectedSymbol(int atom);
-    void SyntaxErrorUnexpectedSymbol(int atom);
+    void syntaxErrorExpectedSymbol(int atom);
+    void syntaxErrorUnexpectedSymbol(int atom);
 
 
-    bool VarDecl(const SymSet& fs);
-	bool FunDecl(const SymSet& fs);
-    bool FunDef(const SymSet &fs);
-    bool Sum(const SymSet& fs);
-    bool Product(const SymSet &fs, std::list<SymbInstance> &cubeProt);
+    bool parseVarDecl(const SymSet &fs);
+	bool parseFunDecl(const SymSet &fs);
+    bool parseFunDef(const SymSet &fs);
+    bool parseSum(const SymSet &fs);
+    bool parseProduct(const SymSet &fs, std::list<SymbInstance> &cubeProt);
 
 public:
 
-    bool Program();
+    bool parseProgram();
 
     explicit Parser(Scan&);
     ~Parser() = default;
-    void SemanticError(int ecode);
+    void semanticError(int ecode);
     std::list<std::pair<std::string, FuzzyFunction>> extract();
     void clear();
 };

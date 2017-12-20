@@ -22,24 +22,24 @@ class Source
 
     const std::string fn;
     std::ifstream istr;
-    std::string Line;//TODO powiedziec doktorowi, ze sie wola max_size i ze history robi balagan w algorytmie h, zapytac
-                    //czy maja byc czytane puste funkcje
+    std::string line;//TODO powiedziec doktorowi, ze sie wola max_size i ze history robi balagan w algorytmie h, zapytac
+                    //czy maja byc czytane puste funkcje, powiedziec, ze artykuly nie sa publikowane, powiedziec, ze agonia
 
     TextPos tpos;
 
-    void PrntLine()
+    void prntLine()
     {
-        std::cout << std::setw(5) << tpos.ln << ' ' << Line;
+        std::cout << std::setw(5) << tpos.ln << ' ' << line;
     }
 
-    bool NextLine();
+    bool nextLine();
 
 public:
     explicit Source(const std::string& file);
     ~Source();
-    void Error(int ec, const TextPos& tp, const std::string& mt = "", const std::string& at = "");
-    char NextChar();
-    const TextPos& GetPos() const
+    void error(int ec, const TextPos &tp, const std::string &mt = "", const std::string &at = "");
+    char nextChar();
+    const TextPos& getPos() const
     {
         return tpos;
     }

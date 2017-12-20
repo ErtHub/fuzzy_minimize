@@ -27,9 +27,9 @@ class Scan
     unsigned long intconstant;
     std::string spell;
 
-    void Nextc()
+    void nextc()
     {
-        c = src.NextChar();
+        c = src.nextChar();
     }
 
 
@@ -38,20 +38,20 @@ public:
 
     explicit Scan(Source &s) : src(s), c(0), intconstant(0)
     {
-        Nextc();
+        nextc();
     }
-    SymType NextSymbol();
-    unsigned long IntConst()
+    SymType nextSymbol();
+    unsigned long intConst()
     {
         return intconstant;
     }
-    const std::string& Spell()
+    const std::string& getSpell()
     {
         return spell;
     }
-    void ScanError(int ecode, const std::string& mtxt = "", const std::string& atxt = "")
+    void scanError(int ecode, const std::string &mtxt = "", const std::string &atxt = "")
     {
-        src.Error(ecode, atompos, mtxt, atxt);
+        src.error(ecode, atompos, mtxt, atxt);
     }
 };
 

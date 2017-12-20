@@ -15,15 +15,15 @@ unordered_map<string, SymType> Scan::KT
     { "output", outputsy }
 };
 
-SymType Scan::NextSymbol()
+SymType Scan::nextSymbol()
 {
 
     while(isspace(c))
-        Nextc();
+        nextc();
     if(c==EOF)
         return others;
 
-    atompos=src.GetPos();
+    atompos= src.getPos();
 
     if(isalpha(c))
     {
@@ -32,7 +32,7 @@ SymType Scan::NextSymbol()
         do
         {
             spell.push_back(c);
-            Nextc();
+            nextc();
         } while(isalnum(c));
         if(KT.find(spell) != KT.end())
             return KT.at(spell);
@@ -47,32 +47,32 @@ SymType Scan::NextSymbol()
         {
             ul = ul * 10 + (c - '0');
             big = big || ul > ULONG_MAX;
-            Nextc();
+            nextc();
         } while (isdigit(c));
         if (big)
-            ScanError(ICONST2BIG, "Integer overflow");
+            scanError(ICONST2BIG, "Integer overflow");
         intconstant = (unsigned long)ul;
         return intconst;
     }
     else switch(c)
     {
 	case '=':
-        Nextc();
+        nextc();
         return becomes;
     case '+':
-        Nextc();
+        nextc();
         return orop;
     case '*':
-        Nextc();
+        nextc();
         return andop;
 	case '~':
-        Nextc();
+        nextc();
         return notop;
     case ';':
-        Nextc();
+        nextc();
         return colon;
     default:
-        Nextc();
+        nextc();
         return others;
   }
 }

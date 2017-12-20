@@ -3,27 +3,27 @@
 using namespace std;
 
 //==================
-void Parser::Nexts()
+void Parser::nexts()
 {
-    symbol = scn.NextSymbol();
+    symbol = scn.nextSymbol();
 }
 //===============================
 void Parser::accept(SymType atom)
 {
     if(symbol == atom)
-        Nexts();
+        nexts();
     else
-        SyntaxErrorExpectedSymbol(atom);
+        syntaxErrorExpectedSymbol(atom);
 }
 //================================
-void Parser::SyntaxErrorExpectedSymbol(int atom)
+void Parser::syntaxErrorExpectedSymbol(int atom)
 {
-	scn.ScanError(FirstSyntaxError + atom, "Expected symbol: ", AT[atom]);
+    scn.scanError(FirstSyntaxError + atom, "Expected symbol: ", AT[atom]);
 }
 //=================================
-void Parser::SyntaxErrorUnexpectedSymbol(int atom)
+void Parser::syntaxErrorUnexpectedSymbol(int atom)
 {
-    scn.ScanError(FirstSyntaxError + atom, "Unexpected symbol: ", AT[atom]);
+    scn.scanError(FirstSyntaxError + atom, "Unexpected symbol: ", AT[atom]);
 }
 
 Parser::Parser(Scan& sc): scn(sc), varcount(0)
@@ -36,99 +36,99 @@ Parser::Parser(Scan& sc): scn(sc), varcount(0)
     factstart = SymSet(varname, notop, others, EOS);
     addops = SymSet(orop, others, EOS);
 
-    Nexts();
+    nexts();
 }
 //==============
-bool Parser::Program()
+bool Parser::parseProgram()
 {
     clear();
-    Trace x("Program", SymSet(-1));
-    return VarDecl(outstart) && FunDecl(funstart) && FunDef((SymSet(others, EOS)));
+    Trace x("parseProgram", SymSet(-1));
+    return parseVarDecl(outstart) && parseFunDecl(funstart) && parseFunDef((SymSet(others, EOS)));
 }
 //========================
-bool Parser::VarDecl(const SymSet& fs)
+bool Parser::parseVarDecl(const SymSet &fs)
 {
-    Trace x("VarDecl", fs);
+    Trace x("parseVarDecl", fs);
     Synchronize s(instart, fs);
     if(!can_parse)
         return false;
     accept(inputsy);
     if(symbol == intconst)
     {
-        varcount = scn.IntConst();
+        varcount = scn.intConst();
         accept(intconst);
     }
     else
         return false;
     while(symbol == varname)
     {
-        if(varTable.find(scn.Spell()) != varTable.end())
-            SemanticError(0);
+        if(varTable.find(scn.getSpell()) != varTable.end())
+            semanticError(0);
         else
-            varTable.insert(make_pair(scn.Spell(), varTable.size()));
+            varTable.insert(make_pair(scn.getSpell(), varTable.size()));
         accept(varname);
     }
     if(varTable.size() > varcount)
-        SemanticError(1);
+        semanticError(1);
     else if(varTable.size() < varcount)
-        SemanticError(2);
+        semanticError(2);
     accept(colon);
     return true;
 }
 //========================
-bool Parser::FunDecl(const SymSet& fs)
+bool Parser::parseFunDecl(const SymSet &fs)
 {
-    Trace x("FunDecl", fs);
+    Trace x("parseFunDecl", fs);
     Synchronize s(outstart, fs);
     if(!can_parse)
         return false;
     accept(outputsy);
     if(symbol == intconst)
     {
-        funcount = scn.IntConst();
+        funcount = scn.intConst();
         accept(intconst);
     }
     else
         return false;
     while(symbol == varname)
     {
-        if(funTable.find(scn.Spell()) != funTable.end() || varTable.find(scn.Spell()) != varTable.end())
-            SemanticError(0);
+        if(funTable.find(scn.getSpell()) != funTable.end() || varTable.find(scn.getSpell()) != varTable.end())
+            semanticError(0);
         else
-            funTable.insert(make_pair(scn.Spell(), false));
+            funTable.insert(make_pair(scn.getSpell(), false));
         accept(varname);
     }
     if(funTable.size() > funcount)
-        SemanticError(4);
+        semanticError(4);
     else if(funTable.size() < funcount)
-        SemanticError(5);
+        semanticError(5);
     accept(colon);
     return true;
 }
 //========================
-bool Parser::FunDef(const SymSet &fs)
+bool Parser::parseFunDef(const SymSet &fs)
 {
-    Trace x("FunDef", fs);
+    Trace x("parseFunDef", fs);
     Synchronize s(funstart, fs);
     if(!can_parse)
         return false;
     while(symbol == varname)
     {
-        string name = scn.Spell();
+        string name = scn.getSpell();
         accept(varname);
         unordered_map<string, bool>::iterator iter;
         if((iter = funTable.find(name)) == funTable.end())
         {
-            SemanticError(6);
+            semanticError(6);
             continue;
         }
         else if(iter->second || (varTable.find(name) != varTable.end()))
         {
-            SemanticError(0);
+            semanticError(0);
             continue;
         }
         accept(becomes);
-        if(!Sum(fs + funstart))
+        if(!parseSum(fs + funstart))
             continue;
         funDefs.emplace_back(make_pair(name, FuzzyFunction(varTable, funProt)));
         funProt.clear();
@@ -139,14 +139,14 @@ bool Parser::FunDef(const SymSet &fs)
     return true;
 }
 //========================
-bool Parser::Sum(const SymSet& fs)
+bool Parser::parseSum(const SymSet &fs)
 {
-    Trace x("Sum", fs);
+    Trace x("parseSum", fs);
     Synchronize s(factstart, fs);
     if(!can_parse)
         return false;
     list<SymbInstance> cubeProt;
-    if(!factstart.has(symbol) || !Product(addops, cubeProt))
+    if(!factstart.has(symbol) || !parseProduct(addops, cubeProt))
         return false;
     else
         funProt.emplace_back(Cube(cubeProt));
@@ -154,15 +154,15 @@ bool Parser::Sum(const SymSet& fs)
     {
         cubeProt.clear();
         accept(orop);
-        if(Product(addops + funstart, cubeProt))
+        if(parseProduct(addops + funstart, cubeProt))
             funProt.emplace_back(Cube(cubeProt));
     }
     return true;
 }
 //========================
-bool Parser::Product(const SymSet &fs, list<SymbInstance> &cubeProt)
+bool Parser::parseProduct(const SymSet &fs, list<SymbInstance> &cubeProt)
 {
-    Trace x("Product", fs);
+    Trace x("parseProduct", fs);
     bool negative = false;
     if(symbol == notop)
     {
@@ -171,12 +171,12 @@ bool Parser::Product(const SymSet &fs, list<SymbInstance> &cubeProt)
     }
     if(symbol == varname)
     {
-        if(varTable.find(scn.Spell()) == varTable.end())
+        if(varTable.find(scn.getSpell()) == varTable.end())
         {
-            SemanticError(3);
+            semanticError(3);
             return false;
         }
-        cubeProt.emplace_back(SymbInstance(scn.Spell(), negative));
+        cubeProt.emplace_back(SymbInstance(scn.getSpell(), negative));
         accept(varname);
     }
     else
@@ -192,10 +192,10 @@ bool Parser::Product(const SymSet &fs, list<SymbInstance> &cubeProt)
         }
         if(symbol == varname)
         {
-            if(varTable.find(scn.Spell()) == varTable.end())
-                SemanticError(3);
+            if(varTable.find(scn.getSpell()) == varTable.end())
+                semanticError(3);
             else
-                cubeProt.emplace_back(SymbInstance(scn.Spell(), negative));
+                cubeProt.emplace_back(SymbInstance(scn.getSpell(), negative));
         }
         accept(varname);
         negative = false;
@@ -203,7 +203,7 @@ bool Parser::Product(const SymSet &fs, list<SymbInstance> &cubeProt)
     return true;
 }
 //===================================
-void Parser::SemanticError(int ecode)
+void Parser::semanticError(int ecode)
 {
     static vector<string> SemErr
             {
@@ -216,7 +216,7 @@ void Parser::SemanticError(int ecode)
                     "Undeclared function"
             };
 
-    scn.ScanError(FirstSemanticError + ecode, SemErr[ecode]);
+    scn.scanError(FirstSemanticError + ecode, SemErr[ecode]);
 }
 
 list<pair<string, FuzzyFunction>> Parser::extract()
@@ -242,7 +242,7 @@ Synchronize::Synchronize(const SymSet& sset, const SymSet& fset): f(fset)
 {
     if(!sset.has(p->symbol))
     {
-        p->SyntaxErrorUnexpectedSymbol(p->symbol);
+        p->syntaxErrorUnexpectedSymbol(p->symbol);
         skipto(sset + f);
     }
     p->can_parse = sset.has(p->symbol);
@@ -252,7 +252,7 @@ Synchronize::~Synchronize()
 {
     if(!f.has(p->symbol))
     {
-        p->SyntaxErrorUnexpectedSymbol(p->symbol);
+        p->syntaxErrorUnexpectedSymbol(p->symbol);
         skipto(f);
     }
 }
@@ -260,5 +260,5 @@ Synchronize::~Synchronize()
 void Synchronize::skipto(const SymSet &ss)
 {
     while(!ss.has(p->symbol))
-        p->Nexts();
+        p->nexts();
 }

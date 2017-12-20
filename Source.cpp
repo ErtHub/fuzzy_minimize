@@ -12,7 +12,7 @@ Source::Source(const string& fnam): fn(fnam)
     }
     cout << "Report of procedure for file: \""<<fnam<<"\"" << endl << endl;
     etotal = 0;
-    NextLine();
+    nextLine();
 }
 
 Source::~Source()
@@ -21,28 +21,28 @@ Source::~Source()
     istr.close();
 }
 
-bool Source::NextLine()
+bool Source::nextLine()
 {
     if(istr.eof())
         return false;
-    getline(istr, Line);
-    Line.push_back('\n');
+    getline(istr, line);
+    line.push_back('\n');
 
     ++tpos.ln;
     tpos.cn=0;
-    while(Line[tpos.cn] == ' ' || Line[tpos.cn] == '\t')
+    while(line[tpos.cn] == ' ' || line[tpos.cn] == '\t')
         ++tpos.cn;
-    PrntLine();
+    prntLine();
 
     einline=0;
     return true;
 }
 
-void Source::Error(int ec, const TextPos& tp, const string& mt, const string& at)
+void Source::error(int ec, const TextPos &tp, const string &mt, const string &at)
 {
     ++etotal;
     if(einline == 0)
-        cout << setw(5) << tpos.ln << ' ' << Line;
+        cout << setw(5) << tpos.ln << ' ' << line;
 
     einline=1;
 
@@ -50,13 +50,13 @@ void Source::Error(int ec, const TextPos& tp, const string& mt, const string& at
     cout << setw(tp.cn) << setfill('-') << '^' << setfill(' ') << mt << at << endl;
 }
 
-char Source::NextChar()
+char Source::nextChar()
 {
     bool r = true;
-    if(tpos.cn == Line.size())
-        r = NextLine();
+    if(tpos.cn == line.size())
+        r = nextLine();
     if(r)
-        return Line[tpos.cn++];
+        return line[tpos.cn++];
     else
         return EOF;
 }//TODO ogarnac outputy z tych modulow!
