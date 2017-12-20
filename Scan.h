@@ -20,7 +20,7 @@ enum ScanErrors { ICONST2BIG = 1 };
 
 class Scan
 {
-    static std::unordered_map<std::string, SymType> KT;
+    static std::unordered_map<std::string, SymType> ktab;
 
     char c;
     TextPos atompos;

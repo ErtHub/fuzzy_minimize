@@ -18,12 +18,12 @@ void Parser::accept(SymType atom)
 //================================
 void Parser::syntaxErrorExpectedSymbol(int atom)
 {
-    scn.scanError(FirstSyntaxError + atom, "Expected symbol: ", AT[atom]);
+    scn.scanError(FirstSyntaxError + atom, "Expected symbol: ", atab[atom]);
 }
 //=================================
 void Parser::syntaxErrorUnexpectedSymbol(int atom)
 {
-    scn.scanError(FirstSyntaxError + atom, "Unexpected symbol: ", AT[atom]);
+    scn.scanError(FirstSyntaxError + atom, "Unexpected symbol: ", atab[atom]);
 }
 
 Parser::Parser(Scan& sc): scn(sc), varcount(0), funcount(0)

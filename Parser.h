@@ -6,7 +6,7 @@
 #include "FuzzyFunction.h"
 #include <memory>
 
-extern std::vector<std::string> AT;
+extern std::vector<std::string> atab;
 
 class Parser;
 

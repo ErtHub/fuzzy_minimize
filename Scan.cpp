@@ -2,14 +2,14 @@
 
 using namespace std;
 
-vector<string> AT
+vector<string> atab
 {
 		"input", "output",
         "intconst", "varname",
         "=", "*", "+", "~", ";", "others"
 };
 
-unordered_map<string, SymType> Scan::KT
+unordered_map<string, SymType> Scan::ktab
 {
     { "input", inputsy },
     { "output", outputsy }
@@ -34,8 +34,8 @@ SymType Scan::nextSymbol()
             spell.push_back(c);
             nextc();
         } while(isalnum(c));
-        if(KT.find(spell) != KT.end())
-            return KT.at(spell);
+        if(ktab.find(spell) != ktab.end())
+            return ktab.at(spell);
         else
             return varname;
     }

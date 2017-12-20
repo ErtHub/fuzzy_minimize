@@ -2,7 +2,7 @@
 
 using namespace std;
 
-extern vector<string> AT;
+extern vector<string> atab;
 //===================
 SymSet::SymSet(int e) : s(vector<unsigned>(nwords, 0))
 {
@@ -56,7 +56,7 @@ ostream& operator<< (ostream& os, const SymSet& t)
             if(value & 1)
             {
                 if(n > 0) os << ',';
-                os << AT[(word * t.ubits + bit)];
+                os << atab[(word * t.ubits + bit)];
                 ++n;
             }
             value >>= 1;
