@@ -70,7 +70,7 @@ SymType Scan::nextSymbol()
         return notop;
     case ';':
         nextc();
-        return colon;
+        return semicolon;
     default:
         nextc();
         return others;

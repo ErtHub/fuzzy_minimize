@@ -27,6 +27,15 @@ class Parser
     friend class Synchronize;
     enum { FirstSyntaxError=10, FirstSemanticError=60 };
 
+    enum SemanticErrors
+    {
+        NAME_COLLISION = 0,
+        NENOUGH_VARNAMES,
+        UNDECLARED_VAR,
+        NENOUGH_FUNNAMES,
+        UNDECLARED_FUN
+    };
+
     Scan& scn;
 
     SymType symbol;

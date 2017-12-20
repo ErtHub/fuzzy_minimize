@@ -26,7 +26,7 @@ void Parser::syntaxErrorUnexpectedSymbol(int atom)
     scn.scanError(FirstSyntaxError + atom, "Unexpected symbol: ", AT[atom]);
 }
 
-Parser::Parser(Scan& sc): scn(sc), varcount(0)
+Parser::Parser(Scan& sc): scn(sc), varcount(0), funcount(0)
 {
     Synchronize::p = this;
 
@@ -52,6 +52,7 @@ bool Parser::parseVarDecl(const SymSet &fs)
     Synchronize s(instart, fs);
     if(!can_parse)
         return false;
+    unsigned long declaredSoFar = 0;
     accept(inputsy);
     if(symbol == intconst)
     {
@@ -60,19 +61,20 @@ bool Parser::parseVarDecl(const SymSet &fs)
     }
     else
         return false;
-    while(symbol == varname)
+    while(declaredSoFar < varcount)
     {
+        if(symbol != varname)
+        {
+            semanticError(NENOUGH_VARNAMES);
+            break;
+        }
         if(varTable.find(scn.getSpell()) != varTable.end())
-            semanticError(0);
+            semanticError(NAME_COLLISION);
         else
             varTable.insert(make_pair(scn.getSpell(), varTable.size()));
         accept(varname);
+        ++declaredSoFar;
     }
-    if(varTable.size() > varcount)
-        semanticError(1);
-    else if(varTable.size() < varcount)
-        semanticError(2);
-    accept(colon);
     return true;
 }
 //========================
@@ -82,6 +84,7 @@ bool Parser::parseFunDecl(const SymSet &fs)
     Synchronize s(outstart, fs);
     if(!can_parse)
         return false;
+    unsigned long declaredSoFar = 0;
     accept(outputsy);
     if(symbol == intconst)
     {
@@ -90,19 +93,19 @@ bool Parser::parseFunDecl(const SymSet &fs)
     }
     else
         return false;
-    while(symbol == varname)
+    while(declaredSoFar < funcount)
     {
+        if(symbol != varname)
+        {
+            semanticError(NENOUGH_FUNNAMES);
+        }
         if(funTable.find(scn.getSpell()) != funTable.end() || varTable.find(scn.getSpell()) != varTable.end())
-            semanticError(0);
+            semanticError(NAME_COLLISION);
         else
             funTable.insert(make_pair(scn.getSpell(), false));
         accept(varname);
+        ++declaredSoFar;
     }
-    if(funTable.size() > funcount)
-        semanticError(4);
-    else if(funTable.size() < funcount)
-        semanticError(5);
-    accept(colon);
     return true;
 }
 //========================
@@ -119,12 +122,12 @@ bool Parser::parseFunDef(const SymSet &fs)
         unordered_map<string, bool>::iterator iter;
         if((iter = funTable.find(name)) == funTable.end())
         {
-            semanticError(6);
+            semanticError(UNDECLARED_FUN);
             continue;
         }
         else if(iter->second || (varTable.find(name) != varTable.end()))
         {
-            semanticError(0);
+            semanticError(NAME_COLLISION);
             continue;
         }
         accept(becomes);
@@ -173,7 +176,7 @@ bool Parser::parseProduct(const SymSet &fs, list<SymbInstance> &cubeProt)
     {
         if(varTable.find(scn.getSpell()) == varTable.end())
         {
-            semanticError(3);
+            semanticError(UNDECLARED_VAR);
             return false;
         }
         cubeProt.emplace_back(SymbInstance(scn.getSpell(), negative));
@@ -193,7 +196,7 @@ bool Parser::parseProduct(const SymSet &fs, list<SymbInstance> &cubeProt)
         if(symbol == varname)
         {
             if(varTable.find(scn.getSpell()) == varTable.end())
-                semanticError(3);
+                semanticError(UNDECLARED_VAR);
             else
                 cubeProt.emplace_back(SymbInstance(scn.getSpell(), negative));
         }
@@ -208,10 +211,8 @@ void Parser::semanticError(int ecode)
     static vector<string> SemErr
             {
                     "Name collision",
-                    "More variable names declared than should be",
                     "Fewer variable names declared than should be",
                     "Undeclared variable",
-                    "More function names declared than should be",
                     "Fewer function names declared than should be",
                     "Undeclared function"
             };

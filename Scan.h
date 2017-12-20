@@ -13,7 +13,7 @@ enum SymType
 
     NKEYS, MAXKEY=outputsy,
 
-    intconst, varname, becomes, andop, orop, notop, colon, others, MAXSYM=others+1
+    intconst, varname, becomes, andop, orop, notop, semicolon, others, MAXSYM=others+1
 };
 
 enum ScanErrors { ICONST2BIG = 1 };
