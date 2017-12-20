@@ -72,7 +72,8 @@ Trace::Trace(const string& text, const SymSet& s)
     {
         prefix();
         cout << text;
-        if(show_symbols) cout << ' ' << s;
+        if(show_symbols)
+            cout << ' ' << s;
         cout << endl << flush;
     }
     ++call_level;

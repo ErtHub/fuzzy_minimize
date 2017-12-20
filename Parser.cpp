@@ -46,7 +46,7 @@ bool Parser::parseProgram()
     return parseVarDecl(outstart) && parseFunDecl(funstart) && parseFunDef((SymSet(others, EOS)));
 }
 //========================
-bool Parser::parseVarDecl(const SymSet &fs)
+bool Parser::parseVarDecl(const SymSet &fs)//TODO bardziej generycznie?
 {
     Trace x("parseVarDecl", fs);
     Synchronize s(instart, fs);

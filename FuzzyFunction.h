@@ -46,7 +46,7 @@ public:
     friend class FuzzyFunction;
     friend std::ostream& operator<<(std::ostream& os, const Cube& i);
 };
-
+//TODO operatory dodawania, ew. append?
 class FuzzyFunction
 {
     std::unordered_map<std::string, unsigned long> varTable;

@@ -7,11 +7,12 @@
 #include "CubeTable.h"
 #include "Scan.h"
 #include "Parser.h"
+#include "FunctionGenerator.h"
 
 using namespace std;
 
 
-int Trace::call_level = 0;
+int Trace::call_level = 0;//TODO pozbyc sie...?
 int Trace::trace_on = 0;
 int Trace::show_symbols = 0;
 
@@ -36,7 +37,7 @@ int main(int argc, char* argv[])
 
     enum Options
     {
-        ALGORITHM = 3, WRITER = 12, TIMER = 16
+        ALGORITHM = 3, WRITER = 12, TIMER = 16, GENERATE = 32
     };
 
 
@@ -45,6 +46,8 @@ int main(int argc, char* argv[])
         cout << "Insufficient execution arguments!" << endl;
         return -1;
     }
+
+    unsigned long genV = 1, genC = 1, genF = 1;
 
     for(int i = 1; i < argc; ++i)
     {
@@ -70,19 +73,56 @@ int main(int argc, char* argv[])
                 case 't':
                     options |= TIMER;
                     break;
+                case 'g':
+                    options |= GENERATE;
+                    if((genV = strtoul(argv[++i], nullptr, 0)) == 0)
+                    {
+                        genF = genC = genV = 1;
+                        --i;
+                    }
+                    else if((genC = strtoul(argv[++i], nullptr, 0)) == 0)
+                    {
+                        genC = genV;
+                        genF = 1;
+                        --i;
+                    }
+                    else if((genF = strtoul(argv[++i], nullptr, 0)) == 0)
+                    {
+                        genF = 1;
+                        --i;
+                    }
+                    break;
                 default:
                     cout << "Unknown option \"" << argv[i] << "\"!" << endl;
                     return -3;
             }
         }
-        else
+        else if(filename.empty())
             filename = argv[i];
+        else
+        {
+            cout << "Unknown option \"" << argv[i] << "\"!" << endl;
+            return -3;
+        }
     }
 
     if(filename.empty())
     {
         cout << "File name not defined." << endl;
         return -4;
+    }
+
+    if(options & GENERATE)
+    {
+        cout << genV << " " << genC << " " << genF << endl;
+        FunctionGenerator fg(genV, genC, genF);
+        fg.generate();
+        if(!fg.writeToFile(filename))
+        {
+            cout << "Could not write to file \"" << filename << "\"" << endl;
+            return -6;
+        }
+        return 0;
     }
 
     switch(options & ALGORITHM)
@@ -104,8 +144,6 @@ int main(int argc, char* argv[])
     if(options & TIMER)
         minimizer = shared_ptr<Minimizer>(new Timer(minimizer));
 
-    //TODO moze jakies rozroznienie kiedy stosowac jakie podwielokrotnosci sekundy?
-    //TODO wspolna tablica dla funkcji rozmytych
     Source src(filename);
     Scan scn(src);
     Parser par(scn);

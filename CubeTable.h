@@ -18,7 +18,7 @@ class Cube;
 class CubeTable
 {
     std::list<CubeRow> content;
-    int write;
+    int write;//TODO zrobic jako public static, wyprowadzic konsensus, zlikwidowac & 2
 
     bool findRi(CubeTable& sideList);
     std::list<std::tuple<unsigned long, unsigned long, CubeRow>> findR(CubeRow& r, CubeTable& sideList, CubeTable& ki);
@@ -30,7 +30,7 @@ class CubeTable
     bool omissionAllowedRecursively(CubeRow& cube, unsigned long position, std::list<unsigned long>::iterator pos0, std::list<unsigned long>::iterator& pos0End) const;
 
 public:
-    CubeTable(int w = 0) : write(w){};
+    explicit CubeTable(int w = 0) : write(w){};
     explicit CubeTable(const std::list<CubeRow> &content, int w = 0);
     explicit CubeTable(const FuzzyFunction &func, int w = 0);
     void sweepCovered(CubeTable& another);

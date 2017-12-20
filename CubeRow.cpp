@@ -29,7 +29,7 @@ void CubeRow::set(uint8_t what, unsigned long where)
     ++meta_phase_numbers[content[where]];
 }
 
-list<unsigned long> CubeRow::localize0() const
+list<unsigned long> CubeRow::localize0() const//TODO bardziej generycznie?
 {
     if(!meta_phase_numbers[0])
         return list<unsigned long>();

@@ -34,6 +34,5 @@ namespace
 }
 
 ZadehClassic ZADEH_CLASSIC;
-//TODO: zrobic singleton
 
 #endif //FUZZY_MINIMIZE_OPERATIONIMPL_H

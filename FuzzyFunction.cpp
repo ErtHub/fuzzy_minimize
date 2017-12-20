@@ -69,6 +69,11 @@ Cube::Cube(const list<SymbInstance>& content) : content(content)
 
 ostream& operator<<(ostream& os, const Cube& i)
 {
+    if(i.content.empty())
+    {
+        os << "1";
+        return os;
+    }
     auto iter = i.content.begin();
     os << *iter;
     for(++iter; iter != i.content.end(); ++iter)

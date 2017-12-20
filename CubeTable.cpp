@@ -368,7 +368,7 @@ list<tuple<unsigned long, unsigned long, CubeRow>> CubeTable::findR(CubeRow& r, 
                 }
     );
     return result;
-}//TODO optymizacja, std::algorithm?, zrobic funkcje rekurencyjne iteracyjnie
+}//TODO zrobic funkcje rekurencyjne iteracyjnie
 
 list<Cube> CubeTable::redeem(const unordered_map<string, unsigned long>& tab) const
 {
