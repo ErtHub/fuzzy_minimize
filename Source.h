@@ -18,6 +18,7 @@ struct TextPos
 
 class Source
 {
+    bool good = false;
     int etotal, einline;
 
     const std::string fn;
@@ -42,6 +43,10 @@ public:
     const TextPos& getPos() const
     {
         return tpos;
+    }
+    bool isGood() const
+    {
+        return good;
     }
 };
 #endif

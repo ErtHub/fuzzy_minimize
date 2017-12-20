@@ -6,18 +6,19 @@ Source::Source(const string& fnam): fn(fnam)
 {
     istr.open(fn.c_str());
     if(!istr)
+        good = false;
+    else
     {
-        cout<<"fuzzy_minimize: error reading file \"" << fn << "\"" << endl;
-        exit(1);
+        good = true;
+        cout << "Report of procedure for file: \""<<fnam<<"\"" << endl << endl;
+        etotal = 0;
+        nextLine();
     }
-    cout << "Report of procedure for file: \""<<fnam<<"\"" << endl << endl;
-    etotal = 0;
-    nextLine();
 }
 
 Source::~Source()
 {
-    cout << endl << "fuzzy_minimize: End of report. Errors detected: " << etotal << endl;
+    cout << endl << "End of execution. Read errors detected: " << etotal << endl;
     istr.close();
 }
 

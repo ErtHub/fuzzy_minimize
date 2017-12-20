@@ -145,6 +145,11 @@ int main(int argc, char* argv[])
         minimizer = shared_ptr<Minimizer>(new Timer(minimizer));
 
     Source src(filename);
+    if(!src.isGood())
+    {
+        cout << "Could not read file \"" << filename << "\"" << endl;
+        return -7;
+    }
     Scan scn(src);
     Parser par(scn);
     Synchronize::p = &par;
