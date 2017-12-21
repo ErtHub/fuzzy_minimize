@@ -17,18 +17,22 @@ FuzzyFunction FunctionGenerator::generateOne(unsigned long vCount, unsigned long
 
     random_device rd;
     mt19937 rng(rd());
-    uniform_int_distribution<uint8_t> uni(0, 3);
 
     for(unsigned long i = 0; i < cCount; ++i)
     {
         CubeRow row(vCount);
 
-        for(unsigned long v = 0; v < vCount; ++v)
-            row.set(uni(rng), v);
-        //we don't want any all-0 cubes to be created, so we choose a random position to put a random [1; 3] value there:
+
+        uniform_int_distribution<unsigned long> uni(1, vCount * 2);
+        unsigned long timesRepeat = uni(rng);
         uniform_int_distribution<unsigned long> tweakerWhere(0, vCount - 1);
-        uniform_int_distribution<uint8_t> tweakerWhat(1, 3);
-        row.set(tweakerWhat(rng), tweakerWhere(rng));
+        uniform_int_distribution<uint8_t> tweakerWhat(1, 2);//TODO moze to powinno byc 1, 3?
+
+        for(unsigned long v = 0; v < timesRepeat; ++v)
+        {
+            unsigned long where = tweakerWhere(rng);
+            row.set(row.get(where) | tweakerWhat(rng), where);
+        }
 
         tetraryTable.append(row);
     }
