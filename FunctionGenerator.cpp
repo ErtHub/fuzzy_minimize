@@ -22,7 +22,6 @@ FuzzyFunction FunctionGenerator::generateOne(unsigned long vCount, unsigned long
     for(unsigned long i = 0; i < cCount; ++i)
     {
         CubeRow row(vCount);
-        bool cubeShallNotBeEmpty = false;
 
         for(unsigned long v = 0; v < vCount; ++v)
             row.set(uni(rng), v);
@@ -50,6 +49,11 @@ void FunctionGenerator::generate()
 
 bool FunctionGenerator::writeToFile(const string& fn) const
 {
+    vector<string> symbRow(varTable.size(), "");
+
+    for(auto& i : varTable)
+        symbRow[i.second] = i.first;
+
     cout << "1" << endl;
     ofstream ostr;
 
@@ -58,8 +62,8 @@ bool FunctionGenerator::writeToFile(const string& fn) const
         return false;
 
     ostr << "input " << varCount << " ";
-    for(auto& i : varTable)
-        ostr << i.first << " ";
+    for(auto& i : symbRow)
+        ostr << i << " ";
     ostr << endl;
     ostr << "output " << funCount << " ";
     for(auto& i : result)
