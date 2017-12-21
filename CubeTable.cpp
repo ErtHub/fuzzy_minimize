@@ -159,6 +159,7 @@ void CubeTable::minimizeExact()
         sweepCovered(k1);
         wasEmpty = k1.empty();
         merge(k1);
+//        content.splice(content.end(), k1.content);
         if(write)
             cout << *this << "----------------" << endl;
         //sweepCovered();

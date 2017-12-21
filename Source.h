@@ -25,7 +25,7 @@ class Source
     std::ifstream istr;
     std::string line;//TODO powiedziec doktorowi, ze sie wola max_size i ze history robi balagan w algorytmie h, zapytac
                     //czy maja byc czytane puste funkcje, powiedziec, ze artykuly nie sa publikowane, powiedziec, ze agonia
-
+                    //zapytac o zmiane generatora
     TextPos tpos;
 
     void prntLine()

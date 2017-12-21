@@ -75,18 +75,18 @@ int main(int argc, char* argv[])
                     break;
                 case 'g':
                     options |= GENERATE;
-                    if((genV = strtoul(argv[++i], nullptr, 0)) == 0)
+                    if(++i >= argc || (genV = strtoul(argv[i], nullptr, 0)) == 0)
                     {
                         genF = genC = genV = 1;
                         --i;
                     }
-                    else if((genC = strtoul(argv[++i], nullptr, 0)) == 0)
+                    else if(++i >= argc || (genC = strtoul(argv[i], nullptr, 0)) == 0)
                     {
                         genC = genV;
                         genF = 1;
                         --i;
                     }
-                    else if((genF = strtoul(argv[++i], nullptr, 0)) == 0)
+                    else if(++i >= argc || (genF = strtoul(argv[i], nullptr, 0)) == 0)
                     {
                         genF = 1;
                         --i;
