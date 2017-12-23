@@ -33,7 +33,6 @@ bool Source::nextLine()
     tpos.cn=0;
     while(line[tpos.cn] == ' ' || line[tpos.cn] == '\t')
         ++tpos.cn;
-    prntLine();
 
     einline=0;
     return true;
@@ -47,6 +46,7 @@ void Source::error(int ec, const TextPos &tp, const string &mt, const string &at
 
     einline=1;
 
+    prntLine();
     cout << setw(2) << ec << "*** ";
     cout << setw(tp.cn) << setfill('-') << '^' << setfill(' ') << mt << at << endl;
 }
