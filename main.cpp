@@ -5,7 +5,7 @@
 #include <iostream>
 #include <memory>
 #include "CubeTable.h"
-#include "Scan.h"
+#include "Scanner.h"
 #include "Parser.h"
 #include "FunctionGenerator.h"
 
@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
     enum Options
     {
         ALGORITHM = 3, WRITER = 12, TIMER = 16, GENERATE = 32
-    };
+    };//TODO wyprowadzic te enumy do respektywnych modulow
 
 
     if (argc < 2)
@@ -150,7 +150,7 @@ int main(int argc, char* argv[])
         cout << "Could not read file \"" << filename << "\"" << endl;
         return -7;
     }
-    Scan scn(src);
+    Scanner scn(src);
     Parser par(scn);
     Synchronize::p = &par;
     if(par.parseProgram())

@@ -65,10 +65,12 @@ CubeTable CubeTable::generateK1() const
         auto j = i;
         for(++j; j != content.end(); ++j)
         {
+            //for every possible pair of rows find the 3 value in at least one of them...
             if(i->get_meta_phase_number(3) || j->get_meta_phase_number(3))
             {
                 for(auto &pos : positions1_2)
                 {
+                    //...and for every 1-2 value pair create one fuzzy consensus row...
                     if((i->get(pos) ^ j->get(pos)) == 3)
                     {
                         CubeRow v(j->size());
@@ -81,6 +83,7 @@ CubeTable CubeTable::generateK1() const
                         if(write & 2)
                             cout << endl;
                         v.set(0, pos);
+                        //...and appendt it to the K1 table
                         result.append(v);
                     }
                 }
@@ -97,6 +100,7 @@ void CubeTable::chooseCoveringSubset()
     {
         CubeRow cube = move(content.front());
         content.pop_front();
+        //for every row, if it's complementary and can be Kleen-expanded...
         if(!cube.get_meta_phase_number(0) || !cube.get_meta_phase_number(3))
         {
             subset.push_back(move(cube));
@@ -106,7 +110,10 @@ void CubeTable::chooseCoveringSubset()
         auto divisionPos = positions0.begin();
         auto pos0End = positions0.end();
         CubeRow halfCube1 = cube;
+        //...expand it...
         CubeRow halfCube2 = move(halfCube1.expand(*divisionPos));
+        /*...until all expansion-derived rows are subsumed by one another row in the function; if a row is not subsumed
+         * and cannot be expanded, it cannot be omitted*/
         if(!(recursiveCover(halfCube1, subset, ++divisionPos, pos0End) && recursiveCover(halfCube2, subset, divisionPos, pos0End)))
             subset.push_back(move(cube));
     }
@@ -133,6 +140,7 @@ bool CubeTable::recursiveCover(CubeRow& cube, const list<CubeRow>& subset, list<
 
 bool CubeTable::omissionAllowed(CubeRow &cube, unsigned long position) const
 {
+    //M. Mukaidono - "Fuzzy logical functions and their minimal and irredundant form"
     CubeRow twin = move(cube.phaseSwitchedTwin(position));
     return checkCover(twin);
 }
@@ -163,7 +171,7 @@ void CubeTable::minimizeExact()
         if(write)
             cout << *this << "----------------" << endl;
         //sweepCovered();
-    } while(!wasEmpty);
+    } while(!wasEmpty);//generate fuzzy consensus and append it to K table until K table's content changes
     chooseCoveringSubset();
 }
 
@@ -354,6 +362,8 @@ list<tuple<unsigned long, unsigned long, CubeRow>> CubeTable::findR(CubeRow& r, 
                 else if(!(r.get(i)))
                     ++zeroPairs;
             }
+            /*for a given r row, create an r_n set of rows; for each r_n row, count the 0 values, localize the 1-2 value
+             * pair with the r row and sort them by the 0 values count*/
             if(seenOnlyOne1_2 && !seenCross3)
                 result.push_back(make_tuple(zeroPairs, pos1_2, rn));
         }
@@ -377,6 +387,8 @@ list<Cube> CubeTable::redeem(const unordered_map<string, unsigned long>& tab) co
 
     vector<string> symbRow(tab.size(), "");
 
+    /*std::unordered_map scrambles the order of variable names which can make the fuzzy expression harder to read;
+     * this action creates the ordered symbol row in order to revert this alteration*/
     for(auto& i : tab)
         symbRow[i.second] = i.first;
 

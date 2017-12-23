@@ -18,7 +18,7 @@ enum SymType
 
 enum ScanErrors { ICONST2BIG = 1 };
 
-class Scan
+class Scanner
 {
     static std::unordered_map<std::string, SymType> ktab;
 
@@ -36,7 +36,7 @@ class Scan
 public:
     Source& src;
 
-    explicit Scan(Source &s) : src(s), c(0), intconstant(0)
+    explicit Scanner(Source &s) : src(s), c(0), intconstant(0)
     {
         nextc();
     }

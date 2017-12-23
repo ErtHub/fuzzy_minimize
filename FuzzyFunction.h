@@ -18,10 +18,12 @@ class CubeTable;
 class Minimizer;
 class ExactMinimizer;
 
+//a class representing a literal in a two-level fuzzy function expression
 class SymbInstance
 {
     std::string varName;
     bool negative;
+
     double calc(const std::unordered_map<std::string, unsigned long>& varTable, const std::vector<double>& args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
     void appendToTable(const std::unordered_map<std::string, unsigned long>& varTable, std::vector<uint8_t>& target) const;
 public:
@@ -32,9 +34,11 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const SymbInstance& s);
 };
 
+//a class representing a product of literals
 class Cube
 {
     std::list<SymbInstance> content;
+
     double calc(const std::unordered_map<std::string, unsigned long>& varTable, const std::vector<double>& args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
     std::vector<uint8_t> tabulate(const std::unordered_map<std::string, unsigned long>& varTable) const;
 public:
@@ -47,10 +51,12 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const Cube& i);
 };
 //TODO operatory dodawania, ew. append?
+//a class representing a two-level expression, i.e. a sum of cubes
 class FuzzyFunction
 {
     std::unordered_map<std::string, unsigned long> varTable;
     std::list<Cube> body;
+
     static ExactMinimizer defaultMinimizer;
 public:
     double calc(const std::vector<double> &args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
@@ -59,7 +65,7 @@ public:
 
     FuzzyFunction() = default;
     FuzzyFunction(std::unordered_map<std::string, unsigned long> varTable, std::list<Cube> body);
-    FuzzyFunction(const std::unordered_map<std::string, unsigned long>& varTable, const CubeTable& tab);
+    FuzzyFunction(const std::unordered_map<std::string, unsigned long>& varTable, const CubeTable& tab);//TODO to chyba powinno byc zrobione inaczej...
     std::unordered_map<std::string, unsigned long> getVarTable() const;
     friend std::ostream& operator<<(std::ostream& os, const FuzzyFunction& f);
 };

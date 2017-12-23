@@ -1,7 +1,7 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include "Scan.h"
+#include "Scanner.h"
 #include "Util.h"
 #include "FuzzyFunction.h"
 #include <memory>
@@ -18,7 +18,7 @@ class Synchronize
 
 public:
     static Parser* p;
-    Synchronize(const SymSet& s,const SymSet& f);
+    Synchronize(const SymSet& s, const SymSet& f);
     ~Synchronize();
 };
 
@@ -36,7 +36,7 @@ class Parser
         UNDECLARED_FUN
     };
 
-    Scan& scn;
+    Scanner& scn;
 
     SymType symbol;
     bool can_parse;
@@ -71,7 +71,7 @@ public:
 
     bool parseProgram();
 
-    explicit Parser(Scan&);
+    explicit Parser(Scanner&);
     ~Parser() = default;
     void semanticError(int ecode);
     std::list<std::pair<std::string, FuzzyFunction>> extract();

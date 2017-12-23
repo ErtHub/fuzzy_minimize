@@ -23,6 +23,10 @@ FuzzyFunction FunctionGenerator::generateOne(unsigned long vCount, unsigned long
         CubeRow row(vCount);
 
 
+        /*every function is generated randomly by choosing at random the times a literal should be inserted into every
+         * cube the function is supposed to consist of; the minimal count is 1, the maximal is double the number of
+         * function's variables; then, the generator chooses at random the variable and its negativeness and the
+         * respective literal is put into cube what is repeated as many times as chosen before*/
         uniform_int_distribution<unsigned long> uni(1, vCount * 2);
         unsigned long timesRepeat = uni(rng);
         uniform_int_distribution<unsigned long> tweakerWhere(0, vCount - 1);
@@ -55,6 +59,7 @@ bool FunctionGenerator::writeToFile(const string& fn) const
 {
     vector<string> symbRow(varTable.size(), "");
 
+    /*descramble the symbol order*/
     for(auto& i : varTable)
         symbRow[i.second] = i.first;
 

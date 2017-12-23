@@ -2,7 +2,7 @@
 #define UTIL_H
 
 #include <cstdarg>
-#include "Scan.h"
+#include "Scanner.h"
 
 const int EOS=-1;
 

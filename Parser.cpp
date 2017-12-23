@@ -26,7 +26,7 @@ void Parser::syntaxErrorUnexpectedSymbol(int atom)
     scn.scanError(FirstSyntaxError + atom, "Unexpected symbol: ", atab[atom]);
 }
 
-Parser::Parser(Scan& sc): scn(sc), varcount(0), funcount(0)
+Parser::Parser(Scanner& sc): scn(sc), varcount(0), funcount(0)
 {
     Synchronize::p = this;
 

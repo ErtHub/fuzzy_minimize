@@ -55,6 +55,10 @@ bool CubeRow::covers(const CubeRow& covered) const
 {
     if(meta_phase_numbers[3] > covered.meta_phase_numbers[3] || meta_phase_numbers[0] < covered.meta_phase_numbers[0] || countLiterals() > covered.countLiterals())
         return false;
+    /*the c1 cube subsumes the c2 cube if c2 contains all the literals of c1; the numbers put in these CubeRow
+     * objects are in their binary representation exactly the switches designating if a literal exists in the cube -
+     * 01 for a negative literal and 10 for a positive one; therefore, the test for the relationship of subsuming can be
+     * performed as the equality of the subsuming row and the bitwise AND of the subsuming and the subsumed row*/
     for(unsigned pos = 0; pos < content.size(); ++pos)
         if(content[pos] && (covered.content[pos] & content[pos]) != content[pos])
             return false;
@@ -63,6 +67,8 @@ bool CubeRow::covers(const CubeRow& covered) const
 
 unsigned long long CubeRow::countLiterals() const
 {
+    /*calculate the number of literals the cube represented by the row consists of; each 1 or 2 value mean there is one
+     * literal, 3 value means there are two*/
     return meta_phase_numbers[1] + meta_phase_numbers[2] + meta_phase_numbers[3] + meta_phase_numbers[3];
 }
 
@@ -83,6 +89,7 @@ unsigned long CubeRow::size() const
 
 CubeRow CubeRow::expand(unsigned long by)
 {
+    //apply Kleen law to expand a row into a sum of two rows - one with a 1 value and the other with 2
     if(by >= size() || content[by])
         return CubeRow();
     CubeRow child(*this);

@@ -1,4 +1,4 @@
-#include "Scan.h"
+#include "Scanner.h"
 
 using namespace std;
 
@@ -9,13 +9,13 @@ vector<string> atab
         "=", "*", "+", "~", ";", "others"
 };
 
-unordered_map<string, SymType> Scan::ktab
+unordered_map<string, SymType> Scanner::ktab
 {
     { "input", inputsy },
     { "output", outputsy }
-};
+};//TODO to powinno chyba byc statyczne
 
-SymType Scan::nextSymbol()
+SymType Scanner::nextSymbol()
 {
 
     while(isspace(c))
