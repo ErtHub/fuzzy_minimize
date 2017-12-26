@@ -2,15 +2,15 @@
 
 using namespace std;
 
-Source::Source(const string& fnam): fn(fnam)
+Source::Source(const string& fname): fileName(fname)
 {
-    istr.open(fn.c_str());
+    istr.open(fileName.c_str());
     if(!istr)
         good = false;
     else
     {
         good = true;
-        cout << "Report of procedure for file: \""<<fnam<<"\"" << endl << endl;
+        cout << "Report of procedure for file: \""<<fname<<"\"" << endl << endl;
         etotal = 0;
         nextLine();
     }
@@ -29,35 +29,38 @@ bool Source::nextLine()
     getline(istr, line);
     line.push_back('\n');
 
-    ++tpos.ln;
-    tpos.cn=0;
-    while(line[tpos.cn] == ' ' || line[tpos.cn] == '\t')
-        ++tpos.cn;
+    ++pos.lineNumber;
+    pos.charNumber=0;
+    while(line[pos.charNumber] == ' ' || line[pos.charNumber] == '\t')
+        ++pos.charNumber;
 
     einline=0;
     return true;
 }
 
-void Source::error(int ec, const TextPos &tp, const string &mt, const string &at)
+void Source::error(int errcode, const TextPos &tp, const string &expl)
 {
     ++etotal;
     if(einline == 0)
-        cout << setw(5) << tpos.ln << ' ' << line;
+    {
+        cout << setw(12) << pos.lineNumber << ' ' << line;
+        einline=1;
+    }
+    else
+        ++einline;
 
-    einline=1;
 
-    prntLine();
-    cout << setw(2) << ec << "*** ";
-    cout << setw(tp.cn) << setfill('-') << '^' << setfill(' ') << mt << at << endl;
+    cout << setw(11) << "Error #" << errcode;
+    cout << setw(tp.charNumber) << setfill('-') << '^' << setfill(' ') << expl << endl;
 }
 
 char Source::nextChar()
 {
     bool r = true;
-    if(tpos.cn == line.size())
+    if(pos.charNumber == line.size())
         r = nextLine();
     if(r)
-        return line[tpos.cn++];
+        return line[pos.charNumber++];
     else
         return EOF;
 }

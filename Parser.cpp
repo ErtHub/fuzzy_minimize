@@ -8,33 +8,33 @@ void Parser::nexts()
     symbol = scn.nextSymbol();
 }
 //===============================
-void Parser::accept(SymType atom)
+void Parser::accept(SymType token)
 {
-    if(symbol == atom)
+    if(symbol == token)
         nexts();
     else
-        syntaxErrorExpectedSymbol(atom);
+        syntaxErrorExpectedSymbol(token);
 }
 //================================
-void Parser::syntaxErrorExpectedSymbol(int atom)
+void Parser::syntaxErrorExpectedSymbol(int token)
 {
-    scn.scanError(FirstSyntaxError + atom, "Expected symbol: ", atab[atom]);
+    scn.scanError(ErrorTypeSyntax + token, "Expected token: " + tokenNames[token]);
 }
 //=================================
-void Parser::syntaxErrorUnexpectedSymbol(int atom)
+void Parser::syntaxErrorUnexpectedSymbol(int token)
 {
-    scn.scanError(FirstSyntaxError + atom, "Unexpected symbol: ", atab[atom]);
+    scn.scanError(ErrorTypeSyntax + token, "Unexpected token: " + tokenNames[token]);
 }
 
 Parser::Parser(Scanner& sc): scn(sc), varcount(0), funcount(0)
 {
-    Synchronize::p = this;
+    Sync::p = this;
 
-    instart = SymSet(inputsy, others, EOS);
-    outstart = SymSet(outputsy, others, EOS);
-    funstart = SymSet(varname, others, EOS);
-    factstart = SymSet(varname, notop, others, EOS);
-    addops = SymSet(orop, others, EOS);
+    instart = TokenTypeSet(inputsymb, others, EOS);
+    outstart = TokenTypeSet(outputsymb, others, EOS);
+    funstart = TokenTypeSet(varname, others, EOS);
+    factstart = TokenTypeSet(varname, notop, others, EOS);
+    addops = TokenTypeSet(orop, others, EOS);
 
     nexts();
 }
@@ -42,18 +42,18 @@ Parser::Parser(Scanner& sc): scn(sc), varcount(0), funcount(0)
 bool Parser::parseProgram()
 {
     clear();
-    Trace x("parseProgram", SymSet(-1));
-    return parseVarDecl(outstart) && parseFunDecl(funstart) && parseFunDef((SymSet(others, EOS)));
+    Trace x("parseProgram", TokenTypeSet(-1));
+    return parseVarDecl(outstart) && parseFunDecl(funstart) && parseFunDef((TokenTypeSet(others, EOS)));
 }
 //========================
-bool Parser::parseVarDecl(const SymSet &fs)//TODO bardziej generycznie?
+bool Parser::parseVarDecl(const TokenTypeSet &follow)//TODO bardziej generycznie?
 {
-    Trace x("parseVarDecl", fs);
-    Synchronize s(instart, fs);
-    if(!can_parse)
+    Trace x("parseVarDecl", follow);
+    Sync s(instart, follow);
+    if(!canParse)
         return false;
     unsigned long declaredSoFar = 0;
-    accept(inputsy);
+    accept(inputsymb);
     if(symbol == intconst)
     {
         varcount = scn.intConst();
@@ -78,14 +78,14 @@ bool Parser::parseVarDecl(const SymSet &fs)//TODO bardziej generycznie?
     return true;
 }
 //========================
-bool Parser::parseFunDecl(const SymSet &fs)
+bool Parser::parseFunDecl(const TokenTypeSet &follow)
 {
-    Trace x("parseFunDecl", fs);
-    Synchronize s(outstart, fs);
-    if(!can_parse)
+    Trace x("parseFunDecl", follow);
+    Sync s(outstart, follow);
+    if(!canParse)
         return false;
     unsigned long declaredSoFar = 0;
-    accept(outputsy);
+    accept(outputsymb);
     if(symbol == intconst)
     {
         funcount = scn.intConst();
@@ -109,11 +109,11 @@ bool Parser::parseFunDecl(const SymSet &fs)
     return true;
 }
 //========================
-bool Parser::parseFunDef(const SymSet &fs)
+bool Parser::parseFunDef(const TokenTypeSet &follow)
 {
-    Trace x("parseFunDef", fs);
-    Synchronize s(funstart, fs);
-    if(!can_parse)
+    Trace x("parseFunDef", follow);
+    Sync s(funstart, follow);
+    if(!canParse)
         return false;
     while(symbol == varname)
     {
@@ -131,7 +131,7 @@ bool Parser::parseFunDef(const SymSet &fs)
             continue;
         }
         accept(becomes);
-        if(!parseSum(fs + funstart))
+        if(!parseSum(follow + funstart))
             continue;
         funDefs.emplace_back(make_pair(name, FuzzyFunction(varTable, funProt)));
         funProt.clear();
@@ -142,14 +142,14 @@ bool Parser::parseFunDef(const SymSet &fs)
     return true;
 }
 //========================
-bool Parser::parseSum(const SymSet &fs)
+bool Parser::parseSum(const TokenTypeSet &follow)
 {
-    Trace x("parseSum", fs);
-    Synchronize s(factstart, fs);
-    if(!can_parse)
+    Trace x("parseSum", follow);
+    Sync s(factstart, follow);
+    if(!canParse)
         return false;
     list<SymbInstance> cubeProt;
-    if(!factstart.has(symbol) || !parseProduct(addops, cubeProt))
+    if(!factstart.contains(symbol) || !parseProduct(addops, cubeProt))
         return false;
     else
         funProt.emplace_back(Cube(cubeProt));
@@ -163,9 +163,9 @@ bool Parser::parseSum(const SymSet &fs)
     return true;
 }
 //========================
-bool Parser::parseProduct(const SymSet &fs, list<SymbInstance> &cubeProt)
+bool Parser::parseProduct(const TokenTypeSet &follow, list<SymbInstance> &cubeProt)
 {
-    Trace x("parseProduct", fs);
+    Trace x("parseProduct", follow);
     bool negative = false;
     if(symbol == notop)
     {
@@ -206,7 +206,7 @@ bool Parser::parseProduct(const SymSet &fs, list<SymbInstance> &cubeProt)
     return true;
 }
 //===================================
-void Parser::semanticError(int ecode)
+void Parser::semanticError(int errcode)
 {
     static vector<string> SemErr
             {
@@ -217,7 +217,7 @@ void Parser::semanticError(int ecode)
                     "Undeclared function"
             };
 
-    scn.scanError(FirstSemanticError + ecode, SemErr[ecode]);
+    scn.scanError(ErrorTypeSemantic + errcode, SemErr[errcode]);
 }
 
 list<pair<string, FuzzyFunction>> Parser::extract()
@@ -237,29 +237,29 @@ void Parser::clear()
     funDefs.clear();
 }
 
-Parser* Synchronize::p = nullptr;
+Parser* Sync::p = nullptr;
 
-Synchronize::Synchronize(const SymSet& sset, const SymSet& fset): f(fset)
+Sync::Sync(const TokenTypeSet& fst, const TokenTypeSet& flw): follow(flw)
 {
-    if(!sset.has(p->symbol))
+    if(!fst.contains(p->symbol))
     {
         p->syntaxErrorUnexpectedSymbol(p->symbol);
-        skipto(sset + f);
+        fastForward(fst + follow);
     }
-    p->can_parse = sset.has(p->symbol);
+    p->canParse = fst.contains(p->symbol);
 }
 //=========================
-Synchronize::~Synchronize()
+Sync::~Sync()
 {
-    if(!f.has(p->symbol))
+    if(!follow.contains(p->symbol))
     {
         p->syntaxErrorUnexpectedSymbol(p->symbol);
-        skipto(f);
+        fastForward(follow);
     }
 }
 //========================================
-void Synchronize::skipto(const SymSet &ss)
+void Sync::fastForward(const TokenTypeSet &to)
 {
-    while(!ss.has(p->symbol))
+    while(!to.contains(p->symbol))
         p->nexts();
 }

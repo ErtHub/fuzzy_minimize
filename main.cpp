@@ -12,9 +12,9 @@
 using namespace std;
 
 
-int Trace::call_level = 0;//TODO pozbyc sie...?
-int Trace::trace_on = 0;
-int Trace::show_symbols = 0;
+int Trace::callLevel = 0;//TODO pozbyc sie...?
+int Trace::traceOn = 0;
+int Trace::showSymbols = 0;
 
 int main(int argc, char* argv[])
 {
@@ -152,7 +152,7 @@ int main(int argc, char* argv[])
     }
     Scanner scn(src);
     Parser par(scn);
-    Synchronize::p = &par;
+    Sync::p = &par;
     if(par.parseProgram())
     {
         list<pair<string, FuzzyFunction>> funsToMinimize = move(par.extract());

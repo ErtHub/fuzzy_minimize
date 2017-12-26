@@ -11,9 +11,9 @@
 
 struct TextPos
 {
-    int ln;
-    int cn;
-    explicit TextPos(int l = 0, int c = 0): ln(l), cn(c) {}
+    int lineNumber;
+    int charNumber;
+    explicit TextPos(int l = 0, int c = 0): lineNumber(l), charNumber(c) {}
 };
 
 class Source
@@ -21,26 +21,26 @@ class Source
     bool good = false;
     int etotal, einline;
 
-    const std::string fn;
+    const std::string fileName;
     std::ifstream istr;
     std::string line;
-    TextPos tpos;
+    TextPos pos;
 
-    void prntLine()
+    void printLine()
     {
-        std::cout << std::setw(5) << tpos.ln << ' ' << line;
+        std::cout << std::setw(5) << pos.lineNumber << ' ' << line;
     }
 
     bool nextLine();
 
 public:
-    explicit Source(const std::string& file);
+    explicit Source(const std::string& fname);
     ~Source();
-    void error(int ec, const TextPos &tp, const std::string &mt = "", const std::string &at = "");
+    void error(int errcode, const TextPos &tp, const std::string &expl = "");
     char nextChar();
     const TextPos& getPos() const
     {
-        return tpos;
+        return pos;
     }
     bool isGood() const
     {

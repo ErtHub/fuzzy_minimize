@@ -4,40 +4,40 @@
 #include <cstdarg>
 #include "Scanner.h"
 
-const int EOS=-1;
+const int EOS = -1;
 
-class SymSet
+class TokenTypeSet
 {
     enum
     {
-        size = MAXSYM,
-        ubits = (sizeof(unsigned) * CHAR_BIT),
-        nwords = ((size-1)/ubits+1)
+        size = MAXSYMB,
+        ubits = sizeof(unsigned) * CHAR_BIT,
+        nwords = (size - 1) / ubits + 1
     };
 
-    std::vector<unsigned> s;
+    std::vector<unsigned> content;
 
 public:
-    SymSet() : s(std::vector<unsigned>(nwords, 0)) {};
-    explicit SymSet(int e);
+    TokenTypeSet() : content(std::vector<unsigned>(nwords, 0)) {};
+    explicit TokenTypeSet(int e);
 
-    SymSet(int, int, ...);
+    TokenTypeSet(int, int, ...);
 
-    SymSet operator+(const SymSet& t) const;
-    bool has(int e)const;
-    friend std::ostream& operator<<(std::ostream& os, const SymSet& t);
+    TokenTypeSet operator+(const TokenTypeSet& t) const;
+    bool contains(int e)const;
+    friend std::ostream& operator<<(std::ostream& os, const TokenTypeSet& t);
 };
 
 class Trace
 {
-    static int call_level;
+    static int callLevel;
 
 public:
-    Trace(const std::string& text, const SymSet& s);
+    Trace(const std::string& text, const TokenTypeSet& s);
     ~Trace();
     static void prefix();
-    static int trace_on;
-    static int show_symbols;
+    static int traceOn;
+    static int showSymbols;
 };
 #endif
 

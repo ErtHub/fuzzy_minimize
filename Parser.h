@@ -6,26 +6,26 @@
 #include "FuzzyFunction.h"
 #include <memory>
 
-extern std::vector<std::string> atab;
+extern std::vector<std::string> tokenNames;
 
 class Parser;
 
-class Synchronize
+class Sync
 {
 	friend class Parser;
-    const SymSet &f;
-    void skipto(const SymSet &ss);
+    const TokenTypeSet &follow;
+    void fastForward(const TokenTypeSet &to);
 
 public:
     static Parser* p;
-    Synchronize(const SymSet& s, const SymSet& f);
-    ~Synchronize();
+    Sync(const TokenTypeSet& fst, const TokenTypeSet& flw);
+    ~Sync();
 };
 
 class Parser
 {
-    friend class Synchronize;
-    enum { FirstSyntaxError=10, FirstSemanticError=60 };
+    friend class Sync;
+    enum { ErrorTypeSyntax=16, ErrorTypeSemantic=64 };
 
     enum SemanticErrors
     {
@@ -39,7 +39,7 @@ class Parser
     Scanner& scn;
 
     SymType symbol;
-    bool can_parse;
+    bool canParse;
     unsigned long varcount;
     unsigned long funcount;
     std::unordered_map<std::string, unsigned long> varTable;
@@ -49,23 +49,23 @@ class Parser
     std::list<std::pair<std::string, FuzzyFunction>> funDefs;
 
 
-    SymSet instart, outstart;
-    SymSet funstart;
-    SymSet factstart;
-    SymSet addops;
+    TokenTypeSet instart, outstart;
+    TokenTypeSet funstart;
+    TokenTypeSet factstart;
+    TokenTypeSet addops;
 
 
     void nexts();
-    void accept(SymType atom);
-    void syntaxErrorExpectedSymbol(int atom);
-    void syntaxErrorUnexpectedSymbol(int atom);
+    void accept(SymType token);
+    void syntaxErrorExpectedSymbol(int token);
+    void syntaxErrorUnexpectedSymbol(int token);
 
 
-    bool parseVarDecl(const SymSet &fs);
-	bool parseFunDecl(const SymSet &fs);
-    bool parseFunDef(const SymSet &fs);
-    bool parseSum(const SymSet &fs);
-    bool parseProduct(const SymSet &fs, std::list<SymbInstance> &cubeProt);
+    bool parseVarDecl(const TokenTypeSet &follow);
+	bool parseFunDecl(const TokenTypeSet &follow);
+    bool parseFunDef(const TokenTypeSet &follow);
+    bool parseSum(const TokenTypeSet &follow);
+    bool parseProduct(const TokenTypeSet &follow, std::list<SymbInstance> &cubeProt);
 
 public:
 
@@ -73,7 +73,7 @@ public:
 
     explicit Parser(Scanner&);
     ~Parser() = default;
-    void semanticError(int ecode);
+    void semanticError(int errcode);
     std::list<std::pair<std::string, FuzzyFunction>> extract();
     void clear();
 };

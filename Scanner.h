@@ -9,22 +9,22 @@
 
 enum SymType
 {
-    inputsy, outputsy,
+    inputsymb, outputsymb,
 
-    NKEYS, MAXKEY=outputsy,
+    NKEYS, MAXKEY=outputsymb,
 
-    intconst, varname, becomes, andop, orop, notop, semicolon, others, MAXSYM=others+1
+    intconst, varname, becomes, andop, orop, notop, semicolon, others, MAXSYMB=others+1
 };
 
 enum ScanErrors { ICONST2BIG = 1 };
 
 class Scanner
 {
-    static std::unordered_map<std::string, SymType> ktab;
+    static std::unordered_map<std::string, SymType> keyTable;
 
     char c;
-    TextPos atompos;
-    unsigned long intconstant;
+    TextPos tokenPos;
+    unsigned long intConstant;
     std::string spell;
 
     void nextc()
@@ -36,22 +36,22 @@ class Scanner
 public:
     Source& src;
 
-    explicit Scanner(Source &s) : src(s), c(0), intconstant(0)
+    explicit Scanner(Source &s) : src(s), c(0), intConstant(0)
     {
         nextc();
     }
     SymType nextSymbol();
     unsigned long intConst()
     {
-        return intconstant;
+        return intConstant;
     }
     const std::string& getSpell()
     {
         return spell;
     }
-    void scanError(int ecode, const std::string &mtxt = "", const std::string &atxt = "")
+    void scanError(int errcode, const std::string &expl = "")
     {
-        src.error(ecode, atompos, mtxt, atxt);
+        src.error(errcode, tokenPos, expl);
     }
 };
 

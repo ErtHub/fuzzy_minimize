@@ -2,17 +2,17 @@
 
 using namespace std;
 
-vector<string> atab
+vector<string> tokenNames
 {
 		"input", "output",
         "intconst", "varname",
         "=", "*", "+", "~", ";", "others"
 };
 
-unordered_map<string, SymType> Scanner::ktab
+unordered_map<string, SymType> Scanner::keyTable
 {
-    { "input", inputsy },
-    { "output", outputsy }
+    { "input", inputsymb },
+    { "output", outputsymb }
 };//TODO to powinno chyba byc statyczne
 
 SymType Scanner::nextSymbol()
@@ -23,7 +23,7 @@ SymType Scanner::nextSymbol()
     if(c==EOF)
         return others;
 
-    atompos= src.getPos();
+    tokenPos= src.getPos();
 
     if(isalpha(c))
     {
@@ -34,8 +34,8 @@ SymType Scanner::nextSymbol()
             spell.push_back(c);
             nextc();
         } while(isalnum(c));
-        if(ktab.find(spell) != ktab.end())
-            return ktab.at(spell);
+        if(keyTable.find(spell) != keyTable.end())
+            return keyTable.at(spell);
         else
             return varname;
     }
@@ -51,7 +51,7 @@ SymType Scanner::nextSymbol()
         } while (isdigit(c));
         if (big)
             scanError(ICONST2BIG, "Integer overflow");
-        intconstant = (unsigned long)ul;
+        intConstant = (unsigned long)ul;
         return intconst;
     }
     else switch(c)
