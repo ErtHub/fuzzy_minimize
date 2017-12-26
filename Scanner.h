@@ -7,7 +7,7 @@
 #include <vector>
 #include "Source.h"
 
-enum SymType
+enum TokenType
 {
     inputsymb, outputsymb,
 
@@ -20,7 +20,7 @@ enum ScanErrors { ICONST2BIG = 1 };
 
 class Scanner
 {
-    static std::unordered_map<std::string, SymType> keyTable;
+    static std::unordered_map<std::string, TokenType> keyTable;
 
     char c;
     TextPos tokenPos;
@@ -40,7 +40,7 @@ public:
     {
         nextc();
     }
-    SymType nextSymbol();
+    TokenType nextSymbol();
     unsigned long intConst()
     {
         return intConstant;

@@ -9,13 +9,13 @@ vector<string> tokenNames
         "=", "*", "+", "~", ";", "others"
 };
 
-unordered_map<string, SymType> Scanner::keyTable
+unordered_map<string, TokenType> Scanner::keyTable
 {
     { "input", inputsymb },
     { "output", outputsymb }
 };//TODO to powinno chyba byc statyczne
 
-SymType Scanner::nextSymbol()
+TokenType Scanner::nextSymbol()
 {
 
     while(isspace(c))

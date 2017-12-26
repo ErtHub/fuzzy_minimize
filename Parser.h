@@ -25,7 +25,11 @@ public:
 class Parser
 {
     friend class Sync;
-    enum { ErrorTypeSyntax=16, ErrorTypeSemantic=64 };
+    enum ErrorTypes
+    {
+        ERROR_TYPE_SYNTAX=16,
+        ERROR_TYPE_SEMANTIC=64
+    };
 
     enum SemanticErrors
     {
@@ -38,7 +42,7 @@ class Parser
 
     Scanner& scn;
 
-    SymType symbol;
+    TokenType symbol;
     bool canParse;
     unsigned long varcount;
     unsigned long funcount;
@@ -56,7 +60,7 @@ class Parser
 
 
     void nexts();
-    void accept(SymType token);
+    void accept(TokenType token);
     void syntaxErrorExpectedSymbol(int token);
     void syntaxErrorUnexpectedSymbol(int token);
 

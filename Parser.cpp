@@ -8,7 +8,7 @@ void Parser::nexts()
     symbol = scn.nextSymbol();
 }
 //===============================
-void Parser::accept(SymType token)
+void Parser::accept(TokenType token)
 {
     if(symbol == token)
         nexts();
@@ -18,12 +18,12 @@ void Parser::accept(SymType token)
 //================================
 void Parser::syntaxErrorExpectedSymbol(int token)
 {
-    scn.scanError(ErrorTypeSyntax + token, "Expected token: " + tokenNames[token]);
-}
+    scn.scanError(ERROR_TYPE_SYNTAX + token, "Expected token: " + tokenNames[token]);
+}//TODO enum, ktory rozroznia expected i unexpected
 //=================================
 void Parser::syntaxErrorUnexpectedSymbol(int token)
 {
-    scn.scanError(ErrorTypeSyntax + token, "Unexpected token: " + tokenNames[token]);
+    scn.scanError(ERROR_TYPE_SYNTAX + token, "Unexpected token: " + tokenNames[token]);
 }
 
 Parser::Parser(Scanner& sc): scn(sc), varcount(0), funcount(0)
@@ -217,7 +217,7 @@ void Parser::semanticError(int errcode)
                     "Undeclared function"
             };
 
-    scn.scanError(ErrorTypeSemantic + errcode, SemErr[errcode]);
+    scn.scanError(ERROR_TYPE_SEMANTIC + errcode, SemErr[errcode]);
 }
 
 list<pair<string, FuzzyFunction>> Parser::extract()
