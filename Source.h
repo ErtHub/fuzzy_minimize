@@ -28,7 +28,7 @@ class Source
 
     void printLine()
     {
-        std::cout << std::setw(5) << pos.lineNumber << ' ' << line;
+        std::cout << std::setw(12) << pos.lineNumber << ' ' << line;
     }
 
     bool nextLine();

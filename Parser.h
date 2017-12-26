@@ -60,7 +60,7 @@ class Parser
     void syntaxErrorExpectedSymbol(int token);
     void syntaxErrorUnexpectedSymbol(int token);
 
-
+	//TODO uzupelnic komentarze gramatyka
     bool parseVarDecl(const TokenTypeSet &follow);
 	bool parseFunDecl(const TokenTypeSet &follow);
     bool parseFunDef(const TokenTypeSet &follow);

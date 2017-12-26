@@ -40,7 +40,7 @@ bool TokenTypeSet::contains(int e) const
 {
     if(e < 0 || e >= size)
         return false;
-    return ((content[e/ubits] & (1 << e % ubits)) != 0);
+    return ((content[e/ubits] & (1 << (e % ubits))) != 0);
 }
 //================================================
 ostream& operator<< (ostream& os, const TokenTypeSet& t)

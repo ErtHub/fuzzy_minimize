@@ -12,7 +12,7 @@
 using namespace std;
 
 
-int Trace::callLevel = 0;//TODO pozbyc sie...?
+int Trace::callLevel = 0;//TODO pozbyc sie...?, created by tez chyba wypada
 int Trace::traceOn = 0;
 int Trace::showSymbols = 0;
 

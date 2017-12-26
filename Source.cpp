@@ -43,7 +43,7 @@ void Source::error(int errcode, const TextPos &tp, const string &expl)
     ++etotal;
     if(einline == 0)
     {
-        cout << setw(12) << pos.lineNumber << ' ' << line;
+        printLine();
         einline=1;
     }
     else
