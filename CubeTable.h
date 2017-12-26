@@ -55,7 +55,7 @@ public:
     void minimizeMukaidono();
     void append(const CubeRow& item);
     bool empty() const;
-    void merge(CubeTable& another);
+    void merge(CubeTable& another);//TODO sort?
     //create a printable fuzzy function object for a given variable names table
     std::list<Cube> redeem(const std::unordered_map<std::string, unsigned long>& tab) const;
 

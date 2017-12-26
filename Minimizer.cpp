@@ -70,6 +70,6 @@ Timer::~Timer()
     unsigned long enumerator = 0;
 
     cout << "Execution times:" << endl;
-    for(auto& t : timeRecords)
+    for(auto t : timeRecords)
         cout << ++enumerator << ". " << t << " ms" << endl;
 }

@@ -11,7 +11,7 @@ CubeRow::CubeRow() : meta_phase_numbers(vector<unsigned long>(4, 0))
 
 CubeRow::CubeRow(vector<uint8_t>& content) : content(content), meta_phase_numbers(vector<unsigned long>(4))
 {
-    for(auto& i : this->content)
+    for(auto i : this->content)
         ++meta_phase_numbers[i];
 }
 
@@ -121,10 +121,10 @@ void CubeRow::print() const
 
 ostream& operator<<(ostream& os, const CubeRow& cr)
 {
-    for(auto& i : cr.content)
+    for(auto i : cr.content)
         os << (int)i << " ";
     cout << "| ";
-    for(auto& i : cr.meta_phase_numbers)
+    for(auto i : cr.meta_phase_numbers)
         os << i << " ";
     return os;
 }
