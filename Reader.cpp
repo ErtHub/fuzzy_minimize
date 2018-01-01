@@ -10,7 +10,6 @@ Reader::Reader(const string& fname): fileName(fname)
     else
     {
         good = true;
-        cout << "Report of procedure for file: \""<<fname<<"\"" << endl << endl;//TODO poprawic te msg i wziac w scopa, zeby sie ladnie wyswietlaly
         errcount = 0;
         nextLine();
     }
@@ -18,7 +17,6 @@ Reader::Reader(const string& fname): fileName(fname)
 
 Reader::~Reader()
 {
-    cout << endl << "End of execution. Read errors detected: " << errcount << endl;
     istr.close();
 }
 

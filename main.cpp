@@ -144,17 +144,20 @@ int main(int argc, char* argv[])
     if(options & TIMER)
         minimizer = shared_ptr<Minimizer>(new Timer(minimizer));
 
-    Reader src(filename);
-    if(!src.isGood())
+    Reader rdr(filename);
+    if(!rdr.isGood())
     {
         cout << "Could not read file \"" << filename << "\"" << endl;
         return -7;
     }
-    Scanner scn(src);
+    else
+        cout << "Reading file \"" << filename << "\"..." << endl;
+    Scanner scn(rdr);
     Parser par(scn);
     Sync::p = &par;
     if(par.parseProgram())
     {
+        cout << "Done reading file. Errors detected: " << rdr.getErrcount() << endl;
         list<pair<string, FuzzyFunction>> funsToMinimize = move(par.extract());
         for(auto& i : funsToMinimize)
             i.second = move(i.second.minimize(minimizer.get()));
@@ -164,7 +167,7 @@ int main(int argc, char* argv[])
     }
     else
     {
-        cout << "Syntax error reading file" << endl;
+        cout << "Critical syntax error reading file" << endl;
         return -2;
     }
     //FuzzyFunction f(list<Cube>{Cube(list<SymbInstance>{SymbInstance(0, true), SymbInstance(0, false)}), Cube(list<SymbInstance>{SymbInstance(1, true), SymbInstance(0, true)})});

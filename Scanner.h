@@ -22,25 +22,25 @@ class Scanner
 {
     static std::unordered_map<std::string, TokenType> keyTable;
 
-    char c;
+    char currentChar;
     TextPos tokenPos;
     unsigned long intConstant;
     std::string spell;
 
     void nextc()
     {
-        c = src.nextChar();
+        currentChar = rdr.nextChar();
     }
 
 
 public:
-    Reader& src;
+    Reader& rdr;
 
-    explicit Scanner(Reader& s) : src(s), c(0), intConstant(0)
+    explicit Scanner(Reader& s) : rdr(s), currentChar(0), intConstant(0)
     {
         nextc();
     }
-    TokenType nextSymbol();
+    TokenType nextToken();
     unsigned long intConst()
     {
         return intConstant;
@@ -51,7 +51,7 @@ public:
     }
     void scanError(int errcode, const std::string& expl = "", const std::string& what = "Scan error")
     {
-        src.alert(errcode, tokenPos, expl, what);
+        rdr.alert(errcode, tokenPos, expl, what);
     }
 };
 

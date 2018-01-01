@@ -43,7 +43,7 @@ class Parser
 
     Scanner& scn;
 
-    TokenType symbol;
+    TokenType currentToken;
     bool canParse;
     unsigned long varcount;
     unsigned long funcount;
@@ -60,10 +60,11 @@ class Parser
     TokenTypeSet addops;
 
 
-    void nexts();
+    void nexttok();
     void accept(TokenType token);
     void syntaxErrorExpectedSymbol(int token, const std::string& what = "Syntax error");
     void syntaxErrorUnexpectedSymbol(int token, const std::string& what = "Syntax error");
+    void semanticError(int errcode, const std::string& what = "Semantic error");
 
 	//TODO uzupelnic komentarze gramatyka
     bool parseVarDecl(const TokenTypeSet& follow);
@@ -75,10 +76,8 @@ class Parser
 public:
 
     bool parseProgram();
-
     explicit Parser(Scanner& s);
     ~Parser() = default;
-    void semanticError(int errcode, const std::string& what = "Semantic error");
     std::list<std::pair<std::string, FuzzyFunction>> extract();
     void clear();
 };

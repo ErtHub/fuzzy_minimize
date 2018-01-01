@@ -15,46 +15,46 @@ unordered_map<string, TokenType> Scanner::keyTable
     { "output", outputsymb }
 };//TODO to powinno chyba byc statyczne
 
-TokenType Scanner::nextSymbol()
+TokenType Scanner::nextToken()
 {
 
-    while(isspace(c))
+    while(isspace(currentChar))
         nextc();
-    if(c == EOF)
+    if(currentChar == EOF)
         return others;
 
-    tokenPos = src.getPos();
+    tokenPos = rdr.getPos();
 
-    if(isalpha(c))
+    if(isalpha(currentChar))
     {
         spell.clear();
 
         do
         {
-            spell.push_back(c);
+            spell.push_back(currentChar);
             nextc();
-        } while(isalnum(c));
+        } while(isalnum(currentChar));
         if(keyTable.find(spell) != keyTable.end())
             return keyTable.at(spell);
         else
             return varname;
     }
-    else if(isdigit(c))
+    else if(isdigit(currentChar))
     {
         bool big = false;
         unsigned long long ul = 0;
         do
         {
-            ul = ul * 10 + (c - '0');
+            ul = ul * 10 + (currentChar - '0');
             big = big || ul > ULONG_MAX;
             nextc();
-        } while (isdigit(c));
+        } while (isdigit(currentChar));
         if (big)
             scanError(ICONST2BIG, "Integer overflow");
         intConstant = (unsigned long)ul;
         return intconst;
     }
-    else switch(c)
+    else switch(currentChar)
     {
 	case '=':
         nextc();

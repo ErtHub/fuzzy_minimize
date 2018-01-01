@@ -41,5 +41,9 @@ public:
     {
         return good;
     }
+    int getErrcount() const
+    {
+        return errcount;
+    }
 };
 #endif

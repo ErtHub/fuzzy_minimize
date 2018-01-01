@@ -3,15 +3,15 @@
 using namespace std;
 
 //==================
-void Parser::nexts()
+void Parser::nexttok()
 {
-    symbol = scn.nextSymbol();
+    currentToken = scn.nextToken();
 }
 //===============================
 void Parser::accept(TokenType token)
 {
-    if(symbol == token)
-        nexts();
+    if(currentToken == token)
+        nexttok();
     else
         syntaxErrorExpectedSymbol(token);
 }
@@ -36,7 +36,7 @@ Parser::Parser(Scanner& s): scn(s), varcount(0), funcount(0)
     factstart = TokenTypeSet(varname, notop, others, EOS);
     addops = TokenTypeSet(orop, others, EOS);
 
-    nexts();
+    nexttok();
 }
 //==============
 bool Parser::parseProgram()
@@ -54,7 +54,7 @@ bool Parser::parseVarDecl(const TokenTypeSet &follow)//TODO bardziej generycznie
         return false;
     unsigned long declaredSoFar = 0;
     accept(inputsymb);
-    if(symbol == intconst)
+    if(currentToken == intconst)
     {
         varcount = scn.intConst();
         accept(intconst);
@@ -63,7 +63,7 @@ bool Parser::parseVarDecl(const TokenTypeSet &follow)//TODO bardziej generycznie
         return false;
     while(declaredSoFar < varcount)
     {
-        if(symbol != varname)
+        if(currentToken != varname)
         {
             semanticError(NENOUGH_VARNAMES);
             break;
@@ -86,7 +86,7 @@ bool Parser::parseFunDecl(const TokenTypeSet &follow)
         return false;
     unsigned long declaredSoFar = 0;
     accept(outputsymb);
-    if(symbol == intconst)
+    if(currentToken == intconst)
     {
         funcount = scn.intConst();
         accept(intconst);
@@ -95,7 +95,7 @@ bool Parser::parseFunDecl(const TokenTypeSet &follow)
         return false;
     while(declaredSoFar < funcount)
     {
-        if(symbol != varname)
+        if(currentToken != varname)
         {
             semanticError(NENOUGH_FUNNAMES);
         }
@@ -115,7 +115,7 @@ bool Parser::parseFunDef(const TokenTypeSet &follow)
     Sync s(funstart, follow);
     if(!canParse)
         return false;
-    while(symbol == varname)
+    while(currentToken == varname)
     {
         string name = scn.getSpell();
         accept(varname);
@@ -149,11 +149,11 @@ bool Parser::parseSum(const TokenTypeSet &follow)
     if(!canParse)
         return false;
     list<SymbInstance> cubeProt;
-    if(!factstart.contains(symbol) || !parseProduct(addops, cubeProt))
+    if(!factstart.contains(currentToken) || !parseProduct(addops, cubeProt))
         return false;
     else
         funProt.emplace_back(Cube(cubeProt));
-    while(symbol == orop)
+    while(currentToken == orop)
     {
         cubeProt.clear();
         accept(orop);
@@ -167,12 +167,12 @@ bool Parser::parseProduct(const TokenTypeSet &follow, list<SymbInstance> &cubePr
 {
     Trace x("parseProduct", follow);
     bool negative = false;
-    if(symbol == notop)
+    if(currentToken == notop)
     {
         accept(notop);
         negative = true;
     }
-    if(symbol == varname)
+    if(currentToken == varname)
     {
         if(varTable.find(scn.getSpell()) == varTable.end())
         {
@@ -185,15 +185,15 @@ bool Parser::parseProduct(const TokenTypeSet &follow, list<SymbInstance> &cubePr
     else
         return false;
     negative = false;
-    while(symbol == andop)
+    while(currentToken == andop)
     {
         accept(andop);
-        if(symbol == notop)
+        if(currentToken == notop)
         {
             accept(notop);
             negative = true;
         }
-        if(symbol == varname)
+        if(currentToken == varname)
         {
             if(varTable.find(scn.getSpell()) == varTable.end())
                 semanticError(UNDECLARED_VAR);
@@ -241,25 +241,25 @@ Parser* Sync::p = nullptr;
 
 Sync::Sync(const TokenTypeSet& fst, const TokenTypeSet& flw): follow(flw)
 {
-    if(!fst.contains(p->symbol))
+    if(!fst.contains(p->currentToken))
     {
-        p->syntaxErrorUnexpectedSymbol(p->symbol);
+        p->syntaxErrorUnexpectedSymbol(p->currentToken);
         fastForward(fst + follow);
     }
-    p->canParse = fst.contains(p->symbol);
+    p->canParse = fst.contains(p->currentToken);
 }
 //=========================
 Sync::~Sync()
 {
-    if(!follow.contains(p->symbol))
+    if(!follow.contains(p->currentToken))
     {
-        p->syntaxErrorUnexpectedSymbol(p->symbol);
+        p->syntaxErrorUnexpectedSymbol(p->currentToken);
         fastForward(follow);
     }
 }
 //========================================
 void Sync::fastForward(const TokenTypeSet &to)
 {
-    while(!to.contains(p->symbol))
-        p->nexts();
+    while(!to.contains(p->currentToken))
+        p->nexttok();
 }
