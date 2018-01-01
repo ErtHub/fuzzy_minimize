@@ -5,7 +5,7 @@
 #include <climits>
 #include <cctype>
 #include <vector>
-#include "Source.h"
+#include "Reader.h"
 
 enum TokenType
 {
@@ -34,9 +34,9 @@ class Scanner
 
 
 public:
-    Source& src;
+    Reader& src;
 
-    explicit Scanner(Source &s) : src(s), c(0), intConstant(0)
+    explicit Scanner(Reader& s) : src(s), c(0), intConstant(0)
     {
         nextc();
     }
@@ -49,9 +49,9 @@ public:
     {
         return spell;
     }
-    void scanError(int errcode, const std::string &expl = "")
+    void scanError(int errcode, const std::string& expl = "", const std::string& what = "Scan error")
     {
-        src.error(errcode, tokenPos, expl);
+        src.alert(errcode, tokenPos, expl, what);
     }
 };
 

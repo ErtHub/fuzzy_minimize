@@ -20,10 +20,10 @@ TokenType Scanner::nextSymbol()
 
     while(isspace(c))
         nextc();
-    if(c==EOF)
+    if(c == EOF)
         return others;
 
-    tokenPos= src.getPos();
+    tokenPos = src.getPos();
 
     if(isalpha(c))
     {

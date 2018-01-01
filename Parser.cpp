@@ -16,17 +16,17 @@ void Parser::accept(TokenType token)
         syntaxErrorExpectedSymbol(token);
 }
 //================================
-void Parser::syntaxErrorExpectedSymbol(int token)
+void Parser::syntaxErrorExpectedSymbol(int token, const string& what)
 {
-    scn.scanError(ERROR_TYPE_SYNTAX + token, "Expected token: " + tokenNames[token]);
+    scn.scanError(ERROR_TYPE_SYNTAX_EXP + token, "Expected token: " + tokenNames[token], what);
 }//TODO enum, ktory rozroznia expected i unexpected
 //=================================
-void Parser::syntaxErrorUnexpectedSymbol(int token)
+void Parser::syntaxErrorUnexpectedSymbol(int token, const string& what)
 {
-    scn.scanError(ERROR_TYPE_SYNTAX + token, "Unexpected token: " + tokenNames[token]);
+    scn.scanError(ERROR_TYPE_SYNTAX_UNEXP + token, "Unexpected token: " + tokenNames[token], what);
 }
 
-Parser::Parser(Scanner& sc): scn(sc), varcount(0), funcount(0)
+Parser::Parser(Scanner& s): scn(s), varcount(0), funcount(0)
 {
     Sync::p = this;
 
@@ -206,9 +206,9 @@ bool Parser::parseProduct(const TokenTypeSet &follow, list<SymbInstance> &cubePr
     return true;
 }
 //===================================
-void Parser::semanticError(int errcode)
+void Parser::semanticError(int errcode, const string& what)
 {
-    static vector<string> SemErr
+    static vector<string> explTab
             {
                     "Name collision",
                     "Fewer variable names declared than should be",
@@ -217,7 +217,7 @@ void Parser::semanticError(int errcode)
                     "Undeclared function"
             };
 
-    scn.scanError(ERROR_TYPE_SEMANTIC + errcode, SemErr[errcode]);
+    scn.scanError(ERROR_TYPE_SEMANTIC + errcode, explTab[errcode], what);
 }
 
 list<pair<string, FuzzyFunction>> Parser::extract()

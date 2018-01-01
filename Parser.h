@@ -27,8 +27,9 @@ class Parser
     friend class Sync;
     enum ErrorTypes
     {
-        ERROR_TYPE_SYNTAX=16,
-        ERROR_TYPE_SEMANTIC=64
+        ERROR_TYPE_SYNTAX_EXP = 16,
+        ERROR_TYPE_SYNTAX_UNEXP = 32,
+        ERROR_TYPE_SEMANTIC = 128
     };
 
     enum SemanticErrors
@@ -61,23 +62,23 @@ class Parser
 
     void nexts();
     void accept(TokenType token);
-    void syntaxErrorExpectedSymbol(int token);
-    void syntaxErrorUnexpectedSymbol(int token);
+    void syntaxErrorExpectedSymbol(int token, const std::string& what = "Syntax error");
+    void syntaxErrorUnexpectedSymbol(int token, const std::string& what = "Syntax error");
 
 	//TODO uzupelnic komentarze gramatyka
-    bool parseVarDecl(const TokenTypeSet &follow);
-	bool parseFunDecl(const TokenTypeSet &follow);
-    bool parseFunDef(const TokenTypeSet &follow);
-    bool parseSum(const TokenTypeSet &follow);
-    bool parseProduct(const TokenTypeSet &follow, std::list<SymbInstance> &cubeProt);
+    bool parseVarDecl(const TokenTypeSet& follow);
+	bool parseFunDecl(const TokenTypeSet& follow);
+    bool parseFunDef(const TokenTypeSet& follow);
+    bool parseSum(const TokenTypeSet& follow);
+    bool parseProduct(const TokenTypeSet& follow, std::list<SymbInstance>& cubeProt);
 
 public:
 
     bool parseProgram();
 
-    explicit Parser(Scanner&);
+    explicit Parser(Scanner& s);
     ~Parser() = default;
-    void semanticError(int errcode);
+    void semanticError(int errcode, const std::string& what = "Semantic error");
     std::list<std::pair<std::string, FuzzyFunction>> extract();
     void clear();
 };

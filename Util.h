@@ -13,7 +13,7 @@ class TokenTypeSet
         size = MAXSYMB,
         ubits = sizeof(unsigned) * CHAR_BIT,
         nwords = (size - 1) / ubits + 1
-    };
+    };//TODO make public static int
 
     std::vector<unsigned> content;
 

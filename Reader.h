@@ -2,7 +2,6 @@
 #define SOURCE_H
 
 #include <iostream>
-#include <iomanip>
 #include <fstream>
 #include <string>
 #include <cstdlib>
@@ -12,31 +11,27 @@
 struct TextPos
 {
     int lineNumber;
-    int charNumber;
-    explicit TextPos(int l = 0, int c = 0): lineNumber(l), charNumber(c) {}
+    int columnNumber;
+    explicit TextPos(int l = 0, int c = 0): lineNumber(l), columnNumber(c) {}
 };
 
-class Source
+class Reader
 {
     bool good = false;
-    int etotal, einline;
+    int errcount;
+    bool firstErrorInLine;
 
     const std::string fileName;
     std::ifstream istr;
     std::string line;
     TextPos pos;
 
-    void printLine()
-    {
-        std::cout << std::setw(12) << pos.lineNumber << ' ' << line;
-    }
-
     bool nextLine();
 
 public:
-    explicit Source(const std::string& fname);
-    ~Source();
-    void error(int errcode, const TextPos &tp, const std::string &expl = "");
+    explicit Reader(const std::string& fname);
+    ~Reader();
+    void alert(int errcode, const TextPos& tp, const std::string& expl = "", const std::string& what = "Unknown error");
     char nextChar();
     const TextPos& getPos() const
     {

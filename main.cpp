@@ -144,7 +144,7 @@ int main(int argc, char* argv[])
     if(options & TIMER)
         minimizer = shared_ptr<Minimizer>(new Timer(minimizer));
 
-    Source src(filename);
+    Reader src(filename);
     if(!src.isGood())
     {
         cout << "Could not read file \"" << filename << "\"" << endl;
