@@ -154,7 +154,6 @@ int main(int argc, char* argv[])
         cout << "Reading file \"" << filename << "\"..." << endl;
     Scanner scn(rdr);
     Parser par(scn);
-    Sync::p = &par;
     if(par.parseProgram())
     {
         cout << "Done reading file. Errors detected: " << rdr.getErrcount() << endl;

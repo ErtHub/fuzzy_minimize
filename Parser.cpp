@@ -26,10 +26,8 @@ void Parser::syntaxErrorUnexpectedSymbol(int token, const string& what)
     scn.scanError(ERROR_TYPE_SYNTAX_UNEXP + token, "Unexpected token: " + tokenNames[token], what);
 }
 
-Parser::Parser(Scanner& s): scn(s), varcount(0), funcount(0)
+Parser::Parser(Scanner& s) : scn(s), varcount(0), funcount(0)
 {
-    Sync::p = this;
-
     instart = TokenTypeSet(inputsymb, others, EOS);
     outstart = TokenTypeSet(outputsymb, others, EOS);
     funstart = TokenTypeSet(varname, others, EOS);
@@ -49,7 +47,7 @@ bool Parser::parseProgram()
 bool Parser::parseVarDecl(const TokenTypeSet &follow)//TODO bardziej generycznie?
 {
     Trace x("parseVarDecl", follow);
-    Sync s(instart, follow);
+    Sync s(this, instart, follow);
     if(!canParse)
         return false;
     unsigned long declaredSoFar = 0;
@@ -81,7 +79,7 @@ bool Parser::parseVarDecl(const TokenTypeSet &follow)//TODO bardziej generycznie
 bool Parser::parseFunDecl(const TokenTypeSet &follow)
 {
     Trace x("parseFunDecl", follow);
-    Sync s(outstart, follow);
+    Sync s(this, outstart, follow);
     if(!canParse)
         return false;
     unsigned long declaredSoFar = 0;
@@ -112,7 +110,7 @@ bool Parser::parseFunDecl(const TokenTypeSet &follow)
 bool Parser::parseFunDef(const TokenTypeSet &follow)
 {
     Trace x("parseFunDef", follow);
-    Sync s(funstart, follow);
+    Sync s(this, funstart, follow);
     if(!canParse)
         return false;
     while(currentToken == varname)
@@ -145,7 +143,7 @@ bool Parser::parseFunDef(const TokenTypeSet &follow)
 bool Parser::parseSum(const TokenTypeSet &follow)
 {
     Trace x("parseSum", follow);
-    Sync s(factstart, follow);
+    Sync s(this, factstart, follow);
     if(!canParse)
         return false;
     list<SymbInstance> cubeProt;
@@ -237,29 +235,27 @@ void Parser::clear()
     funDefs.clear();
 }
 
-Parser* Sync::p = nullptr;
-
-Sync::Sync(const TokenTypeSet& fst, const TokenTypeSet& flw): follow(flw)
+Sync::Sync(Parser* p, const TokenTypeSet& fst, const TokenTypeSet& flw) : par(p), follow(flw)
 {
-    if(!fst.contains(p->currentToken))
+    if(!fst.contains(par->currentToken))
     {
-        p->syntaxErrorUnexpectedSymbol(p->currentToken);
+        par->syntaxErrorUnexpectedSymbol(par->currentToken);
         fastForward(fst + follow);
     }
-    p->canParse = fst.contains(p->currentToken);
+    par->canParse = fst.contains(par->currentToken);
 }
 //=========================
 Sync::~Sync()
 {
-    if(!follow.contains(p->currentToken))
+    if(!follow.contains(par->currentToken))
     {
-        p->syntaxErrorUnexpectedSymbol(p->currentToken);
+        par->syntaxErrorUnexpectedSymbol(par->currentToken);
         fastForward(follow);
     }
 }
 //========================================
 void Sync::fastForward(const TokenTypeSet &to)
 {
-    while(!to.contains(p->currentToken))
-        p->nexttok();
+    while(!to.contains(par->currentToken))
+        par->nexttok();
 }

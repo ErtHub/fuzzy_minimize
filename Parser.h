@@ -12,13 +12,13 @@ class Parser;
 
 class Sync
 {
-	friend class Parser;
+    Parser* par;
+    friend class Parser;
     const TokenTypeSet &follow;
     void fastForward(const TokenTypeSet &to);
 
 public:
-    static Parser* p;
-    Sync(const TokenTypeSet& fst, const TokenTypeSet& flw);
+    Sync(Parser* p, const TokenTypeSet& fst, const TokenTypeSet& flw);
     ~Sync();
 };
 
