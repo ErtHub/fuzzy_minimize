@@ -2,7 +2,6 @@
 #define PARSER_H
 
 #include "Scanner.h"
-#include "Util.h"
 #include "FuzzyFunction.h"
 #include <memory>
 

@@ -106,7 +106,7 @@ FuzzyFunction FuzzyFunction::minimize(Minimizer* minimizer) const
     return minimizer->minimize(*this);
 }
 
-FuzzyFunction::FuzzyFunction(unordered_map<string, unsigned long> varTable, list<Cube> body) : varTable(move(varTable)), body(move(body))//move yo' body :D
+FuzzyFunction::FuzzyFunction(unordered_map<string, unsigned long> varTable, list<Cube> body) : varTable(move(varTable)), body(move(body))
 {}
 
 FuzzyFunction::FuzzyFunction(const unordered_map<string, unsigned long>& varTable, const CubeTable& tab) : body(move(tab.redeem(varTable))), varTable(varTable)

@@ -15,6 +15,69 @@ unordered_map<string, TokenType> Scanner::keyTable
     { "output", outputsymb }
 };//TODO to powinno chyba byc statyczne
 
+TokenTypeSet::TokenTypeSet(int elem) : content(vector<unsigned>(nwords, 0))
+{
+    if(elem >= 0 && elem < size)
+        content[elem/ubits] = (unsigned)(1 << (elem % ubits));
+}
+
+TokenTypeSet::TokenTypeSet(int elem1, int elem2,...) : content(vector<unsigned>(nwords, 0))
+{
+    va_list ap;
+    int e;
+
+    if(elem1 >= 0 && elem1 < size)
+        content[elem1/ubits] = (unsigned)(1 << (elem1 % ubits));
+    e = elem2;
+    va_start(ap, elem2);
+    while(e >= 0)
+    {
+        if(e < size)
+            content[e/ubits] |= (1 << (e % ubits));
+        e = va_arg(ap, int);
+    }
+    va_end(ap);
+}
+
+TokenTypeSet TokenTypeSet::operator+(const TokenTypeSet& set)const
+{
+    TokenTypeSet temp = *this;
+    for(int i = 0; i < nwords; ++i)
+        temp.content[i] |= set.content[i];
+    return temp;
+}
+
+bool TokenTypeSet::contains(int elem) const
+{
+    if(elem < 0 || elem >= size)
+        return false;
+    return ((content[elem/ubits] & (1 << (elem % ubits))) != 0);
+}
+
+ostream& operator<< (ostream& os, const TokenTypeSet& set)
+{
+    unsigned word, bit, value, n = 0;
+    os << '{';
+    for(word = 0; word < set.nwords; ++word)
+    {
+        bit = 0;
+        value = set.content[word];
+        while(value)
+        {
+            if(value & 1)
+            {
+                if(n > 0) os << ',';
+                os << tokenNames[(word * set.ubits + bit)];
+                ++n;
+            }
+            value >>= 1;
+            ++bit;
+        }
+    }
+    os << '}';
+    return os;
+}
+
 TokenType Scanner::nextToken()
 {
 

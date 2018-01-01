@@ -19,7 +19,7 @@ void Parser::accept(TokenType token)
 void Parser::syntaxErrorExpectedSymbol(int token, const string& what)
 {
     scn.scanError(ERROR_TYPE_SYNTAX_EXP + token, "Expected token: " + tokenNames[token], what);
-}//TODO enum, ktory rozroznia expected i unexpected
+}
 //=================================
 void Parser::syntaxErrorUnexpectedSymbol(int token, const string& what)
 {
@@ -40,13 +40,11 @@ Parser::Parser(Scanner& s) : scn(s), varcount(0), funcount(0)
 bool Parser::parseProgram()
 {
     clear();
-    Trace x("parseProgram", TokenTypeSet(-1));
     return parseVarDecl(outstart) && parseFunDecl(funstart) && parseFunDef((TokenTypeSet(others, EOS)));
 }
 //========================
 bool Parser::parseVarDecl(const TokenTypeSet &follow)//TODO bardziej generycznie?
 {
-    Trace x("parseVarDecl", follow);
     Sync s(this, instart, follow);
     if(!canParse)
         return false;
@@ -78,7 +76,6 @@ bool Parser::parseVarDecl(const TokenTypeSet &follow)//TODO bardziej generycznie
 //========================
 bool Parser::parseFunDecl(const TokenTypeSet &follow)
 {
-    Trace x("parseFunDecl", follow);
     Sync s(this, outstart, follow);
     if(!canParse)
         return false;
@@ -109,7 +106,6 @@ bool Parser::parseFunDecl(const TokenTypeSet &follow)
 //========================
 bool Parser::parseFunDef(const TokenTypeSet &follow)
 {
-    Trace x("parseFunDef", follow);
     Sync s(this, funstart, follow);
     if(!canParse)
         return false;
@@ -142,7 +138,6 @@ bool Parser::parseFunDef(const TokenTypeSet &follow)
 //========================
 bool Parser::parseSum(const TokenTypeSet &follow)
 {
-    Trace x("parseSum", follow);
     Sync s(this, factstart, follow);
     if(!canParse)
         return false;
@@ -163,7 +158,6 @@ bool Parser::parseSum(const TokenTypeSet &follow)
 //========================
 bool Parser::parseProduct(const TokenTypeSet &follow, list<SymbInstance> &cubeProt)
 {
-    Trace x("parseProduct", follow);
     bool negative = false;
     if(currentToken == notop)
     {
