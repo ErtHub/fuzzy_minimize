@@ -20,6 +20,7 @@ public:
     explicit Minimizer(int w = 0) : write(w){}
     virtual ~Minimizer() = default;
     virtual FuzzyFunction minimize(const FuzzyFunction& input) = 0;
+    virtual void report(std::ostream& os) const = 0;
 };
 
 class ExactMinimizer : public Minimizer
@@ -28,6 +29,7 @@ public:
     explicit ExactMinimizer(int w = 0) : Minimizer(w){};
     ~ExactMinimizer() override = default;
     FuzzyFunction minimize(const FuzzyFunction& input) override;
+    void report(std::ostream& os) const override { os << ""; };
 };
 
 class HeuristicMinimizer : public Minimizer
@@ -36,6 +38,7 @@ public:
     explicit HeuristicMinimizer(int w = 0) : Minimizer(w){};
     ~HeuristicMinimizer() override = default;
     FuzzyFunction minimize(const FuzzyFunction& input) override;
+    void report(std::ostream& os) const override { os << ""; };
 };
 
 class MukaidonoMinimizer : public Minimizer
@@ -44,6 +47,7 @@ public:
     explicit MukaidonoMinimizer(int w = 0) : Minimizer(w){};
     ~MukaidonoMinimizer() override = default;
     FuzzyFunction minimize(const FuzzyFunction& input) override;
+    void report(std::ostream& os) const override { os << ""; };
 };
 
 class MinimizerDecorator : public Minimizer
@@ -58,8 +62,9 @@ class Timer : public MinimizerDecorator
     std::list<double> timeRecords;
 public:
     explicit Timer(std::shared_ptr<Minimizer> minimizer) : MinimizerDecorator(std::move(minimizer)){};
-    ~Timer() override;
+    ~Timer() override = default;
     FuzzyFunction minimize(const FuzzyFunction& input) override;
+    void report(std::ostream& os) const override;
 };
 
 #endif //FUZZY_MINIMIZE_MINIMIZER_H

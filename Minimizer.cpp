@@ -65,11 +65,12 @@ FuzzyFunction Timer::minimize(const FuzzyFunction &input)
     return result;
 }
 
-Timer::~Timer()
+void Timer::report(std::ostream &os) const
 {
+    wrappee->report(os);
     unsigned long enumerator = 0;
 
-    cout << "Execution times:" << endl;
+    os << "Execution times:" << endl;
     for(auto t : timeRecords)
-        cout << ++enumerator << ". " << t << " ms" << endl;
+        os << ++enumerator << ". " << t << " ms" << endl;
 }

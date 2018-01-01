@@ -157,6 +157,7 @@ int main(int argc, char* argv[])
             i.second = move(i.second.minimize(minimizer.get()));
         for(auto& i : funsToMinimize)
             cout << i.first << " = " << i.second << endl;
+        minimizer->report(cout);
         return 0;
     }
     else
