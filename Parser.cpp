@@ -2,12 +2,12 @@
 
 using namespace std;
 
-//==================
+
 void Parser::nexttok()
 {
     currentToken = scn.nextToken();
 }
-//===============================
+
 void Parser::accept(TokenType token)
 {
     if(currentToken == token)
@@ -15,12 +15,12 @@ void Parser::accept(TokenType token)
     else
         syntaxErrorExpectedSymbol(token);
 }
-//================================
+
 void Parser::syntaxErrorExpectedSymbol(int token, const string& what)
 {
     scn.scanError(ERROR_TYPE_SYNTAX_EXP + token, "Expected token: " + tokenNames[token], what);
 }
-//=================================
+
 void Parser::syntaxErrorUnexpectedSymbol(int token, const string& what)
 {
     scn.scanError(ERROR_TYPE_SYNTAX_UNEXP + token, "Unexpected token: " + tokenNames[token], what);
@@ -36,17 +36,17 @@ Parser::Parser(Scanner& s) : scn(s), varcount(0), funcount(0)
 
     nexttok();
 }
-//==============
+
 bool Parser::parseProgram()
 {
     clear();
     return parseVarDecl(outstart) && parseFunDecl(funstart) && parseFunDef((TokenTypeSet(others, EOS)));
 }
-//========================
+
 bool Parser::parseVarDecl(const TokenTypeSet &follow)//TODO bardziej generycznie?
 {
     Sync s(this, instart, follow);
-    if(!canParse)
+    if(!good)
         return false;
     unsigned long declaredSoFar = 0;
     accept(inputsymb);
@@ -73,11 +73,11 @@ bool Parser::parseVarDecl(const TokenTypeSet &follow)//TODO bardziej generycznie
     }
     return true;
 }
-//========================
+
 bool Parser::parseFunDecl(const TokenTypeSet &follow)
 {
     Sync s(this, outstart, follow);
-    if(!canParse)
+    if(!good)
         return false;
     unsigned long declaredSoFar = 0;
     accept(outputsymb);
@@ -103,11 +103,11 @@ bool Parser::parseFunDecl(const TokenTypeSet &follow)
     }
     return true;
 }
-//========================
+
 bool Parser::parseFunDef(const TokenTypeSet &follow)
 {
     Sync s(this, funstart, follow);
-    if(!canParse)
+    if(!good)
         return false;
     while(currentToken == varname)
     {
@@ -135,11 +135,11 @@ bool Parser::parseFunDef(const TokenTypeSet &follow)
     }
     return true;
 }
-//========================
+
 bool Parser::parseSum(const TokenTypeSet &follow)
 {
     Sync s(this, factstart, follow);
-    if(!canParse)
+    if(!good)
         return false;
     list<SymbInstance> cubeProt;
     if(!factstart.contains(currentToken) || !parseProduct(addops, cubeProt))
@@ -155,7 +155,7 @@ bool Parser::parseSum(const TokenTypeSet &follow)
     }
     return true;
 }
-//========================
+
 bool Parser::parseProduct(const TokenTypeSet &follow, list<SymbInstance> &cubeProt)
 {
     bool negative = false;
@@ -197,7 +197,7 @@ bool Parser::parseProduct(const TokenTypeSet &follow, list<SymbInstance> &cubePr
     }
     return true;
 }
-//===================================
+
 void Parser::semanticError(int errcode, const string& what)
 {
     static vector<string> explTab
@@ -236,9 +236,9 @@ Sync::Sync(Parser* p, const TokenTypeSet& fst, const TokenTypeSet& flw) : par(p)
         par->syntaxErrorUnexpectedSymbol(par->currentToken);
         fastForward(fst + follow);
     }
-    par->canParse = fst.contains(par->currentToken);
+    par->good = fst.contains(par->currentToken);
 }
-//=========================
+
 Sync::~Sync()
 {
     if(!follow.contains(par->currentToken))
@@ -247,7 +247,7 @@ Sync::~Sync()
         fastForward(follow);
     }
 }
-//========================================
+
 void Sync::fastForward(const TokenTypeSet &to)
 {
     while(!to.contains(par->currentToken))

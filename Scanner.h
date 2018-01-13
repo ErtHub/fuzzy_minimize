@@ -10,11 +10,7 @@
 
 enum TokenType
 {
-    inputsymb, outputsymb,
-
-    NKEYS, MAXKEY=outputsymb,
-
-    intconst, varname, becomes, andop, orop, notop, semicolon, others, MAXSYMB=others+1
+    inputsymb, outputsymb, intconst, varname, becomes, andop, orop, notop, semicolon, others, MAXSYMB=others+1
 };
 
 const int EOS = -1;
@@ -35,7 +31,7 @@ public:
 
     TokenTypeSet operator+(const TokenTypeSet& set) const;
     bool contains(int elem)const;
-    friend std::ostream& operator<<(std::ostream& os, const TokenTypeSet& set);
+    //friend std::ostream& operator<<(std::ostream& os, const TokenTypeSet& set);
 };
 
 enum ScanErrors { ICONST2BIG = 1 };

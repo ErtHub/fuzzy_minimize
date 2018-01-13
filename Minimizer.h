@@ -15,7 +15,7 @@ class FuzzyFunction;
 class Minimizer
 {
 protected:
-    int write;
+    int write;//TODO zliczanie generowanych kostek?
 public:
     explicit Minimizer(int w = 0) : write(w){}
     virtual ~Minimizer() = default;
@@ -29,7 +29,7 @@ public:
     explicit ExactMinimizer(int w = 0) : Minimizer(w){};
     ~ExactMinimizer() override = default;
     FuzzyFunction minimize(const FuzzyFunction& input) override;
-    void report(std::ostream& os) const override { os << ""; };
+    void report(std::ostream& os) const override {};
 };
 
 class HeuristicMinimizer : public Minimizer
@@ -38,7 +38,7 @@ public:
     explicit HeuristicMinimizer(int w = 0) : Minimizer(w){};
     ~HeuristicMinimizer() override = default;
     FuzzyFunction minimize(const FuzzyFunction& input) override;
-    void report(std::ostream& os) const override { os << ""; };
+    void report(std::ostream& os) const override {};
 };
 
 class MukaidonoMinimizer : public Minimizer
@@ -47,7 +47,7 @@ public:
     explicit MukaidonoMinimizer(int w = 0) : Minimizer(w){};
     ~MukaidonoMinimizer() override = default;
     FuzzyFunction minimize(const FuzzyFunction& input) override;
-    void report(std::ostream& os) const override { os << ""; };
+    void report(std::ostream& os) const override {};
 };
 
 class MinimizerDecorator : public Minimizer

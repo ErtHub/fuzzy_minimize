@@ -27,8 +27,8 @@ class Parser
     enum ErrorTypes
     {
         ERROR_TYPE_SYNTAX_EXP = 16,
-        ERROR_TYPE_SYNTAX_UNEXP = 32,
-        ERROR_TYPE_SEMANTIC = 128
+        ERROR_TYPE_SYNTAX_UNEXP = 64,
+        ERROR_TYPE_SEMANTIC = 256
     };
 
     enum SemanticErrors
@@ -43,7 +43,7 @@ class Parser
     Scanner& scn;
 
     TokenType currentToken;
-    bool canParse;
+    bool good;
     unsigned long varcount;
     unsigned long funcount;
     std::unordered_map<std::string, unsigned long> varTable;

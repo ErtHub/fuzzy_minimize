@@ -4,12 +4,27 @@
 
 #include <iostream>
 #include <memory>
+#include <getopt.h>
 #include "CubeTable.h"
 #include "Scanner.h"
 #include "Parser.h"
 #include "FunctionGenerator.h"
 
 using namespace std;
+
+void printHelp(char* progname, ostream& os)
+{
+    os << progname << " - Help" << endl;
+    os << progname <<" [-f filename][-e|-u|-m][-v|-V][-t][-r genV][-c genC][-i genF][-h]" << endl;
+    os << "Options:" << endl;
+    os << "-f - specify the name of the file to be read from or written to" << endl;
+    os << "-e, -u, -m - specify the algorithm to be run, Exact, Heuristic and Mukaidono respectively" << endl;
+    os << "-v - print cube tables every iteration" << endl;
+    os << "-V - print cube tables and fuzzy consensus calculation every iteration" << endl;
+    os << "-t - measure the algorithms execution time" << endl;
+    os << "-r, -c, -i - launch program in the random fuzzy function generation mode instead and specify the number of variables, cubes and functions respectively" << endl;
+    os << "-h - print this help" << endl;
+}
 
 int main(int argc, char* argv[])
 {
@@ -35,87 +50,88 @@ int main(int argc, char* argv[])
         ALGORITHM = 3, WRITER = 12, TIMER = 16, GENERATE = 32
     };//TODO wyprowadzic te enumy do respektywnych modulow
 
-
-    if (argc < 2)
+    if(argc < 2)
     {
-        cout << "Insufficient execution arguments!" << endl;
+        cout << "Usage:" << endl;
+        cout << argv[0] << " -h - ask for help" << endl;
+        cout << argv[0] << " -f filename - run the Exact Algorithm for the content of the file with name \"filename\"" << endl;
         return -1;
     }
 
-    unsigned long genV = 1, genC = 1, genF = 1;
+    unsigned long genV = 0, genC = 0, genF = 0;
+    int c;
 
-    for(int i = 1; i < argc; ++i)
+    while((c = getopt(argc, argv, "f:eumvVtr:c:i:h")) != -1)
     {
-        if(argv[i][0] == '-')
+        switch(c)
         {
-            switch(argv[i][1])
-            {
-                case 'e':
-                    options |= EXACT;
-                    break;
-                case 'h':
-                    options |= HEURISTIC;
-                    break;
-                case 'm':
-                    options |= HEURISTIC_MUKAIDONO;
-                    break;
-                case 'v':
-                    options |= VERBOSE;
-                    break;
-                case 'V':
-                    options |= VERY_VERBOSE;
-                    break;
-                case 't':
-                    options |= TIMER;
-                    break;
-                case 'g':
-                    options |= GENERATE;
-                    if(++i >= argc || (genV = strtoul(argv[i], nullptr, 0)) == 0)
-                    {
-                        genF = genC = genV = 1;
-                        --i;
-                    }
-                    else if(++i >= argc || (genC = strtoul(argv[i], nullptr, 0)) == 0)
-                    {
-                        genC = genV;
-                        genF = 1;
-                        --i;
-                    }
-                    else if(++i >= argc || (genF = strtoul(argv[i], nullptr, 0)) == 0)
-                    {
-                        genF = 1;
-                        --i;
-                    }
-                    break;
-                default:
-                    cout << "Unknown option \"" << argv[i] << "\"!" << endl;
-                    return -3;
-            }
-        }
-        else if(filename.empty())
-            filename = argv[i];
-        else
-        {
-            cout << "Unknown option \"" << argv[i] << "\"!" << endl;
-            return -3;
+            case 'f':
+                filename = optarg;
+                break;
+            case 'e':
+                options |= EXACT;
+                break;
+            case 'u':
+                options |= HEURISTIC;
+                break;
+            case 'm':
+                options |= HEURISTIC_MUKAIDONO;
+                break;
+            case 'v':
+                options |= VERBOSE;
+                break;
+            case 'V':
+                options |= VERY_VERBOSE;
+                break;
+            case 't':
+                options |= TIMER;
+                break;
+            case 'r':
+                options |= GENERATE;
+                genV = strtoul(optarg, nullptr, 0);
+                break;
+            case 'c':
+                options |= GENERATE;
+                genC = strtoul(optarg, nullptr, 0);
+                break;
+            case 'i':
+                options |= GENERATE;
+                genF = strtoul(optarg, nullptr, 0);
+                break;
+            case 'h':
+                printHelp(argv[0], cout);
+                return 0;
+            case '?':
+            default:
+                if(optopt == 'f' || optopt == 'r' || optopt == 'c' || optopt == 'i')
+                    cout << "Option \"-" << (char)optopt << "\" requires an argument!" << endl;
+                else
+                    cout << "Unknown option \"-" << (char)optopt << "\"!" << endl;
+                return -2;
         }
     }
 
     if(filename.empty())
     {
         cout << "File name not defined." << endl;
-        return -4;
+        return -3;
     }
 
     if(options & GENERATE)
     {
-        cout << genV << " " << genC << " " << genF << endl;
+        if(!genV)
+            genV = 1;
+        if(!genC)
+            genC = genV;
+        if(!genF)
+            genF = 1;
+        cout << "Generating " << genF << genV << " variable fuzzy functions, " << genC << " cubes each...";
         FunctionGenerator fg(genV, genC, genF);
         fg.generate();
         if(!fg.writeToFile(filename))
         {
             cout << "Could not write to file \"" << filename << "\"" << endl;
-            return -6;
+            return -4;
         }
         return 0;
     }
@@ -143,7 +159,7 @@ int main(int argc, char* argv[])
     if(!rdr.isGood())
     {
         cout << "Could not read file \"" << filename << "\"" << endl;
-        return -7;
+        return -6;
     }
     else
         cout << "Reading file \"" << filename << "\"..." << endl;
@@ -163,7 +179,7 @@ int main(int argc, char* argv[])
     else
     {
         cout << "Critical syntax error reading file" << endl;
-        return -2;
+        return -7;
     }
     //FuzzyFunction f(list<Cube>{Cube(list<SymbInstance>{SymbInstance(0, true), SymbInstance(0, false)}), Cube(list<SymbInstance>{SymbInstance(1, true), SymbInstance(0, true)})});
     /*SymbInstance a(1, true), b(1, false), c(1, false), d(0, true);

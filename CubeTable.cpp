@@ -14,8 +14,8 @@ CubeTable::CubeTable(const FuzzyFunction &func, int w) : content(func.tabulate()
 
 void CubeTable::sweepCovered(CubeTable& another)
 {
-    sweepCovered();
-    another.sweepCovered();
+    //sweepCovered();
+    //another.sweepCovered();
     for(auto& i : content)
         another.sweepCovered(i);
     for(auto& i : another.content)
@@ -83,7 +83,7 @@ CubeTable CubeTable::generateK1() const
                         if(write & 2)
                             cout << endl;
                         v.set(0, pos);
-                        //...and appendt it to the K1 table
+                        //...and append it to the K1 table
                         result.append(v);
                     }
                 }
@@ -164,6 +164,7 @@ void CubeTable::minimizeExact()
     {
         k1 = move(generateK1());
         k1.content.sort();
+        k1.sweepCovered();
         sweepCovered(k1);
         wasEmpty = k1.empty();
         merge(k1);
@@ -205,9 +206,11 @@ void CubeTable::minimizeHeuristic()
                 cout << endl;
             rk.set(0, pos1_2);
             ki.content.push_back(rk);
+
             sweepCovered(ki.content.back());
             sideList.sweepCovered(ki.content.back());
             ki.sweepCovered(ki.content.back());
+
             if(checkCover(ki.content.back()) || sideList.checkCover(ki.content.back()) || ki.checkCover(ki.content.back()))
             {
                 ki.content.pop_back();
@@ -220,7 +223,7 @@ void CubeTable::minimizeHeuristic()
                 ki.content.pop_back();
                 break;
             }
-
+//TODO getopt
             history.content.push_front(rk);
             r = rk;
             R = findR(r, sideList, ki);

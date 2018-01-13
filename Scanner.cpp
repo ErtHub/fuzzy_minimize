@@ -4,9 +4,7 @@ using namespace std;
 
 vector<string> tokenNames
 {
-		"input", "output",
-        "intconst", "varname",
-        "=", "*", "+", "~", ";", "others"
+        "input", "output", "intconst", "varname", "=", "*", "+", "~", ";", "others"
 };
 
 unordered_map<string, TokenType> Scanner::keyTable
@@ -21,7 +19,7 @@ TokenTypeSet::TokenTypeSet(int elem) : content(vector<unsigned>(nwords, 0))
         content[elem/ubits] = (unsigned)(1 << (elem % ubits));
 }
 
-TokenTypeSet::TokenTypeSet(int elem1, int elem2,...) : content(vector<unsigned>(nwords, 0))
+TokenTypeSet::TokenTypeSet(int elem1, int elem2, ...) : content(vector<unsigned>(nwords, 0))
 {
     va_list ap;
     int e;
@@ -54,7 +52,7 @@ bool TokenTypeSet::contains(int elem) const
     return ((content[elem/ubits] & (1 << (elem % ubits))) != 0);
 }
 
-ostream& operator<< (ostream& os, const TokenTypeSet& set)
+/*ostream& operator<< (ostream& os, const TokenTypeSet& set)
 {
     unsigned word, bit, value, n = 0;
     os << '{';
@@ -76,7 +74,7 @@ ostream& operator<< (ostream& os, const TokenTypeSet& set)
     }
     os << '}';
     return os;
-}
+}*/
 
 TokenType Scanner::nextToken()
 {
