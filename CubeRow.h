@@ -10,6 +10,13 @@
 #include <vector>
 #include <list>
 
+enum Covering
+{
+    NO_COVER = 0,
+    NEQUAL,
+    EQUAL,
+};
+
 /*this class represents the tetrary-tabular form of a fuzzy expression cube; every position represents a variable of a
  * function and a value is set as 0 if there is no literal representing the variable, 1 if there is a negative literal
  * 2, if there is a positive one and 3 if there are both*/
@@ -29,7 +36,7 @@ public:
     //point all the positions, where the value is 1 or 2
     std::list<unsigned long> localize1_2() const;
     //test if the calling CubeRow object subsumes the one given as 'covered'
-    bool covers(const CubeRow& covered) const;
+    int covers(const CubeRow& covered) const;
     unsigned long long countLiterals() const;
     uint8_t get(unsigned long where) const;
     unsigned long get_meta_phase_number(uint8_t which) const;

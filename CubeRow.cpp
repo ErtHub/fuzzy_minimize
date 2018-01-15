@@ -51,18 +51,25 @@ list<unsigned long> CubeRow::localize1_2() const
     return positions1_2;
 }
 
-bool CubeRow::covers(const CubeRow& covered) const
+int CubeRow::covers(const CubeRow& covered) const
 {
+    int rowsAreEqual = EQUAL;
     if(meta_phase_numbers[3] > covered.meta_phase_numbers[3] || meta_phase_numbers[0] < covered.meta_phase_numbers[0] || countLiterals() > covered.countLiterals())
-        return false;
+        return NO_COVER;
     /*the c1 cube subsumes the c2 cube if c2 contains all the literals of c1; the numbers put in these CubeRow
      * objects are in their binary representation exactly the switches designating if a literal exists in the cube -
      * 01 for a negative literal and 10 for a positive one; therefore, the test for the relationship of subsuming can be
      * performed as the equality of the subsuming row and the bitwise AND of the subsuming and the subsumed row*/
     for(unsigned pos = 0; pos < content.size(); ++pos)
-        if(content[pos] && (covered.content[pos] & content[pos]) != content[pos])
-            return false;
-    return true;
+    {
+        if(content[pos] != covered.content[pos])
+        {
+            rowsAreEqual = NEQUAL;
+            if(content[pos] && (covered.content[pos] & content[pos]) != content[pos])
+                return NO_COVER;
+        }
+    }
+    return rowsAreEqual;
 }
 
 unsigned long long CubeRow::countLiterals() const

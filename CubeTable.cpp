@@ -12,31 +12,35 @@ CubeTable::CubeTable(const std::list<CubeRow> &content, int w) : content(content
 CubeTable::CubeTable(const FuzzyFunction &func, int w) : content(func.tabulate()), write(w)
 {}
 
-void CubeTable::sweepCovered(CubeTable& another)
+void CubeTable::sweepCovered(CubeTable& another, int sweepEqual)
 {
     //sweepCovered();
     //another.sweepCovered();
     for(auto& i : content)
-        another.sweepCovered(i);
+        another.sweepCovered(i, sweepEqual);
     for(auto& i : another.content)
-        sweepCovered(i);
+        sweepCovered(i, sweepEqual);
 }
 
-void CubeTable::sweepCovered()
+void CubeTable::sweepCovered(int sweepEqual)
 {
     for(auto& i : content)
-        sweepCovered(i);
+        sweepCovered(i, sweepEqual);
 }
 
-void CubeTable::sweepCovered(const CubeRow& i)
+bool CubeTable::sweepCovered(const CubeRow& i, int sweepEqual)
 {
+    int equality = 0;
+    int equalitiesSoFar = 0;
     for(auto k = content.begin(); k != content.end();)
     {
-        if(addressof(*k) != addressof(i) && i.covers(*k))
+        if(addressof(*k) != addressof(i) && ((equality = i.covers(*k)) & sweepEqual))
             k = content.erase(k);
         else
             ++k;
+        equalitiesSoFar |= equality;
     }
+    return (bool)(equalitiesSoFar & EQUAL);
 }
 
 void CubeTable::append(const CubeRow& item)
@@ -44,13 +48,13 @@ void CubeTable::append(const CubeRow& item)
     content.push_back(item);
 }
 
-bool CubeTable::checkCover(const CubeRow& covered) const
+bool CubeTable::checkCover(const CubeRow& covered, int checkEqual) const
 {
     /*for(auto& i : content)
         if((addressof(i) != addressof(covered)) && i.covers(covered))
             return true;
     return false;*/
-    return any_of(content.begin(), content.end(), [&](const CubeRow& c){ return (addressof(c) != addressof(covered)) && c.covers(covered); });
+    return any_of(content.begin(), content.end(), [&](const CubeRow& c){ return (addressof(c) != addressof(covered)) && (c.covers(covered) & checkEqual); });
 }
 
 CubeTable CubeTable::generateK1() const
@@ -142,7 +146,7 @@ bool CubeTable::omissionAllowed(CubeRow &cube, unsigned long position) const
 {
     //M. Mukaidono - "Fuzzy logical functions and their minimal and irredundant form"
     CubeRow twin = move(cube.phaseSwitchedTwin(position));
-    return checkCover(twin);
+    return (bool)checkCover(twin);
 }
 
 bool CubeTable::omissionAllowedRecursively(CubeRow &cube, unsigned long position,
@@ -180,9 +184,10 @@ void CubeTable::minimizeHeuristic()
 {
     content.sort();
     sweepCovered();
+    unsigned long originalSize = content.size();
     CubeTable sideList;
     CubeTable ki;
-    CubeTable history;
+//    CubeTable history;
     while(findRi(sideList))
     {
         CubeRow r;
@@ -207,24 +212,24 @@ void CubeTable::minimizeHeuristic()
             rk.set(0, pos1_2);
             ki.content.push_back(rk);
 
-            sweepCovered(ki.content.back());
-            sideList.sweepCovered(ki.content.back());
-            ki.sweepCovered(ki.content.back());
+            bool rowWasRepeated = sweepCovered(ki.content.back(), NEQUAL);
+            rowWasRepeated |= sideList.sweepCovered(ki.content.back(), NEQUAL);
+            rowWasRepeated |= ki.sweepCovered(ki.content.back(), NEQUAL);
 
-            if(checkCover(ki.content.back()) || sideList.checkCover(ki.content.back()) || ki.checkCover(ki.content.back()))
+            if(checkCover(ki.content.back(), NEQUAL) || sideList.checkCover(ki.content.back(), NEQUAL) || ki.checkCover(ki.content.back(), NEQUAL))
             {
                 ki.content.pop_back();
                 continue;
             }
             if(!rk.get_meta_phase_number(1) && !rk.get_meta_phase_number(2))
                 break;
-            if(rLiteralsCount < rk.countLiterals() || history.checkCover(ki.content.back()))
+            if(rLiteralsCount < rk.countLiterals() || rowWasRepeated)
             {
                 ki.content.pop_back();
                 break;
             }
-//TODO getopt
-            history.content.push_front(rk);
+
+//            history.content.push_front(rk);
             r = rk;
             R = findR(r, sideList, ki);
             rLiteralsCount = r.countLiterals();
@@ -233,7 +238,8 @@ void CubeTable::minimizeHeuristic()
         }
     }
     merge(sideList);
-    merge(ki);
+    if(content.size() < originalSize)
+        merge(ki);
 //    content.sort();
 //    chooseCoveringSubset();
 }

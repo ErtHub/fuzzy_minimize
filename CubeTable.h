@@ -27,7 +27,7 @@ class CubeTable
      * at other positions than r_i; sort them by descending 0 value pairs count*/
     std::list<std::tuple<unsigned long, unsigned long, CubeRow>> findR(CubeRow& r, CubeTable& sideList, CubeTable& ki);
     //check if the table has any single row that subsumes the row given as 'covered'
-    bool checkCover(const CubeRow& covered) const;
+    bool checkCover(const CubeRow& covered, int checkEqual = NEQUAL | EQUAL) const;
     /*for a K tetrary table, generate a K1 table containing all the fuzzy consensus rows excluding ones that derive from
      * pairs of rows of which both are not complementary*/
     CubeTable generateK1() const;
@@ -43,10 +43,10 @@ public:
     explicit CubeTable(const std::list<CubeRow> &content, int w = 0);
     explicit CubeTable(const FuzzyFunction &func, int w = 0);
     //the sweepCovered functions are called to remove all cubes subsumed by any other single cube
-    void sweepCovered(CubeTable& another);
-    void sweepCovered();
+    void sweepCovered(CubeTable& another, int sweepEqual = NEQUAL | EQUAL);
+    void sweepCovered(int sweepEqual = NEQUAL | EQUAL);
     //sweep out the cubes subsumed by the cube given as 'i'
-    void sweepCovered(const CubeRow& i);
+    bool sweepCovered(const CubeRow& i, int sweepEqual = NEQUAL | EQUAL);
     //A. Wielgus 2003 - algorithm 7.2
     void minimizeExact();
     //A. Wielgus 2003 - algorithm 7.3
