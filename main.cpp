@@ -5,10 +5,12 @@
 #include <iostream>
 #include <memory>
 #include <getopt.h>
+#include <sstream>
 #include "CubeTable.h"
 #include "Scanner.h"
 #include "Parser.h"
 #include "FunctionGenerator.h"
+#include "Minimizer.h"
 
 using namespace std;
 
@@ -169,10 +171,14 @@ int main(int argc, char* argv[])
     {
         cout << "Done reading file. Errors detected: " << rdr.getErrcount() << endl;
         list<pair<string, FuzzyFunction>> funsToMinimize = move(par.extract());
+        ostringstream ostr;
         for(auto& i : funsToMinimize)
-            i.second = move(i.second.minimize(minimizer.get()));
-        for(auto& i : funsToMinimize)
-            cout << i.first << " = " << i.second << endl;
+        {
+            minimizer->minimize(i.second);
+            minimizer->writeResult(ostr << i.first << " = ");
+            ostr << endl;
+        }
+        cout << ostr.str();
         minimizer->report(cout);
         return 0;
     }

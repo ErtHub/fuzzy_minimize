@@ -81,6 +81,12 @@ ostream& operator<<(ostream& os, const Cube& i)
     return os;
 }
 
+void FuzzyFunction::clear()
+{
+    varTable.clear();
+    body.clear();
+}
+
 double FuzzyFunction::calc(const vector<double> &args, OperationImpl* opImpl) const
 {
     double acc = 0;
@@ -99,11 +105,6 @@ list<CubeRow> FuzzyFunction::tabulate() const
         res.emplace_back(CubeRow(partialRes));
     }
     return res;
-}
-
-FuzzyFunction FuzzyFunction::minimize(Minimizer* minimizer) const
-{
-    return minimizer->minimize(*this);
 }
 
 FuzzyFunction::FuzzyFunction(unordered_map<string, unsigned long> varTable, list<Cube> body) : varTable(move(varTable)), body(move(body))

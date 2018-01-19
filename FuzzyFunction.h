@@ -11,12 +11,9 @@
 #include "OperationImpl.h"
 #include "CubeRow.h"
 #include "CubeTable.h"
-#include "Minimizer.h"
 
 
 class CubeTable;
-class Minimizer;
-class ExactMinimizer;
 
 //a class representing a literal in a two-level fuzzy function expression
 class SymbInstance
@@ -57,15 +54,15 @@ class FuzzyFunction
     std::unordered_map<std::string, unsigned long> varTable;
     std::list<Cube> body;
 
-    static ExactMinimizer defaultMinimizer;
 public:
+    void clear();
     double calc(const std::vector<double> &args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
     std::list<CubeRow> tabulate() const;
-    FuzzyFunction minimize(Minimizer* minimizer = (Minimizer*)&defaultMinimizer) const;
 
     FuzzyFunction() = default;
     FuzzyFunction(std::unordered_map<std::string, unsigned long> varTable, std::list<Cube> body);
     FuzzyFunction(const std::unordered_map<std::string, unsigned long>& varTable, const CubeTable& tab);//TODO to chyba powinno byc zrobione inaczej...
+
     std::unordered_map<std::string, unsigned long> getVarTable() const;
     friend std::ostream& operator<<(std::ostream& os, const FuzzyFunction& f);
 };

@@ -97,49 +97,54 @@ CubeTable CubeTable::generateK1() const
     return result;
 }
 
-void CubeTable::chooseCoveringSubset()
+CubeTable CubeTable::separateEssentials()
 {
-    list<CubeRow> subset;
-    while(!content.empty())
+    list<CubeRow> essentials;
+
+    for(auto i = content.begin(); i != content.end();)
     {
-        CubeRow cube = move(content.front());
-        content.pop_front();
         //for every row, if it's complementary and can be Kleen-expanded...
-        if(!cube.get_meta_phase_number(0) || !cube.get_meta_phase_number(3))
+        if(!i->get_meta_phase_number(0) || !i->get_meta_phase_number(3))
         {
-            subset.push_back(move(cube));
+            essentials.push_back(move(*i));
+            i = content.erase(i);
             continue;
         }
-        list<unsigned long> positions0 = move(cube.localize0());
+        list<unsigned long> positions0 = move(i->localize0());
         auto divisionPos = positions0.begin();
         auto pos0End = positions0.end();
-        CubeRow halfCube1 = cube;
+        CubeRow halfCube1 = *i;
         //...expand it...
         CubeRow halfCube2 = move(halfCube1.expand(*divisionPos));
         /*...until all expansion-derived rows are subsumed by one another row in the function; if a row is not subsumed
-         * and cannot be expanded, it cannot be omitted*/
-        if(!(recursiveCover(halfCube1, subset, ++divisionPos, pos0End) && recursiveCover(halfCube2, subset, divisionPos, pos0End)))
-            subset.push_back(move(cube));
+         * and cannot be expanded, the original cube is an essential prime implicant*/
+        if(!(recursiveCover(halfCube1, ++divisionPos, pos0End, essentials) && recursiveCover(halfCube2, divisionPos, pos0End, essentials)))
+        {
+            essentials.push_back(move(*i));
+            i = content.erase(i);
+        }
+        else
+            ++i;
     }
-    content = move(subset);
+    return CubeTable(essentials);
 }
 
-bool CubeTable::recursiveCover(CubeRow& cube, const list<CubeRow>& subset, list<unsigned long>::iterator pos0, list<unsigned long>::iterator& pos0End) const
+bool CubeTable::recursiveCover(CubeRow& cube, list<unsigned long>::iterator pos0, list<unsigned long>::iterator& pos0End, const list<CubeRow>& secondList) const
 {
     /*for(auto& i : content)
         if(i.covers(cube))
             return true;
-    for(auto& i : subset)
+    for(auto& i : secondList)
         if(i.covers(cube))
             return true;*/
-    function<bool(const CubeRow&)> checkFun = [&](const CubeRow& c) { return c.covers(cube); };
-    if(any_of(content.begin(), content.end(), checkFun) || any_of(subset.begin(), subset.end(), checkFun))
+    function<bool(const CubeRow&)> checkFun = [&](const CubeRow& c) { return addressof(c) != addressof(cube) && c.covers(cube); };
+    if(any_of(content.begin(), content.end(), checkFun) || any_of(secondList.begin(), secondList.end(), checkFun))
         return true;
     if(pos0 == pos0End)
         return false;
-    CubeRow Cube2 = move(cube.expand(*pos0));
+    CubeRow cube2 = move(cube.expand(*pos0));
 
-    return recursiveCover(cube, subset, ++pos0, pos0End) && recursiveCover(Cube2, subset, pos0, pos0End);
+    return recursiveCover(cube, ++pos0, pos0End, secondList) && recursiveCover(cube2, pos0, pos0End, secondList);
 }
 
 bool CubeTable::omissionAllowed(CubeRow &cube, unsigned long position) const
@@ -155,13 +160,27 @@ bool CubeTable::omissionAllowedRecursively(CubeRow &cube, unsigned long position
 {
     CubeRow twin1 = move(cube.phaseSwitchedTwin(position));
     CubeRow twin2 = twin1.expand(*pos0);
-    return recursiveCover(twin1, list<CubeRow>(), ++pos0, pos0End) && recursiveCover(twin2, list<CubeRow>(), pos0, pos0End);
+    return recursiveCover(twin1, ++pos0, pos0End) && recursiveCover(twin2, pos0, pos0End);
+}
+
+void CubeTable::expandAndFilter(CubeRow &cube, std::list<unsigned long>::iterator pos0,
+                                std::list<unsigned long>::iterator &pos0End, std::list<CubeRow> &target) const
+{
+    if(checkCover(cube))
+        return;
+    if(pos0 == pos0End)
+    {
+        target.push_back(move(cube));
+        return;
+    }
+    CubeRow cube2 = move(cube.expand(*pos0));
+    expandAndFilter(cube, ++pos0, pos0End, target);
+    expandAndFilter(cube2, pos0, pos0End, target);
+
 }
 
 void CubeTable::minimizeExact()
 {
-    content.sort();
-    sweepCovered();
     CubeTable k1;
     bool wasEmpty = true;
     do
@@ -177,7 +196,6 @@ void CubeTable::minimizeExact()
             cout << *this << "----------------" << endl;
         //sweepCovered();
     } while(!wasEmpty);//generate fuzzy consensus and append it to K table until K table's content changes
-    chooseCoveringSubset();
 }
 
 void CubeTable::minimizeHeuristic()
@@ -241,7 +259,7 @@ void CubeTable::minimizeHeuristic()
     if(content.size() < originalSize)
         merge(ki);
 //    content.sort();
-//    chooseCoveringSubset();
+//    separateEssentials();
 }
 
 void CubeTable::minimizeMukaidono()
@@ -293,9 +311,33 @@ bool CubeTable::empty() const
     return content.empty();
 }
 
+unsigned long CubeTable::size() const
+{
+    return content.size();
+}
+
 void CubeTable::merge(CubeTable &another)
 {
     content.merge(another.content);
+}
+
+void CubeTable::sort()
+{
+    content.sort();
+}
+
+void CubeTable::clear()
+{
+    content.clear();
+}
+
+CubeRow CubeTable::pop_front()
+{
+    if(empty())
+        return CubeRow();
+    CubeRow result = move(content.front());
+    content.pop_front();
+    return result;
 }
 
 /*void CubeTable::print()
@@ -310,10 +352,10 @@ void CubeTable::merge(CubeTable &another)
 ostream& operator<<(ostream& os, const CubeTable& ct)
 {
     for(auto& row : ct.content)
-    {
-        os << row;
-        os << endl;
-    }
+//    {
+        os << row << endl;
+//        os << endl;
+//    }
     return os;
 }
 
@@ -417,5 +459,49 @@ list<Cube> CubeTable::redeem(const unordered_map<string, unsigned long>& tab) co
         result.emplace_back(Cube(partialResult));
     }
 
+    return result;
+}
+
+CubeTable CubeTable::crossProduct(const CubeTable &another) const
+{
+    CubeTable result;
+    for(auto& i : content)
+    {
+        for(auto& j : another.content)
+        {
+            CubeRow toInsert(i.size() > j.size() ? i.size() : j.size());
+            for(unsigned long pos = 0; pos < i.size() && pos < j.size(); ++pos)
+                toInsert.set(i.get(pos) | j.get(pos), pos);
+//            cout << toInsert << "hubert" << endl;
+            result.append(toInsert);
+        }
+    }
+    result.sweepCovered();
+    return result;
+}
+
+list<CubeRow> CubeTable::findUncoveredCompletes(const CubeTable &covering) const
+{
+    list<CubeRow> result;
+
+    for(auto& i : content)
+    {
+        if(i.get_meta_phase_number(3))
+        {
+            if(!i.get_meta_phase_number(0))
+            {
+                if(!covering.checkCover(i))
+                    result.push_back(i);
+                continue;
+            }
+            list<unsigned long> positions0 = move(i.localize0());
+            auto divisionPos = positions0.begin();
+            auto pos0End = positions0.end();
+            CubeRow cube1 = i;
+            CubeRow cube2 = cube1.expand(*divisionPos);
+            covering.expandAndFilter(cube1, ++divisionPos, pos0End, result);
+            covering.expandAndFilter(cube2, divisionPos, pos0End, result);
+        }
+    }
     return result;
 }

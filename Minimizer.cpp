@@ -9,21 +9,78 @@ using namespace std::chrono;
 
 FuzzyFunction ExactMinimizer::minimize(const FuzzyFunction &input)
 {
+    clear();
     CubeTable tab(input, write);
 
     if(write)
         cout << "================" << endl;
 
+    tab.sort();
+    tab.sweepCovered();
+
+    givenFunction = tab;
+
     tab.minimizeExact();
+    result = FuzzyFunction(input.getVarTable(), tab);
+    essentials = move(tab.separateEssentials());
+    redundants = vector<CubeRow>(tab.size());
+    for(auto& i : redundants)
+        i = move(tab.pop_front());
+    list<CubeRow> uncoveredCompletes = givenFunction.findUncoveredCompletes(essentials);
 
-    if(write)
-        cout << tab << endl << "================" << endl;
+    if(!uncoveredCompletes.empty())
+    {
+        for(unsigned long i = 0; i < redundants.size(); ++i)
+        {
+            if(!redundants[i].covers(uncoveredCompletes.front()))
+                continue;
+            CubeRow row(redundants.size());
+            row.set(1, i);
+            solutions.append(row);
+        }
+        uncoveredCompletes.pop_front();
+        
+        while(!uncoveredCompletes.empty())
+        {
+            CubeTable factor2;
+            for(unsigned long i = 0; i < redundants.size(); ++i)
+            {
+                if(!redundants[i].covers(uncoveredCompletes.front()))
+                    continue;
+                CubeRow row(redundants.size());
+//            cout << redundants.size() << "hubert" << endl;
+                row.set(1, i);
+//            cout << row << "hubert" << endl;
+                factor2.append(row);
+            }
+//        cout << solutions << "hubert" << factor2 << "hubert" << endl;
+            solutions = move(solutions.crossProduct(factor2));
+            uncoveredCompletes.pop_front();
+        }
+    }
+    else
+    {
+        CubeRow row(redundants.size());
+        solutions.append(row);
+    }
 
-    return FuzzyFunction(input.getVarTable(), tab);
+    while(!solutions.empty())
+    {
+//        cout << "hubert" << endl << solutions << "hubert" << endl;
+        CubeTable covering(essentials);
+        CubeRow sol = move(solutions.pop_front());
+        for(unsigned long i = 0; i < sol.size(); ++i)
+            if(sol.get(i))
+                covering.append(redundants[i]);
+        coverings.emplace_back(FuzzyFunction(input.getVarTable(), covering));
+    }
+
+    return result;
 }
 
 FuzzyFunction HeuristicMinimizer::minimize(const FuzzyFunction &input)
 {
+    clear();
     CubeTable tab(input, write);
 
     if(write)
@@ -34,11 +91,13 @@ FuzzyFunction HeuristicMinimizer::minimize(const FuzzyFunction &input)
     if(write)
         cout << tab << endl << "================" << endl;
 
-    return FuzzyFunction(input.getVarTable(), tab);
+    result = FuzzyFunction(input.getVarTable(), tab);
+    return result;
 }
 
 FuzzyFunction MukaidonoMinimizer::minimize(const FuzzyFunction &input)
 {
+    clear();
     CubeTable tab(input, write);
 
     if(write)
@@ -49,20 +108,53 @@ FuzzyFunction MukaidonoMinimizer::minimize(const FuzzyFunction &input)
     if(write)
         cout << tab << endl << "================" << endl;
 
-    return FuzzyFunction(input.getVarTable(), tab);
+    result = FuzzyFunction(input.getVarTable(), tab);
+    return result;
 }
 
 FuzzyFunction Timer::minimize(const FuzzyFunction &input)
 {
-    FuzzyFunction result;
-
     high_resolution_clock::time_point executionStart = high_resolution_clock::now();
-    result = move(wrappee->minimize(input));
+    result = wrappee->minimize(input);
     high_resolution_clock::time_point executionEnd = high_resolution_clock::now();
 
     duration<double, ratio<1, 1000>> executionTime = executionEnd - executionStart;
     timeRecords.push_back(executionTime.count());
     return result;
+}
+
+void Minimizer::clear()
+{
+    result.clear();
+}
+
+void ExactMinimizer::clear()
+{
+    Minimizer::clear();
+    solutions.clear();
+    essentials.clear();
+    givenFunction.clear();
+    redundants.clear();
+    coverings.clear();
+}
+
+void Minimizer::writeResult(std::ostream &os) const
+{
+    os << result << endl;
+}
+
+void ExactMinimizer::writeResult(std::ostream &os) const
+{
+    unsigned long enumerator = 0;
+    Minimizer::writeResult(os);
+    os << "Possible coverings:" << endl;
+    for(auto& i : coverings)
+        os << ++enumerator << ". " << i << endl;
+}
+
+void Timer::writeResult(std::ostream &os) const
+{
+    wrappee->writeResult(os);
 }
 
 void Timer::report(std::ostream &os) const

@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <iostream>
 #include <tuple>
+#include <functional>
 
 class FuzzyFunction;
 class Cube;
@@ -31,12 +32,11 @@ class CubeTable
     /*for a K tetrary table, generate a K1 table containing all the fuzzy consensus rows excluding ones that derive from
      * pairs of rows of which both are not complementary*/
     CubeTable generateK1() const;
-    //of the given cubes set exclude the redundant complementary cubes leaving the function in one of its minimal forms
-    void chooseCoveringSubset();
     //apply the Kleen law to check if a cube is subsumed by any set of cubes of the function
-    bool recursiveCover(CubeRow& cube, const std::list<CubeRow>& subset, std::list<unsigned long>::iterator pos0, std::list<unsigned long>::iterator& pos0End) const;
+    bool recursiveCover(CubeRow& cube, std::list<unsigned long>::iterator pos0, std::list<unsigned long>::iterator& pos0End, const std::list<CubeRow>& secondList = std::list<CubeRow>()) const;
     bool omissionAllowed(CubeRow& cube, unsigned long position) const;
     bool omissionAllowedRecursively(CubeRow& cube, unsigned long position, std::list<unsigned long>::iterator pos0, std::list<unsigned long>::iterator& pos0End) const;
+    void expandAndFilter(CubeRow& cube, std::list<unsigned long>::iterator pos0, std::list<unsigned long>::iterator& pos0End, std::list<CubeRow>& target) const;
 
 public:
     explicit CubeTable(int w = 0) : write(w){};
@@ -55,9 +55,17 @@ public:
     void minimizeMukaidono();
     void append(const CubeRow& item);
     bool empty() const;
-    void merge(CubeTable& another);//TODO sort?
+    unsigned long size() const;
+    void merge(CubeTable& another);
+    void sort();
+    void clear();
+    CubeRow pop_front();
     //create a printable fuzzy expression object for a given variable names table
     std::list<Cube> redeem(const std::unordered_map<std::string, unsigned long>& tab) const;
+    CubeTable crossProduct(const CubeTable& another) const;
+    //of the given cubes set decide by definition, which are function's essential prime implicants, then separate and return them
+    CubeTable separateEssentials();
+    std::list<CubeRow> findUncoveredCompletes(const CubeTable& covering) const;
 
     friend std::ostream& operator<<(std::ostream& os, const CubeTable& f);
 };
