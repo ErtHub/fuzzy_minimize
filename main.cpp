@@ -30,7 +30,6 @@ void printHelp(char* progname, ostream& os)
 
 int main(int argc, char* argv[])
 {
-
     int options = 0;
 
     string filename;
@@ -175,11 +174,9 @@ int main(int argc, char* argv[])
         for(auto& i : funsToMinimize)
         {
             minimizer->minimize(i.second);
-            minimizer->writeResult(ostr << i.first << " = ");
-            ostr << endl;
+            minimizer->writeResult(ostr << i.first << " = ") << endl;
         }
-        cout << ostr.str();
-        minimizer->report(cout);
+        minimizer->report(cout << ostr.str());
         return 0;
     }
     else

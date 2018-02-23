@@ -22,8 +22,8 @@ public:
     explicit Minimizer(int w = 0) : write(w){}
     virtual ~Minimizer() = default;
     virtual FuzzyFunction minimize(const FuzzyFunction& input) = 0;
-    virtual void writeResult(std::ostream& os) const;
-    virtual void report(std::ostream& os) const = 0;
+    virtual std::ostream& writeResult(std::ostream& os) const;
+    virtual std::ostream& report(std::ostream& os) const = 0;
     virtual void clear();
 };
 
@@ -38,8 +38,8 @@ public:
     explicit ExactMinimizer(int w = 0) : Minimizer(w){};
     ~ExactMinimizer() override = default;
     FuzzyFunction minimize(const FuzzyFunction& input) override;
-    void writeResult(std::ostream& os) const override;
-    void report(std::ostream& os) const override {};
+    std::ostream& writeResult(std::ostream& os) const override;
+    std::ostream& report(std::ostream& os) const override { return os; };
     void clear() override;
 };
 
@@ -49,7 +49,7 @@ public:
     explicit HeuristicMinimizer(int w = 0) : Minimizer(w){};
     ~HeuristicMinimizer() override = default;
     FuzzyFunction minimize(const FuzzyFunction& input) override;
-    void report(std::ostream& os) const override {};
+    std::ostream& report(std::ostream& os) const override { return os; };
 };
 
 class MukaidonoMinimizer : public Minimizer
@@ -58,7 +58,7 @@ public:
     explicit MukaidonoMinimizer(int w = 0) : Minimizer(w){};
     ~MukaidonoMinimizer() override = default;
     FuzzyFunction minimize(const FuzzyFunction& input) override;
-    void report(std::ostream& os) const override {};
+    std::ostream& report(std::ostream& os) const override { return os; };
 };
 
 class MinimizerDecorator : public Minimizer
@@ -75,8 +75,8 @@ public:
     explicit Timer(std::shared_ptr<Minimizer> minimizer) : MinimizerDecorator(std::move(minimizer)){};
     ~Timer() override = default;
     FuzzyFunction minimize(const FuzzyFunction& input) override;
-    void writeResult(std::ostream& os) const override;
-    void report(std::ostream& os) const override;
+    std::ostream& writeResult(std::ostream& os) const override;
+    std::ostream& report(std::ostream& os) const override;
 };
 
 #endif //FUZZY_MINIMIZE_MINIMIZER_H

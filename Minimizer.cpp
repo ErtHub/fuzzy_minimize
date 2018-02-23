@@ -138,31 +138,32 @@ void ExactMinimizer::clear()
     coverings.clear();
 }
 
-void Minimizer::writeResult(std::ostream &os) const
+ostream& Minimizer::writeResult(std::ostream &os) const
 {
     os << result << endl;
+    return os;
 }
 
-void ExactMinimizer::writeResult(std::ostream &os) const
+ostream& ExactMinimizer::writeResult(std::ostream &os) const
 {
     unsigned long enumerator = 0;
-    Minimizer::writeResult(os);
-    os << "Possible coverings:" << endl;
+    Minimizer::writeResult(os) << "Possible coverings:" << endl;
     for(auto& i : coverings)
         os << ++enumerator << ". " << i << endl;
+    return os;
 }
 
-void Timer::writeResult(std::ostream &os) const
+ostream& Timer::writeResult(std::ostream &os) const
 {
-    wrappee->writeResult(os);
+    return wrappee->writeResult(os);
 }
 
-void Timer::report(std::ostream &os) const
+ostream& Timer::report(std::ostream &os) const
 {
-    wrappee->report(os);
     unsigned long enumerator = 0;
 
-    os << "Execution times:" << endl;
+    wrappee->report(os) << "Execution times:" << endl;
     for(auto t : timeRecords)
         os << ++enumerator << ". " << t << " ms" << endl;
+    return os;
 }
