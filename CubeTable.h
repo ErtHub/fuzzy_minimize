@@ -33,7 +33,7 @@ class CubeTable
      * pairs of rows of which both are not complementary*/
     CubeTable generateK1() const;
     //apply the Kleen law to check if a cube is subsumed by any set of cubes of the function
-    bool recursiveCover(CubeRow& cube, std::list<unsigned long>::iterator pos0, std::list<unsigned long>::iterator& pos0End, const std::list<CubeRow>& secondList = std::list<CubeRow>()) const;
+    bool recursiveCover(CubeRow& original, CubeRow& cube, std::list<unsigned long>::iterator pos0, std::list<unsigned long>::iterator& pos0End, const std::list<CubeRow>& secondList = std::list<CubeRow>()) const;
     bool omissionAllowed(CubeRow& cube, unsigned long position) const;
     bool omissionAllowedRecursively(CubeRow& cube, unsigned long position, std::list<unsigned long>::iterator pos0, std::list<unsigned long>::iterator& pos0End) const;
     void expandAndFilter(CubeRow& cube, std::list<unsigned long>::iterator pos0, std::list<unsigned long>::iterator& pos0End, std::list<CubeRow>& target) const;

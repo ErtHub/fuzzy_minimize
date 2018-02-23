@@ -15,7 +15,9 @@ FuzzyFunction ExactMinimizer::minimize(const FuzzyFunction &input)
     if(write)
         cout << "================" << endl;
 
+#ifdef SORT_TABLES
     tab.sort();
+#endif
     tab.sweepCovered();
 
     givenFunction = tab;

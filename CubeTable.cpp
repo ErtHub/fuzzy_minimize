@@ -103,6 +103,7 @@ CubeTable CubeTable::separateEssentials()
 
     for(auto i = content.begin(); i != content.end();)
     {
+        cout << *i;
         //for every row, if it's complementary and can be Kleen-expanded...
         if(!i->get_meta_phase_number(0) || !i->get_meta_phase_number(3))
         {
@@ -118,7 +119,7 @@ CubeTable CubeTable::separateEssentials()
         CubeRow halfCube2 = move(halfCube1.expand(*divisionPos));
         /*...until all expansion-derived rows are subsumed by one another row in the function; if a row is not subsumed
          * and cannot be expanded, the original cube is an essential prime implicant*/
-        if(!(recursiveCover(halfCube1, ++divisionPos, pos0End, essentials) && recursiveCover(halfCube2, divisionPos, pos0End, essentials)))
+        if(!(recursiveCover(*i, halfCube1, ++divisionPos, pos0End, essentials) && recursiveCover(*i, halfCube2, divisionPos, pos0End, essentials)))
         {
             essentials.push_back(move(*i));
             i = content.erase(i);
@@ -129,7 +130,7 @@ CubeTable CubeTable::separateEssentials()
     return CubeTable(essentials);
 }
 
-bool CubeTable::recursiveCover(CubeRow& cube, list<unsigned long>::iterator pos0, list<unsigned long>::iterator& pos0End, const list<CubeRow>& secondList) const
+bool CubeTable::recursiveCover(CubeRow& original, CubeRow& cube, list<unsigned long>::iterator pos0, list<unsigned long>::iterator& pos0End, const list<CubeRow>& secondList) const
 {
     /*for(auto& i : content)
         if(i.covers(cube))
@@ -137,14 +138,14 @@ bool CubeTable::recursiveCover(CubeRow& cube, list<unsigned long>::iterator pos0
     for(auto& i : secondList)
         if(i.covers(cube))
             return true;*/
-    function<bool(const CubeRow&)> checkFun = [&](const CubeRow& c) { return addressof(c) != addressof(cube) && c.covers(cube); };
+    function<bool(const CubeRow&)> checkFun = [&](const CubeRow& c) { return addressof(c) != addressof(original) && c.covers(cube); };
     if(any_of(content.begin(), content.end(), checkFun) || any_of(secondList.begin(), secondList.end(), checkFun))
         return true;
     if(pos0 == pos0End)
         return false;
     CubeRow cube2 = move(cube.expand(*pos0));
 
-    return recursiveCover(cube, ++pos0, pos0End, secondList) && recursiveCover(cube2, pos0, pos0End, secondList);
+    return recursiveCover(original, cube, ++pos0, pos0End, secondList) && recursiveCover(original, cube2, pos0, pos0End, secondList);
 }
 
 bool CubeTable::omissionAllowed(CubeRow &cube, unsigned long position) const
@@ -160,7 +161,7 @@ bool CubeTable::omissionAllowedRecursively(CubeRow &cube, unsigned long position
 {
     CubeRow twin1 = move(cube.phaseSwitchedTwin(position));
     CubeRow twin2 = twin1.expand(*pos0);
-    return recursiveCover(twin1, ++pos0, pos0End) && recursiveCover(twin2, pos0, pos0End);
+    return recursiveCover(cube, twin1, ++pos0, pos0End) && recursiveCover(cube, twin2, pos0, pos0End);
 }
 
 void CubeTable::expandAndFilter(CubeRow &cube, std::list<unsigned long>::iterator pos0,
@@ -186,12 +187,17 @@ void CubeTable::minimizeExact()
     do
     {
         k1 = move(generateK1());
+#ifdef SORT_TABLES
         k1.content.sort();
+#endif
         k1.sweepCovered();
         sweepCovered(k1);
         wasEmpty = k1.empty();
+#ifdef SORT_TABLES
         merge(k1);
-//        content.splice(content.end(), k1.content);
+#else
+        content.splice(content.end(), k1.content);
+#endif
         if(write)
             cout << *this << "----------------" << endl;
         //sweepCovered();
@@ -200,7 +206,9 @@ void CubeTable::minimizeExact()
 
 void CubeTable::minimizeHeuristic()
 {
+#ifdef SORT_TABLES
     content.sort();
+#endif
     sweepCovered();
     unsigned long originalSize = content.size();
     CubeTable sideList;
@@ -255,16 +263,24 @@ void CubeTable::minimizeHeuristic()
                 cout << *this << endl << sideList << endl << ki << "----------------" << endl;
         }
     }
+#ifdef SORT_TABLES
     merge(sideList);
     if(content.size() < originalSize)
         merge(ki);
+#else
+    content.splice(content.end(), sideList.content);
+    if(content.size() < originalSize)
+        content.splice(content.end(), ki.content);
+#endif
 //    content.sort();
 //    separateEssentials();
 }
 
 void CubeTable::minimizeMukaidono()
 {
+#ifdef SORT_TABLES
     content.sort();
+#endif
     sweepCovered();
     for(auto& i : content)
     {
