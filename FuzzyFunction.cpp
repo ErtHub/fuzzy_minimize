@@ -6,12 +6,12 @@
 
 using namespace std;
 
-double SymbInstance::calc(const unordered_map<string, unsigned long>& varTable, const vector<double>& args, OperationImpl* opImpl) const
+double SymbInstance::calc(const VarTable& varTable, const vector<double>& args, OperationImpl* opImpl) const
 {
     return negative ? opImpl->negate(args[varTable.at(varName)]) : args[varTable.at(varName)];
 }
 
-void SymbInstance::appendToTable(const unordered_map<string, unsigned long>& varTable, std::vector<uint8_t> &target) const
+void SymbInstance::appendToTable(const VarTable& varTable, CubeRowCont& target) const
 {
     target[varTable.at(varName)] |= 1 << (1 & !negative);
 }
@@ -32,7 +32,7 @@ ostream& operator<<(ostream& os, const SymbInstance& s)
     return os;
 }
 
-double Cube::calc(const unordered_map<string, unsigned long>& varTable, const vector<double> &args, OperationImpl* opImpl) const
+double Cube::calc(const VarTable& varTable, const vector<double> &args, OperationImpl* opImpl) const
 {
     double acc = 1;
     for(auto& i : content)
@@ -40,9 +40,9 @@ double Cube::calc(const unordered_map<string, unsigned long>& varTable, const ve
     return acc;
 }
 
-vector<uint8_t> Cube::tabulate(const std::unordered_map<std::string, unsigned long>& varTable) const
+CubeRowCont Cube::tabulate(const VarTable& varTable) const
 {
-    vector<uint8_t> res(varTable.size(), 0);
+    CubeRowCont res(varTable.size(), 0);
     for(auto& i : content)
         i.appendToTable(varTable, res);
     return res;
@@ -64,7 +64,7 @@ bool Cube::hasSymbol(const SymbInstance& symb) const
     return false;
 }
 
-Cube::Cube(const list<SymbInstance>& content) : content(content)
+Cube::Cube(const CubeCont& content) : content(content)
 {}
 
 ostream& operator<<(ostream& os, const Cube& i)
@@ -95,10 +95,10 @@ double FuzzyFunction::calc(const vector<double> &args, OperationImpl* opImpl) co
     return acc;
 }
 
-list<CubeRow> FuzzyFunction::tabulate() const
+CubeTableCont FuzzyFunction::tabulate() const
 {
-    list<CubeRow> res;
-    vector<uint8_t> partialRes;
+    CubeTableCont res;
+    CubeRowCont partialRes;
     for(auto& i : body)
     {
         partialRes = move(i.tabulate(varTable));
@@ -107,13 +107,13 @@ list<CubeRow> FuzzyFunction::tabulate() const
     return res;
 }
 
-FuzzyFunction::FuzzyFunction(unordered_map<string, unsigned long> varTable, list<Cube> body) : varTable(move(varTable)), body(move(body))
+FuzzyFunction::FuzzyFunction(VarTable varTable, FunctionBody body) : varTable(move(varTable)), body(move(body))
 {}
 
-FuzzyFunction::FuzzyFunction(const unordered_map<string, unsigned long>& varTable, const CubeTable& tab) : body(move(tab.redeem(varTable))), varTable(varTable)
+FuzzyFunction::FuzzyFunction(const VarTable& varTable, const CubeTable& tab) : body(move(tab.redeem(varTable))), varTable(varTable)
 {}
 
-unordered_map<string, unsigned long> FuzzyFunction::getVarTable() const
+VarTable FuzzyFunction::getVarTable() const
 {
     return varTable;
 }

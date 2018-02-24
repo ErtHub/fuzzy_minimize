@@ -46,9 +46,9 @@ class Parser
     bool good;
     unsigned long varcount;
     unsigned long funcount;
-    std::unordered_map<std::string, unsigned long> varTable;
+    VarTable varTable;
 	std::unordered_map<std::string, bool> funTable;
-    std::list<Cube> funProt;
+    FunctionBody funProt;
 
     std::list<std::pair<std::string, FuzzyFunction>> funDefs;
 
@@ -70,7 +70,7 @@ class Parser
 	bool parseFunDecl(const TokenTypeSet& follow);
     bool parseFunDef(const TokenTypeSet& follow);
     bool parseSum(const TokenTypeSet& follow);
-    bool parseProduct(const TokenTypeSet& follow, std::list<SymbInstance>& cubeProt);
+    bool parseProduct(const TokenTypeSet& follow, CubeCont& cubeProt);
 
 public:
 

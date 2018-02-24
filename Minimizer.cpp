@@ -28,7 +28,7 @@ FuzzyFunction ExactMinimizer::minimize(const FuzzyFunction &input)
     redundants = vector<CubeRow>(tab.size());
     for(auto& i : redundants)
         i = move(tab.pop_front());
-    list<CubeRow> uncoveredCompletes = givenFunction.findUncoveredCompletes(essentials);
+    CubeTableCont uncoveredCompletes = givenFunction.findUncoveredCompletes(essentials);
 
     if(!uncoveredCompletes.empty())
     {

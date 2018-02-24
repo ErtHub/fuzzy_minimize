@@ -27,6 +27,8 @@ public:
     virtual void clear();
 };
 
+using MinimizerPtr = std::shared_ptr<Minimizer>;
+
 class ExactMinimizer : public Minimizer
 {
     CubeTable givenFunction;
@@ -64,15 +66,15 @@ public:
 class MinimizerDecorator : public Minimizer
 {
 protected:
-    std::shared_ptr<Minimizer> wrappee;
-    explicit MinimizerDecorator(std::shared_ptr<Minimizer> minimizer) : wrappee(std::move(minimizer)){};
+    MinimizerPtr wrappee;
+    explicit MinimizerDecorator(MinimizerPtr minimizer) : wrappee(std::move(minimizer)){};
 };
 
 class Timer : public MinimizerDecorator
 {
     std::list<double> timeRecords;
 public:
-    explicit Timer(std::shared_ptr<Minimizer> minimizer) : MinimizerDecorator(std::move(minimizer)){};
+    explicit Timer(MinimizerPtr minimizer) : MinimizerDecorator(std::move(minimizer)){};
     ~Timer() override = default;
     FuzzyFunction minimize(const FuzzyFunction& input) override;
     std::ostream& writeResult(std::ostream& os) const override;

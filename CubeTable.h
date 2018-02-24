@@ -15,10 +15,13 @@
 
 class FuzzyFunction;
 class Cube;
+using CubeTableCont = std::list<CubeRow>;
+using VarTable = std::unordered_map<std::string, unsigned long>;
+using FunctionBody = std::list<Cube>;
 
 class CubeTable
 {
-    std::list<CubeRow> content;
+    CubeTableCont content;
     //this variable is checked to decide if the table should be printed to standard output at certain algorithm stages
     int write;//TODO zrobic jako public static, wyprowadzic konsensus, zlikwidowac & 2
 
@@ -33,14 +36,14 @@ class CubeTable
      * pairs of rows of which both are not complementary*/
     CubeTable generateK1() const;
     //apply the Kleen law to check if a cube is subsumed by any set of cubes of the function
-    bool recursiveCover(CubeRow& original, CubeRow& cube, std::list<unsigned long>::iterator pos0, std::list<unsigned long>::iterator& pos0End, const std::list<CubeRow>& secondList = std::list<CubeRow>()) const;
+    bool recursiveCover(CubeRow& original, CubeRow& cube, std::list<unsigned long>::iterator pos0, std::list<unsigned long>::iterator& pos0End, const CubeTableCont& secondList = CubeTableCont()) const;
     bool omissionAllowed(CubeRow& cube, unsigned long position) const;
     bool omissionAllowedRecursively(CubeRow& cube, unsigned long position, std::list<unsigned long>::iterator pos0, std::list<unsigned long>::iterator& pos0End) const;
-    void expandAndFilter(CubeRow& cube, std::list<unsigned long>::iterator pos0, std::list<unsigned long>::iterator& pos0End, std::list<CubeRow>& target) const;
+    void expandAndFilter(CubeRow& cube, std::list<unsigned long>::iterator pos0, std::list<unsigned long>::iterator& pos0End, CubeTableCont& target) const;
 
 public:
     explicit CubeTable(int w = 0) : write(w){};
-    explicit CubeTable(const std::list<CubeRow> &content, int w = 0);
+    explicit CubeTable(const CubeTableCont &content, int w = 0);
     explicit CubeTable(const FuzzyFunction &func, int w = 0);
     //the sweepCovered functions are called to remove all cubes subsumed by any other single cube
     void sweepCovered(CubeTable& another, int sweepEqual = NEQUAL | EQUAL);
@@ -61,11 +64,11 @@ public:
     void clear();
     CubeRow pop_front();
     //create a printable fuzzy expression object for a given variable names table
-    std::list<Cube> redeem(const std::unordered_map<std::string, unsigned long>& tab) const;
+    FunctionBody redeem(const VarTable& tab) const;
     CubeTable crossProduct(const CubeTable& another) const;
     //of the given cubes set decide by definition, which are function's essential prime implicants, then separate and return them
     CubeTable separateEssentials();
-    std::list<CubeRow> findUncoveredCompletes(const CubeTable& covering) const;
+    CubeTableCont findUncoveredCompletes(const CubeTable& covering) const;
 
     friend std::ostream& operator<<(std::ostream& os, const CubeTable& f);
 };

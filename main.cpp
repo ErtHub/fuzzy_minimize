@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
 
     string filename;
 
-    shared_ptr<Minimizer> minimizer;
+    MinimizerPtr minimizer;
 
     enum MinimizationFashion
     {
@@ -140,13 +140,13 @@ int main(int argc, char* argv[])
     switch(options & ALGORITHM)
     {
         case EXACT:
-            minimizer = shared_ptr<Minimizer>(new ExactMinimizer((options & WRITER) / VERBOSE));
+            minimizer = MinimizerPtr(new ExactMinimizer((options & WRITER) / VERBOSE));
             break;
         case HEURISTIC:
-            minimizer = shared_ptr<Minimizer>(new HeuristicMinimizer((options & WRITER) / VERBOSE));
+            minimizer = MinimizerPtr(new HeuristicMinimizer((options & WRITER) / VERBOSE));
             break;
         case HEURISTIC_MUKAIDONO:
-            minimizer = shared_ptr<Minimizer>(new MukaidonoMinimizer((options & WRITER) / VERBOSE));
+            minimizer = MinimizerPtr(new MukaidonoMinimizer((options & WRITER) / VERBOSE));
             break;
         default:
             cout << "Algorithm option error." << endl;
@@ -154,7 +154,7 @@ int main(int argc, char* argv[])
     }
 
     if(options & TIMER)
-        minimizer = shared_ptr<Minimizer>(new Timer(minimizer));
+        minimizer = MinimizerPtr(new Timer(minimizer));
 
     Reader rdr(filename);
     if(!rdr.isGood())
@@ -184,23 +184,23 @@ int main(int argc, char* argv[])
         cout << "Critical syntax error reading file" << endl;
         return -7;
     }
-    //FuzzyFunction f(list<Cube>{Cube(list<SymbInstance>{SymbInstance(0, true), SymbInstance(0, false)}), Cube(list<SymbInstance>{SymbInstance(1, true), SymbInstance(0, true)})});
+    //FuzzyFunction f(FunctionBody{Cube(CubeCont{SymbInstance(0, true), SymbInstance(0, false)}), Cube(CubeCont{SymbInstance(1, true), SymbInstance(0, true)})});
     /*SymbInstance a(1, true), b(1, false), c(1, false), d(0, true);
-    list<SymbInstance> dave;
+    CubeCont dave;
     dave.push_back(a);
     dave.push_back(b);
-    list<SymbInstance> connor;
+    CubeCont connor;
     connor.push_back(c);
     connor.push_back(d);
     Cube alpha(dave), beta(connor);
-    list<Cube> steve;
+    FunctionBody steve;
     steve.push_back(alpha);
     steve.push_back(beta);
     FuzzyFunction f(steve);
     cout << f.calc(vector<double>{0.5, 0.25}) << endl;*/
 
     /*vector<uint8_t> v1, v2, v3, v4, v5, v6, v7;
-    list<CubeRow> l;
+    CubeTableCont l;
     v1.push_back(0);
     v1.push_back(1);
     v1.push_back(0);
@@ -239,7 +239,7 @@ int main(int argc, char* argv[])
 
 
     /*vector<uint8_t> v1, v2, v3, v4, v5, v6, v7;
-    list<CubeRow> l;
+    CubeTableCont l;
     v1.push_back(0);
     v1.push_back(1);
     v1.push_back(0);

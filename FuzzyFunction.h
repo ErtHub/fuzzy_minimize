@@ -14,6 +14,8 @@
 
 
 class CubeTable;
+using CubeTableCont = std::list<CubeRow>;
+using VarTable = std::unordered_map<std::string, unsigned long>;
 
 //a class representing a literal in a two-level fuzzy function expression
 class SymbInstance
@@ -21,8 +23,8 @@ class SymbInstance
     std::string varName;
     bool negative;
 
-    double calc(const std::unordered_map<std::string, unsigned long>& varTable, const std::vector<double>& args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
-    void appendToTable(const std::unordered_map<std::string, unsigned long>& varTable, std::vector<uint8_t>& target) const;
+    double calc(const VarTable& varTable, const std::vector<double>& args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
+    void appendToTable(const VarTable& varTable, CubeRowCont& target) const;
 public:
     SymbInstance(std::string varName, bool negative);
 
@@ -31,39 +33,43 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const SymbInstance& s);
 };
 
+using CubeCont = std::list<SymbInstance>;
+
 //a class representing a product of literals
 class Cube
 {
-    std::list<SymbInstance> content;
+    CubeCont content;
 
-    double calc(const std::unordered_map<std::string, unsigned long>& varTable, const std::vector<double>& args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
-    std::vector<uint8_t> tabulate(const std::unordered_map<std::string, unsigned long>& varTable) const;
+    double calc(const VarTable& varTable, const std::vector<double>& args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
+    CubeRowCont tabulate(const VarTable& varTable) const;
 public:
     bool covers(const Cube& another) const;
     bool hasSymbol(const SymbInstance& symb) const;
 
-    explicit Cube(const std::list<SymbInstance> &content);
+    explicit Cube(const CubeCont &content);
 
     friend class FuzzyFunction;
     friend std::ostream& operator<<(std::ostream& os, const Cube& i);
 };
+
+using FunctionBody = std::list<Cube>;
 //TODO operatory dodawania, ew. append?
 //a class representing a two-level expression, i.e. a sum of cubes
 class FuzzyFunction
 {
-    std::unordered_map<std::string, unsigned long> varTable;
-    std::list<Cube> body;
+    VarTable varTable;
+    FunctionBody body;
 
 public:
     void clear();
     double calc(const std::vector<double> &args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
-    std::list<CubeRow> tabulate() const;
+    CubeTableCont tabulate() const;
 
     FuzzyFunction() = default;
-    FuzzyFunction(std::unordered_map<std::string, unsigned long> varTable, std::list<Cube> body);
-    FuzzyFunction(const std::unordered_map<std::string, unsigned long>& varTable, const CubeTable& tab);//TODO to chyba powinno byc zrobione inaczej...
+    FuzzyFunction(VarTable varTable, FunctionBody body);
+    FuzzyFunction(const VarTable& varTable, const CubeTable& tab);//TODO to chyba powinno byc zrobione inaczej...
 
-    std::unordered_map<std::string, unsigned long> getVarTable() const;
+    VarTable getVarTable() const;
     friend std::ostream& operator<<(std::ostream& os, const FuzzyFunction& f);
 };
 

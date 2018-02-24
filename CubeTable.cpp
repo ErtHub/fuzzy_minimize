@@ -6,7 +6,7 @@
 
 using namespace std;
 
-CubeTable::CubeTable(const std::list<CubeRow> &content, int w) : content(content), write(w)
+CubeTable::CubeTable(const CubeTableCont &content, int w) : content(content), write(w)
 {}
 
 CubeTable::CubeTable(const FuzzyFunction &func, int w) : content(func.tabulate()), write(w)
@@ -99,11 +99,10 @@ CubeTable CubeTable::generateK1() const
 
 CubeTable CubeTable::separateEssentials()
 {
-    list<CubeRow> essentials;
+    CubeTableCont essentials;
 
     for(auto i = content.begin(); i != content.end();)
     {
-        cout << *i;
         //for every row, if it's complementary and can be Kleen-expanded...
         if(!i->get_meta_phase_number(0) || !i->get_meta_phase_number(3))
         {
@@ -130,7 +129,7 @@ CubeTable CubeTable::separateEssentials()
     return CubeTable(essentials);
 }
 
-bool CubeTable::recursiveCover(CubeRow& original, CubeRow& cube, list<unsigned long>::iterator pos0, list<unsigned long>::iterator& pos0End, const list<CubeRow>& secondList) const
+bool CubeTable::recursiveCover(CubeRow& original, CubeRow& cube, list<unsigned long>::iterator pos0, list<unsigned long>::iterator& pos0End, const CubeTableCont& secondList) const
 {
     /*for(auto& i : content)
         if(i.covers(cube))
@@ -165,7 +164,7 @@ bool CubeTable::omissionAllowedRecursively(CubeRow &cube, unsigned long position
 }
 
 void CubeTable::expandAndFilter(CubeRow &cube, std::list<unsigned long>::iterator pos0,
-                                std::list<unsigned long>::iterator &pos0End, std::list<CubeRow> &target) const
+                                std::list<unsigned long>::iterator &pos0End, CubeTableCont &target) const
 {
     if(checkCover(cube))
         return;
@@ -392,7 +391,7 @@ bool CubeTable::findRi(CubeTable& sideList)
 list<tuple<unsigned long, unsigned long, CubeRow>> CubeTable::findR(CubeRow& r, CubeTable& sideList, CubeTable& ki)
 {
     list<tuple<unsigned long, unsigned long, CubeRow>> result;
-    auto loop = [&](list<CubeRow>& l)
+    auto loop = [&](CubeTableCont& l)
     {
         for(auto& rn : l)
         {
@@ -448,9 +447,9 @@ list<tuple<unsigned long, unsigned long, CubeRow>> CubeTable::findR(CubeRow& r, 
     return result;
 }//TODO zrobic funkcje rekurencyjne iteracyjnie
 
-list<Cube> CubeTable::redeem(const unordered_map<string, unsigned long>& tab) const
+FunctionBody CubeTable::redeem(const VarTable& tab) const
 {
-    list<Cube> result;
+    FunctionBody result;
 
     vector<string> symbRow(tab.size(), "");
 
@@ -461,7 +460,7 @@ list<Cube> CubeTable::redeem(const unordered_map<string, unsigned long>& tab) co
 
     for(auto& row : content)
     {
-        list<SymbInstance> partialResult;
+        CubeCont partialResult;
         for(unsigned long i = 0; i < symbRow.size(); ++i)
         {
             if(row.get(i))
@@ -496,9 +495,9 @@ CubeTable CubeTable::crossProduct(const CubeTable &another) const
     return result;
 }
 
-list<CubeRow> CubeTable::findUncoveredCompletes(const CubeTable &covering) const
+CubeTableCont CubeTable::findUncoveredCompletes(const CubeTable &covering) const
 {
-    list<CubeRow> result;
+    CubeTableCont result;
 
     for(auto& i : content)
     {

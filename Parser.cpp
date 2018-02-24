@@ -141,7 +141,7 @@ bool Parser::parseSum(const TokenTypeSet &follow)
     Sync s(this, factstart, follow);
     if(!good)
         return false;
-    list<SymbInstance> cubeProt;
+    CubeCont cubeProt;
     if(!factstart.contains(currentToken) || !parseProduct(addops, cubeProt))
         return false;
     else
@@ -156,7 +156,7 @@ bool Parser::parseSum(const TokenTypeSet &follow)
     return true;
 }
 
-bool Parser::parseProduct(const TokenTypeSet &follow, list<SymbInstance> &cubeProt)
+bool Parser::parseProduct(const TokenTypeSet &follow, CubeCont &cubeProt)
 {
     bool negative = false;
     if(currentToken == notop)

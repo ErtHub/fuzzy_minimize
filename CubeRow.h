@@ -17,18 +17,20 @@ enum Covering
     EQUAL,
 };
 
+using CubeRowCont = std::vector<uint8_t>;
+
 /*this class represents the tetrary-tabular form of a fuzzy expression cube; every position represents a variable of a
  * function and a value is set as 0 if there is no literal representing the variable, 1 if there is a negative literal
  * 2, if there is a positive one and 3 if there are both*/
 class CubeRow
 {
-    std::vector<uint8_t> content;//TODO uint8_t : 2?
+    CubeRowCont content;//TODO uint8_t : 2?
     //counts of every value in the main row
     std::vector<unsigned long> meta_phase_numbers;
 
 public:
     explicit CubeRow();
-    explicit CubeRow(std::vector<uint8_t>& content);
+    explicit CubeRow(CubeRowCont& content);
     explicit CubeRow(unsigned long size);
     void set(uint8_t what, unsigned long where);
     //point all the positions, where the value is 0

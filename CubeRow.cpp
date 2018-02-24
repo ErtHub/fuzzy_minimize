@@ -9,13 +9,13 @@ using namespace std;
 CubeRow::CubeRow() : meta_phase_numbers(vector<unsigned long>(4, 0))
 {}
 
-CubeRow::CubeRow(vector<uint8_t>& content) : content(content), meta_phase_numbers(vector<unsigned long>(4))
+CubeRow::CubeRow(CubeRowCont& content) : content(content), meta_phase_numbers(vector<unsigned long>(4))
 {
     for(auto i : this->content)
         ++meta_phase_numbers[i];
 }
 
-CubeRow::CubeRow(unsigned long size) : content(vector<uint8_t>(size)), meta_phase_numbers(vector<unsigned long>(4))
+CubeRow::CubeRow(unsigned long size) : content(CubeRowCont(size)), meta_phase_numbers(vector<unsigned long>(4))
 {
     meta_phase_numbers[0] = size;
 }

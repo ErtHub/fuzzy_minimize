@@ -14,7 +14,7 @@ class FunctionGenerator
 {
     unsigned long varCount, cubeCount, funCount;
     std::list<std::pair<std::string, FuzzyFunction>> result;
-    std::unordered_map<std::string, unsigned long> varTable;
+    VarTable varTable;
 
     FuzzyFunction generateOne(unsigned long vCount, unsigned long cCount);
 
