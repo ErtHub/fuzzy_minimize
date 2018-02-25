@@ -192,11 +192,7 @@ void CubeTable::minimizeExact()
         k1.sweepCovered();
         sweepCovered(k1);
         wasEmpty = k1.empty();
-#ifdef SORT_TABLES
         merge(k1);
-#else
-        content.splice(content.end(), k1.content);
-#endif
         if(write)
             cout << *this << "----------------" << endl;
         //sweepCovered();
@@ -262,15 +258,9 @@ void CubeTable::minimizeHeuristic()
                 cout << *this << endl << sideList << endl << ki << "----------------" << endl;
         }
     }
-#ifdef SORT_TABLES
     merge(sideList);
     if(content.size() < originalSize)
         merge(ki);
-#else
-    content.splice(content.end(), sideList.content);
-    if(content.size() < originalSize)
-        content.splice(content.end(), ki.content);
-#endif
 //    content.sort();
 //    separateEssentials();
 }
@@ -333,7 +323,11 @@ unsigned long CubeTable::size() const
 
 void CubeTable::merge(CubeTable &another)
 {
+#ifdef SORT_TABLES
     content.merge(another.content);
+#else
+    content.splice(content.end(), another.content);
+#endif
 }
 
 void CubeTable::sort()
