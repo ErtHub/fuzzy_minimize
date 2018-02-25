@@ -2,6 +2,11 @@
 
 using namespace std;
 
+vector<string> Parser::tokenNames
+{
+    "input", "output", "intconst", "varname", "=", "*", "+", "~", ";", "others"
+};
+
 
 void Parser::nexttok()
 {

@@ -23,7 +23,10 @@ public:
 
 class Parser
 {
+    static std::vector<std::string> tokenNames;
+
     friend class Sync;
+
     enum ErrorTypes
     {
         ERROR_TYPE_SYNTAX_EXP = 16,
@@ -52,12 +55,7 @@ class Parser
 
     std::list<std::pair<std::string, FuzzyFunction>> funDefs;
 
-
-    TokenTypeSet instart, outstart;
-    TokenTypeSet funstart;
-    TokenTypeSet factstart;
-    TokenTypeSet addops;
-
+    TokenTypeSet instart, outstart, funstart, factstart, addops;
 
     void nexttok();
     void accept(TokenType token);

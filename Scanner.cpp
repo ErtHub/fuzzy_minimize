@@ -2,16 +2,11 @@
 
 using namespace std;
 
-vector<string> tokenNames
-{
-        "input", "output", "intconst", "varname", "=", "*", "+", "~", ";", "others"
-};
-
 unordered_map<string, TokenType> Scanner::keyTable
 {
     { "input", inputsymb },
     { "output", outputsymb }
-};//TODO to powinno chyba byc statyczne
+};
 
 TokenTypeSet::TokenTypeSet(int elem) : content(vector<unsigned>(nwords, 0))
 {
