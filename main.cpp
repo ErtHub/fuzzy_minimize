@@ -36,20 +36,10 @@ int main(int argc, char* argv[])
 
     MinimizerPtr minimizer;
 
-    enum MinimizationFashion
-    {
-        EXACT = 0, HEURISTIC, HEURISTIC_MUKAIDONO
-    };
-
-    enum Writers
-    {
-        NO_WRITER = 0, VERBOSE = 4, VERY_VERBOSE = 8
-    };
-
     enum Options
     {
         ALGORITHM = 3, WRITER = 12, TIMER = 16, GENERATE = 32
-    };//TODO wyprowadzic te enumy do respektywnych modulow
+    };
 
     if(argc < 2)
     {
