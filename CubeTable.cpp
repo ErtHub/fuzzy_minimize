@@ -97,6 +97,33 @@ CubeTable CubeTable::generateK1() const
     return result;
 }
 
+void CubeTable::chooseCoveringSubset()
+{
+    list<CubeRow> subset;
+    while(!content.empty())
+    {
+        CubeRow cube = move(content.front());
+        content.pop_front();
+        //for every row, if it's complementary and can be Kleen-expanded...
+        if(!cube.get_meta_phase_number(0) || !cube.get_meta_phase_number(3))
+        {
+            subset.push_back(move(cube));
+            continue;
+        }
+        list<unsigned long> positions0 = move(cube.localize0());
+        auto divisionPos = positions0.begin();
+        auto pos0End = positions0.end();
+        CubeRow halfCube1 = cube;
+        //...expand it...
+        CubeRow halfCube2 = move(halfCube1.expand(*divisionPos));
+        /*...until all expansion-derived rows are subsumed by one another row in the function; if a row is not subsumed
+         * and cannot be expanded, it cannot be omitted*/
+        if(!(recursiveCover(cube, halfCube1, ++divisionPos, pos0End, subset) && recursiveCover(cube, halfCube2, divisionPos, pos0End, subset)))
+            subset.push_back(move(cube));
+    }
+    content = move(subset);
+}
+
 CubeTable CubeTable::separateEssentials()
 {
     CubeTableCont essentials;

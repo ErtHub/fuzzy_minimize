@@ -21,6 +21,7 @@ void printHelp(char* progname, ostream& os)
     os << "Options:" << endl;
     os << "-f - specify the name of the file to be read from or written to" << endl;
     os << "-e, -u, -m - specify the algorithm to be run, Exact, Heuristic and Mukaidono respectively" << endl;
+    os << "-x - enable choosing covering subset by expansion and sweeping" << endl;
     os << "-v - print cube tables every iteration" << endl;
     os << "-V - print cube tables and fuzzy consensus calculation every iteration" << endl;
     os << "-t - measure the algorithms execution time" << endl;
@@ -38,7 +39,7 @@ int main(int argc, char* argv[])
 
     enum Options
     {
-        ALGORITHM = 3, WRITER = 12, TIMER = 16, GENERATE = 32
+        ALGORITHM = 3, WRITER = 12, TIMER = 16, GENERATE = 32, EXPAND = 64
     };
 
     if(argc < 2)
@@ -52,7 +53,7 @@ int main(int argc, char* argv[])
     unsigned long genV = 0, genC = 0, genF = 0;
     int c;
 
-    while((c = getopt(argc, argv, "f:eumvVtr:c:i:h")) != -1)
+    while((c = getopt(argc, argv, "f:eumxvVtr:c:i:h")) != -1)
     {
         switch(c)
         {
@@ -67,6 +68,9 @@ int main(int argc, char* argv[])
                 break;
             case 'm':
                 options |= HEURISTIC_MUKAIDONO;
+                break;
+            case 'x':
+                options |= EXPAND;
                 break;
             case 'v':
                 options |= VERBOSE;
@@ -130,13 +134,13 @@ int main(int argc, char* argv[])
     switch(options & ALGORITHM)
     {
         case EXACT:
-            minimizer = MinimizerPtr(new ExactMinimizer((options & WRITER) / VERBOSE));
+            minimizer = MinimizerPtr(new ExactMinimizer((options & WRITER) / VERBOSE, (bool)(options & EXPAND)));
             break;
         case HEURISTIC:
-            minimizer = MinimizerPtr(new HeuristicMinimizer((options & WRITER) / VERBOSE));
+            minimizer = MinimizerPtr(new HeuristicMinimizer((options & WRITER) / VERBOSE, (bool)(options & EXPAND)));
             break;
         case HEURISTIC_MUKAIDONO:
-            minimizer = MinimizerPtr(new MukaidonoMinimizer((options & WRITER) / VERBOSE));
+            minimizer = MinimizerPtr(new MukaidonoMinimizer((options & WRITER) / VERBOSE, (bool)(options & EXPAND)));
             break;
         default:
             cout << "Algorithm option error." << endl;

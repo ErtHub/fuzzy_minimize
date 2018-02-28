@@ -66,6 +66,7 @@ public:
     //create a printable fuzzy expression object for a given variable names table
     FunctionBody redeem(const VarTable& tab) const;
     CubeTable crossProduct(const CubeTable& another) const;
+    void chooseCoveringSubset();
     //of the given cubes set decide by definition, which are function's essential prime implicants, then separate and return them
     CubeTable separateEssentials();
     CubeTableCont findUncoveredCompletes(const CubeTable& covering) const;

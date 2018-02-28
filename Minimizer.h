@@ -27,9 +27,10 @@ class Minimizer
 {
 protected:
     int write;//TODO zliczanie generowanych kostek?
+    bool expand;
     FuzzyFunction result;
 public:
-    explicit Minimizer(int w = 0) : write(w){}
+    explicit Minimizer(int w = 0, bool x = false) : write(w), expand(x){}
     virtual ~Minimizer() = default;
     virtual FuzzyFunction minimize(const FuzzyFunction& input) = 0;
     virtual std::ostream& writeResult(std::ostream& os) const;
@@ -47,7 +48,7 @@ class ExactMinimizer : public Minimizer
     CubeTable solutions;
     std::list<FuzzyFunction> coverings;
 public:
-    explicit ExactMinimizer(int w = 0) : Minimizer(w){};
+    explicit ExactMinimizer(int w = 0, bool x = false) : Minimizer(w, x){};
     ~ExactMinimizer() override = default;
     FuzzyFunction minimize(const FuzzyFunction& input) override;
     std::ostream& writeResult(std::ostream& os) const override;
@@ -58,7 +59,7 @@ public:
 class HeuristicMinimizer : public Minimizer
 {
 public:
-    explicit HeuristicMinimizer(int w = 0) : Minimizer(w){};
+    explicit HeuristicMinimizer(int w = 0, bool x = false) : Minimizer(w, x){};
     ~HeuristicMinimizer() override = default;
     FuzzyFunction minimize(const FuzzyFunction& input) override;
     std::ostream& report(std::ostream& os) const override { return os; };
@@ -67,7 +68,7 @@ public:
 class MukaidonoMinimizer : public Minimizer
 {
 public:
-    explicit MukaidonoMinimizer(int w = 0) : Minimizer(w){};
+    explicit MukaidonoMinimizer(int w = 0, bool x = false) : Minimizer(w, x){};
     ~MukaidonoMinimizer() override = default;
     FuzzyFunction minimize(const FuzzyFunction& input) override;
     std::ostream& report(std::ostream& os) const override { return os; };

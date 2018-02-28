@@ -23,6 +23,12 @@ FuzzyFunction ExactMinimizer::minimize(const FuzzyFunction &input)
     givenFunction = tab;
 
     tab.minimizeExact();
+    if(expand)
+    {
+        tab.chooseCoveringSubset();
+        result = FuzzyFunction(input.getVarTable(), tab);
+        return result;
+    }
     result = FuzzyFunction(input.getVarTable(), tab);
     essentials = move(tab.separateEssentials());
     redundants = vector<CubeRow>(tab.size());
@@ -90,6 +96,9 @@ FuzzyFunction HeuristicMinimizer::minimize(const FuzzyFunction &input)
 
     tab.minimizeHeuristic();
 
+    if(expand)
+        tab.chooseCoveringSubset();
+
     if(write)
         cout << tab << endl << "================" << endl;
 
@@ -106,6 +115,9 @@ FuzzyFunction MukaidonoMinimizer::minimize(const FuzzyFunction &input)
         cout << "================" << endl;
 
     tab.minimizeMukaidono();
+
+    if(expand)
+        tab.chooseCoveringSubset();
 
     if(write)
         cout << tab << endl << "================" << endl;
@@ -149,9 +161,13 @@ ostream& Minimizer::writeResult(std::ostream &os) const
 ostream& ExactMinimizer::writeResult(std::ostream &os) const
 {
     unsigned long enumerator = 0;
-    Minimizer::writeResult(os) << "Possible coverings:" << endl;
-    for(auto& i : coverings)
-        os << ++enumerator << ". " << i << endl;
+    Minimizer::writeResult(os);
+    if(!expand)
+    {
+        os << "Possible coverings:" << endl;
+        for(auto& i : coverings)
+            os << ++enumerator << ". " << i << endl;
+    }
     return os;
 }
 
