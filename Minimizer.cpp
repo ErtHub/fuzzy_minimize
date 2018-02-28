@@ -56,12 +56,9 @@ FuzzyFunction ExactMinimizer::minimize(const FuzzyFunction &input)
                 if(!redundants[i].covers(uncoveredCompletes.front()))
                     continue;
                 CubeRow row(redundants.size());
-//            cout << redundants.size() << "hubert" << endl;
                 row.set(1, i);
-//            cout << row << "hubert" << endl;
                 factor2.append(row);
             }
-//        cout << solutions << "hubert" << factor2 << "hubert" << endl;
             solutions = move(solutions.crossProduct(factor2));
             uncoveredCompletes.pop_front();
         }
@@ -74,7 +71,6 @@ FuzzyFunction ExactMinimizer::minimize(const FuzzyFunction &input)
 
     while(!solutions.empty())
     {
-//        cout << "hubert" << endl << solutions << "hubert" << endl;
         CubeTable covering(essentials);
         CubeRow sol = move(solutions.pop_front());
         for(unsigned long i = 0; i < sol.size(); ++i)

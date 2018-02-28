@@ -47,30 +47,6 @@ bool TokenTypeSet::contains(int elem) const
     return ((content[elem/ubits] & (1 << (elem % ubits))) != 0);
 }
 
-/*ostream& operator<< (ostream& os, const TokenTypeSet& set)
-{
-    unsigned word, bit, value, n = 0;
-    os << '{';
-    for(word = 0; word < set.nwords; ++word)
-    {
-        bit = 0;
-        value = set.content[word];
-        while(value)
-        {
-            if(value & 1)
-            {
-                if(n > 0) os << ',';
-                os << tokenNames[(word * set.ubits + bit)];
-                ++n;
-            }
-            value >>= 1;
-            ++bit;
-        }
-    }
-    os << '}';
-    return os;
-}*/
-
 TokenType Scanner::nextToken()
 {
 

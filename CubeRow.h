@@ -24,7 +24,7 @@ using CubeRowCont = std::vector<uint8_t>;
  * 2, if there is a positive one and 3 if there are both*/
 class CubeRow
 {
-    CubeRowCont content;//TODO uint8_t : 2?
+    CubeRowCont content;
     //counts of every value in the main row
     std::vector<unsigned long> meta_phase_numbers;
 

@@ -63,7 +63,6 @@ class Parser
     void syntaxErrorUnexpectedSymbol(int token, const std::string& what = "Syntax error");
     void semanticError(int errcode, const std::string& what = "Semantic error");
 
-	//TODO uzupelnic komentarze gramatyka
     bool parseVarDecl(const TokenTypeSet& follow);
 	bool parseFunDecl(const TokenTypeSet& follow);
     bool parseFunDef(const TokenTypeSet& follow);

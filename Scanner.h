@@ -31,7 +31,6 @@ public:
 
     TokenTypeSet operator+(const TokenTypeSet& set) const;
     bool contains(int elem)const;
-    //friend std::ostream& operator<<(std::ostream& os, const TokenTypeSet& set);
 };
 
 enum ScanErrors { ICONST2BIG = 1 };

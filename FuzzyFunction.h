@@ -53,7 +53,6 @@ public:
 };
 
 using FunctionBody = std::list<Cube>;
-//TODO operatory dodawania, ew. append?
 //a class representing a two-level expression, i.e. a sum of cubes
 class FuzzyFunction
 {
@@ -67,7 +66,7 @@ public:
 
     FuzzyFunction() = default;
     FuzzyFunction(VarTable varTable, FunctionBody body);
-    FuzzyFunction(const VarTable& varTable, const CubeTable& tab);//TODO to chyba powinno byc zrobione inaczej...
+    FuzzyFunction(const VarTable& varTable, const CubeTable& tab);
 
     VarTable getVarTable() const;
     friend std::ostream& operator<<(std::ostream& os, const FuzzyFunction& f);

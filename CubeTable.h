@@ -23,7 +23,7 @@ class CubeTable
 {
     CubeTableCont content;
     //this variable is checked to decide if the table should be printed to standard output at certain algorithm stages
-    int write;//TODO zrobic jako public static, wyprowadzic konsensus, zlikwidowac & 2
+    int write;
 
     //find another r_i row which has at least one 3 value
     bool findRi(CubeTable& sideList);

@@ -48,7 +48,7 @@ bool Parser::parseProgram()
     return parseVarDecl(outstart) && parseFunDecl(funstart) && parseFunDef((TokenTypeSet(others, EOS)));
 }
 
-bool Parser::parseVarDecl(const TokenTypeSet &follow)//TODO bardziej generycznie?
+bool Parser::parseVarDecl(const TokenTypeSet &follow)
 {
     Sync s(this, instart, follow);
     if(!good)
@@ -134,8 +134,6 @@ bool Parser::parseFunDef(const TokenTypeSet &follow)
             continue;
         funDefs.emplace_back(make_pair(name, FuzzyFunction(varTable, funProt)));
         funProt.clear();
-//        funTable.erase(iter);
-//        funTable.insert(make_pair(name, true));
         iter->second = true;
     }
     return true;

@@ -29,7 +29,7 @@ void CubeRow::set(uint8_t what, unsigned long where)
     ++meta_phase_numbers[content[where]];
 }
 
-list<unsigned long> CubeRow::localize0() const//TODO bardziej generycznie?
+list<unsigned long> CubeRow::localize0() const
 {
     if(!meta_phase_numbers[0])
         return list<unsigned long>();
@@ -111,20 +111,6 @@ CubeRow CubeRow::phaseSwitchedTwin(unsigned long where) const
     twin.set(twin.get(where) ^ (uint8_t)3, where);
     return twin;
 }
-
-/*
-void CubeRow::print() const
-{
-    for(auto& i : content)
-    {
-        cout << (int)i << " ";
-    }
-    cout << "| ";
-    for(auto& i : meta_phase_numbers)
-    {
-        cout << i << " ";
-    }
-}*/
 
 ostream& operator<<(ostream& os, const CubeRow& cr)
 {

@@ -14,8 +14,6 @@ CubeTable::CubeTable(const FuzzyFunction &func, int w) : content(func.tabulate()
 
 void CubeTable::sweepCovered(CubeTable& another, int sweepEqual)
 {
-    //sweepCovered();
-    //another.sweepCovered();
     for(auto& i : content)
         another.sweepCovered(i, sweepEqual);
     for(auto& i : another.content)
@@ -50,10 +48,6 @@ void CubeTable::append(const CubeRow& item)
 
 bool CubeTable::checkCover(const CubeRow& covered, int checkEqual) const
 {
-    /*for(auto& i : content)
-        if((addressof(i) != addressof(covered)) && i.covers(covered))
-            return true;
-    return false;*/
     return any_of(content.begin(), content.end(), [&](const CubeRow& c){ return (addressof(c) != addressof(covered)) && (c.covers(covered) & checkEqual); });
 }
 
@@ -158,12 +152,6 @@ CubeTable CubeTable::separateEssentials()
 
 bool CubeTable::recursiveCover(CubeRow& original, CubeRow& cube, list<unsigned long>::iterator pos0, list<unsigned long>::iterator& pos0End, const CubeTableCont& secondList) const
 {
-    /*for(auto& i : content)
-        if(i.covers(cube))
-            return true;
-    for(auto& i : secondList)
-        if(i.covers(cube))
-            return true;*/
     function<bool(const CubeRow&)> checkFun = [&](const CubeRow& c) { return addressof(c) != addressof(original) && c.covers(cube); };
     if(any_of(content.begin(), content.end(), checkFun) || any_of(secondList.begin(), secondList.end(), checkFun))
         return true;
@@ -222,7 +210,6 @@ void CubeTable::minimizeExact()
         merge(k1);
         if(write)
             cout << *this << "----------------" << endl;
-        //sweepCovered();
     } while(!wasEmpty);//generate fuzzy consensus and append it to K table until K table's content changes
 }
 
@@ -235,7 +222,6 @@ void CubeTable::minimizeHeuristic()
     unsigned long originalSize = content.size();
     CubeTable sideList;
     CubeTable ki;
-//    CubeTable history;
     while(findRi(sideList))
     {
         CubeRow r;
@@ -277,7 +263,6 @@ void CubeTable::minimizeHeuristic()
                 break;
             }
 
-//            history.content.push_front(rk);
             r = rk;
             R = findR(r, sideList, ki);
             rLiteralsCount = r.countLiterals();
@@ -288,8 +273,6 @@ void CubeTable::minimizeHeuristic()
     merge(sideList);
     if(content.size() < originalSize)
         merge(ki);
-//    content.sort();
-//    separateEssentials();
 }
 
 void CubeTable::minimizeMukaidono()
@@ -376,22 +359,10 @@ CubeRow CubeTable::pop_front()
     return result;
 }
 
-/*void CubeTable::print()
-{
-    for(auto& row : content)
-    {
-        row.print();
-        cout << endl;
-    }
-}*/
-
 ostream& operator<<(ostream& os, const CubeTable& ct)
 {
     for(auto& row : ct.content)
-//    {
         os << row << endl;
-//        os << endl;
-//    }
     return os;
 }
 
@@ -466,7 +437,7 @@ list<tuple<unsigned long, unsigned long, CubeRow>> CubeTable::findR(CubeRow& r, 
                 }
     );
     return result;
-}//TODO zrobic funkcje rekurencyjne iteracyjnie
+}
 
 FunctionBody CubeTable::redeem(const VarTable& tab) const
 {
@@ -508,7 +479,6 @@ CubeTable CubeTable::crossProduct(const CubeTable &another) const
             CubeRow toInsert(i.size() > j.size() ? i.size() : j.size());
             for(unsigned long pos = 0; pos < i.size() && pos < j.size(); ++pos)
                 toInsert.set(i.get(pos) | j.get(pos), pos);
-//            cout << toInsert << "hubert" << endl;
             result.append(toInsert);
         }
     }

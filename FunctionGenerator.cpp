@@ -30,7 +30,7 @@ FuzzyFunction FunctionGenerator::generateOne(unsigned long vCount, unsigned long
         uniform_int_distribution<unsigned long> uni(1, vCount * 2);
         unsigned long timesRepeat = uni(rng);
         uniform_int_distribution<unsigned long> tweakerWhere(0, vCount - 1);
-        uniform_int_distribution<uint8_t> tweakerWhat(1, 2);//TODO moze to powinno byc 1, 3?
+        uniform_int_distribution<uint8_t> tweakerWhat(1, 2);
 
         for(unsigned long v = 0; v < timesRepeat; ++v)
         {

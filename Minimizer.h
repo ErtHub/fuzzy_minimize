@@ -26,7 +26,7 @@ enum Writers
 class Minimizer
 {
 protected:
-    int write;//TODO zliczanie generowanych kostek?
+    int write;
     bool expand;
     FuzzyFunction result;
 public:
