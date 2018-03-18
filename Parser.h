@@ -49,7 +49,7 @@ class Parser
     bool good;
     unsigned long varcount;
     unsigned long funcount;
-    VarTable varTable;
+    VarTablePtr varTable;
 	std::unordered_map<std::string, bool> funTable;
     FunctionBody funProt;
 

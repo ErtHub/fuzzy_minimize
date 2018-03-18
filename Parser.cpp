@@ -31,7 +31,7 @@ void Parser::syntaxErrorUnexpectedSymbol(int token, const string& what)
     scn.scanError(ERROR_TYPE_SYNTAX_UNEXP + token, "Unexpected token: " + tokenNames[token], what);
 }
 
-Parser::Parser(Scanner& s) : scn(s), varcount(0), funcount(0)
+Parser::Parser(Scanner& s) : scn(s), varcount(0), funcount(0), varTable(new unordered_map<string, unsigned long>())
 {
     instart = TokenTypeSet(inputsymb, others, EOS);
     outstart = TokenTypeSet(outputsymb, others, EOS);
@@ -69,10 +69,10 @@ bool Parser::parseVarDecl(const TokenTypeSet &follow)
             semanticError(NENOUGH_VARNAMES);
             break;
         }
-        if(varTable.find(scn.getSpell()) != varTable.end())
+        if(varTable->find(scn.getSpell()) != varTable->end())
             semanticError(NAME_COLLISION);
         else
-            varTable.insert(make_pair(scn.getSpell(), varTable.size()));
+            varTable->insert(make_pair(scn.getSpell(), varTable->size()));
         accept(varname);
         ++declaredSoFar;
     }
@@ -99,7 +99,7 @@ bool Parser::parseFunDecl(const TokenTypeSet &follow)
         {
             semanticError(NENOUGH_FUNNAMES);
         }
-        if(funTable.find(scn.getSpell()) != funTable.end() || varTable.find(scn.getSpell()) != varTable.end())
+        if(funTable.find(scn.getSpell()) != funTable.end() || varTable->find(scn.getSpell()) != varTable->end())
             semanticError(NAME_COLLISION);
         else
             funTable.insert(make_pair(scn.getSpell(), false));
@@ -124,7 +124,7 @@ bool Parser::parseFunDef(const TokenTypeSet &follow)
             semanticError(UNDECLARED_FUN);
             continue;
         }
-        else if(iter->second || (varTable.find(name) != varTable.end()))
+        else if(iter->second || (varTable->find(name) != varTable->end()))
         {
             semanticError(NAME_COLLISION);
             continue;
@@ -169,7 +169,7 @@ bool Parser::parseProduct(const TokenTypeSet &follow, CubeCont &cubeProt)
     }
     if(currentToken == varname)
     {
-        if(varTable.find(scn.getSpell()) == varTable.end())
+        if(varTable->find(scn.getSpell()) == varTable->end())
         {
             semanticError(UNDECLARED_VAR);
             return false;
@@ -190,7 +190,7 @@ bool Parser::parseProduct(const TokenTypeSet &follow, CubeCont &cubeProt)
         }
         if(currentToken == varname)
         {
-            if(varTable.find(scn.getSpell()) == varTable.end())
+            if(varTable->find(scn.getSpell()) == varTable->end())
                 semanticError(UNDECLARED_VAR);
             else
                 cubeProt.emplace_back(SymbInstance(scn.getSpell(), negative));
@@ -226,7 +226,7 @@ void Parser::clear()
 {
     varcount = 0;
     funcount = 0;
-    varTable.clear();
+    varTable.reset(new unordered_map<string, unsigned long>());
     funTable.clear();
     funProt.clear();
     funDefs.clear();

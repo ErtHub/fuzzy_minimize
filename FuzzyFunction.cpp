@@ -83,7 +83,7 @@ ostream& operator<<(ostream& os, const Cube& i)
 
 void FuzzyFunction::clear()
 {
-    varTable.clear();
+    varTable.reset();
     body.clear();
 }
 
@@ -91,7 +91,7 @@ double FuzzyFunction::calc(const vector<double> &args, OperationImpl* opImpl) co
 {
     double acc = 0;
     for(auto& i : body)
-        acc = opImpl->s_norm(acc, i.calc(varTable, args, opImpl));
+        acc = opImpl->s_norm(acc, i.calc(*varTable, args, opImpl));
     return acc;
 }
 
@@ -101,19 +101,19 @@ CubeTableCont FuzzyFunction::tabulate() const
     CubeRowCont partialRes;
     for(auto& i : body)
     {
-        partialRes = move(i.tabulate(varTable));
+        partialRes = move(i.tabulate(*varTable));
         res.emplace_back(CubeRow(partialRes));
     }
     return res;
 }
 
-FuzzyFunction::FuzzyFunction(VarTable varTable, FunctionBody body) : varTable(move(varTable)), body(move(body))
+FuzzyFunction::FuzzyFunction(VarTablePtr varTable, FunctionBody body) : varTable(move(varTable)), body(move(body))
 {}
 
-FuzzyFunction::FuzzyFunction(const VarTable& varTable, const CubeTable& tab) : body(move(tab.redeem(varTable))), varTable(varTable)
+FuzzyFunction::FuzzyFunction(const VarTablePtr& varTable, const CubeTable& tab) : body(move(tab.redeem(*varTable))), varTable(varTable)
 {}
 
-VarTable FuzzyFunction::getVarTable() const
+VarTablePtr FuzzyFunction::getVarTable() const
 {
     return varTable;
 }

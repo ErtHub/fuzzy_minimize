@@ -11,7 +11,7 @@ FuzzyFunction FunctionGenerator::generateOne(unsigned long vCount, unsigned long
 
     cout << "3" << endl;
     for(unsigned long i = 0; i < vCount; ++i)
-        varTable.insert(make_pair(("z" + to_string(i)), i));
+        varTable->insert(make_pair(("z" + to_string(i)), i));
 
     CubeTable tetraryTable;
 
@@ -57,10 +57,10 @@ void FunctionGenerator::generate()
 
 bool FunctionGenerator::writeToFile(const string& fn) const
 {
-    vector<string> symbRow(varTable.size(), "");
+    vector<string> symbRow(varTable->size(), "");
 
     /*descramble the symbol order*/
-    for(auto& i : varTable)
+    for(auto& i : *varTable)
         symbRow[i.second] = i.first;
 
     cout << "1" << endl;

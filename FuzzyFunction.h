@@ -8,6 +8,7 @@
 #include <list>
 #include <vector>
 #include <unordered_map>
+#include <memory>
 #include "OperationImpl.h"
 #include "CubeRow.h"
 #include "CubeTable.h"
@@ -16,6 +17,7 @@
 class CubeTable;
 using CubeTableCont = std::list<CubeRow>;
 using VarTable = std::unordered_map<std::string, unsigned long>;
+using VarTablePtr = std::shared_ptr<VarTable>;
 
 //a class representing a literal in a two-level fuzzy function expression
 class SymbInstance
@@ -56,7 +58,7 @@ using FunctionBody = std::list<Cube>;
 //a class representing a two-level expression, i.e. a sum of cubes
 class FuzzyFunction
 {
-    VarTable varTable;
+    VarTablePtr varTable;
     FunctionBody body;
 
 public:
@@ -65,10 +67,10 @@ public:
     CubeTableCont tabulate() const;
 
     FuzzyFunction() = default;
-    FuzzyFunction(VarTable varTable, FunctionBody body);
-    FuzzyFunction(const VarTable& varTable, const CubeTable& tab);
+    FuzzyFunction(VarTablePtr varTable, FunctionBody body);
+    FuzzyFunction(const VarTablePtr& varTable, const CubeTable& tab);
 
-    VarTable getVarTable() const;
+    VarTablePtr getVarTable() const;
     friend std::ostream& operator<<(std::ostream& os, const FuzzyFunction& f);
 };
 
