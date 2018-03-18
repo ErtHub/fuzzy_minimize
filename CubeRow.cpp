@@ -112,6 +112,21 @@ CubeRow CubeRow::phaseSwitchedTwin(unsigned long where) const
     return twin;
 }
 
+CubeRow CubeRow::fuzzyConsensus(const CubeRow &another, unsigned long pos, int w) const
+{
+    CubeRow result(size());
+    for(unsigned long i = 0; i < result.size(); ++i)
+    {
+        result.set(get(i) | another.get(i), i);
+        if(w & 2)
+            cout << "(" << (int)get(i) << ", " << (int)another.get(i) << ")";
+    }
+    if(w & 2)
+        cout << endl;
+    result.set(0, pos);
+    return result;
+}
+
 ostream& operator<<(ostream& os, const CubeRow& cr)
 {
     for(auto i : cr.content)

@@ -46,6 +46,7 @@ public:
     CubeRow expand(unsigned long by);
     //used to create a row with a literal designated as 'where' negated
     CubeRow phaseSwitchedTwin(unsigned long where) const;
+    CubeRow fuzzyConsensus(const CubeRow& another, unsigned long pos, int w = 0) const;
 
     friend bool operator<(CubeRow& first, CubeRow& second)
     {

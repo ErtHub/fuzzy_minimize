@@ -71,16 +71,7 @@ CubeTable CubeTable::generateK1() const
                     //...and for every 1-2 value pair create one fuzzy consensus row...
                     if((i->get(pos) ^ j->get(pos)) == 3)
                     {
-                        CubeRow v(j->size());
-                        for(unsigned long p = 0; p < v.size(); ++p)
-                        {
-                            v.set(i->get(p) | j->get(p), p);
-                            if(write & 2)
-                                cout << "(" << (int)i->get(p) << ", " << (int)j->get(p) << ")";
-                        }
-                        if(write & 2)
-                            cout << endl;
-                        v.set(0, pos);
+                        CubeRow v = move(i->fuzzyConsensus(*j, pos, write));
                         //...and append it to the K1 table
                         result.append(v);
                     }
@@ -234,16 +225,7 @@ void CubeTable::minimizeHeuristic()
             CubeRow rj;
             rj = move(get<2>(R.front()));
             R.pop_front();
-            CubeRow rk(rj.size());
-            for(unsigned long i = 0; i < rk.size(); ++i)
-            {
-                rk.set(r.get(i) | rj.get(i), i);
-                if(write & 2)
-                    cout << "(" << (int)r.get(i) << ", " << (int)rj.get(i) << ")";
-            }
-            if(write & 2)
-                cout << endl;
-            rk.set(0, pos1_2);
+            CubeRow rk = move(r.fuzzyConsensus(rj, pos1_2, write));
             ki.content.push_back(rk);
 
             bool rowWasRepeated = sweepCovered(ki.content.back(), NEQUAL);
