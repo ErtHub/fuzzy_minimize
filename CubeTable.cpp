@@ -434,15 +434,15 @@ FunctionBody CubeTable::redeem(const VarTable& tab) const
 
     for(auto& row : content)
     {
-        CubeCont partialResult;
+        Cube partialResult;
         for(unsigned long i = 0; i < symbRow.size(); ++i)
         {
             if(row.get(i))
             {
                 if(row.get(i) & 2)
-                    partialResult.emplace_back(SymbInstance(symbRow[i], false));
+                    partialResult += (SymbInstance(symbRow[i], false));
                 if(row.get(i) & 1)
-                    partialResult.emplace_back(SymbInstance(symbRow[i], true));
+                    partialResult += (SymbInstance(symbRow[i], true));
             }
         }
         result.emplace_back(Cube(partialResult));

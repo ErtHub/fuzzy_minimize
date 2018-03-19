@@ -64,6 +64,12 @@ bool Cube::hasSymbol(const SymbInstance& symb) const
     return false;
 }
 
+Cube Cube::operator+=(const SymbInstance &symb)
+{
+    content.emplace_back(symb);
+    return *this;
+}
+
 Cube::Cube(const CubeCont& content) : content(content)
 {}
 
@@ -105,6 +111,12 @@ CubeTableCont FuzzyFunction::tabulate() const
         res.emplace_back(CubeRow(partialRes));
     }
     return res;
+}
+
+FuzzyFunction FuzzyFunction::operator+=(const Cube &cube)
+{
+    body.emplace_back(cube);
+    return *this;
 }
 
 FuzzyFunction::FuzzyFunction(VarTablePtr varTable, FunctionBody body) : varTable(move(varTable)), body(move(body))

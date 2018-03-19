@@ -76,6 +76,7 @@ bool Parser::parseVarDecl(const TokenTypeSet &follow)
         accept(varname);
         ++declaredSoFar;
     }
+    funProt = FuzzyFunction(varTable);
     return true;
 }
 
@@ -132,8 +133,8 @@ bool Parser::parseFunDef(const TokenTypeSet &follow)
         accept(becomes);
         if(!parseSum(follow + funstart))
             continue;
-        funDefs.emplace_back(make_pair(name, FuzzyFunction(varTable, funProt)));
-        funProt.clear();
+        funDefs.emplace_back(make_pair(name, funProt));
+        funProt = FuzzyFunction(varTable);
         iter->second = true;
     }
     return true;
@@ -144,22 +145,22 @@ bool Parser::parseSum(const TokenTypeSet &follow)
     Sync s(this, factstart, follow);
     if(!good)
         return false;
-    CubeCont cubeProt;
+    Cube cubeProt;
     if(!factstart.contains(currentToken) || !parseProduct(addops, cubeProt))
         return false;
     else
-        funProt.emplace_back(Cube(cubeProt));
+        funProt += (Cube(cubeProt));
     while(currentToken == orop)
     {
-        cubeProt.clear();
+        cubeProt = Cube();
         accept(orop);
         if(parseProduct(addops + funstart, cubeProt))
-            funProt.emplace_back(Cube(cubeProt));
+            funProt += (Cube(cubeProt));
     }
     return true;
 }
 
-bool Parser::parseProduct(const TokenTypeSet &follow, CubeCont &cubeProt)
+bool Parser::parseProduct(const TokenTypeSet &follow, Cube &cubeProt)
 {
     bool negative = false;
     if(currentToken == notop)
@@ -174,7 +175,7 @@ bool Parser::parseProduct(const TokenTypeSet &follow, CubeCont &cubeProt)
             semanticError(UNDECLARED_VAR);
             return false;
         }
-        cubeProt.emplace_back(SymbInstance(scn.getSpell(), negative));
+        cubeProt += (SymbInstance(scn.getSpell(), negative));
         accept(varname);
     }
     else
@@ -193,7 +194,7 @@ bool Parser::parseProduct(const TokenTypeSet &follow, CubeCont &cubeProt)
             if(varTable->find(scn.getSpell()) == varTable->end())
                 semanticError(UNDECLARED_VAR);
             else
-                cubeProt.emplace_back(SymbInstance(scn.getSpell(), negative));
+                cubeProt += (SymbInstance(scn.getSpell(), negative));
         }
         accept(varname);
         negative = false;

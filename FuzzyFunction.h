@@ -47,8 +47,9 @@ class Cube
 public:
     bool covers(const Cube& another) const;
     bool hasSymbol(const SymbInstance& symb) const;
+    Cube operator+=(const SymbInstance& symb);
 
-    explicit Cube(const CubeCont &content);
+    explicit Cube(const CubeCont &content = CubeCont());
 
     friend class FuzzyFunction;
     friend std::ostream& operator<<(std::ostream& os, const Cube& i);
@@ -65,9 +66,10 @@ public:
     void clear();
     double calc(const std::vector<double> &args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
     CubeTableCont tabulate() const;
+    FuzzyFunction operator+=(const Cube& cube);
 
     FuzzyFunction() = default;
-    FuzzyFunction(VarTablePtr varTable, FunctionBody body);
+    explicit FuzzyFunction(VarTablePtr varTable, FunctionBody body = FunctionBody());
     FuzzyFunction(const VarTablePtr& varTable, const CubeTable& tab);
 
     VarTablePtr getVarTable() const;
