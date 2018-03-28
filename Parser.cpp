@@ -36,8 +36,9 @@ Parser::Parser(Scanner& s) : scn(s), varcount(0), funcount(0), varTable(new unor
     instart = TokenTypeSet(inputsymb, others, EOS);
     outstart = TokenTypeSet(outputsymb, others, EOS);
     funstart = TokenTypeSet(varname, others, EOS);
-    factstart = TokenTypeSet(varname, notop, others, EOS);
+    factstart = funstart + TokenTypeSet(notop);
     addops = TokenTypeSet(orop, others, EOS);
+    factrpt = addops + funstart;
 
     nexttok();
 }
@@ -154,7 +155,7 @@ bool Parser::parseSum(const TokenTypeSet &follow)
     {
         cubeProt = Cube();
         accept(orop);
-        if(parseProduct(addops + funstart, cubeProt))
+        if(parseProduct(factrpt, cubeProt))
             funProt += (Cube(cubeProt));
     }
     return true;

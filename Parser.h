@@ -55,7 +55,7 @@ class Parser
 
     std::list<std::pair<std::string, FuzzyFunction>> funDefs;
 
-    TokenTypeSet instart, outstart, funstart, factstart, addops;
+    TokenTypeSet instart, outstart, funstart, factstart, addops, factrpt;
 
     void nexttok();
     void accept(TokenType token);
