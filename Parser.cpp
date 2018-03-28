@@ -150,13 +150,13 @@ bool Parser::parseSum(const TokenTypeSet &follow)
     if(!factstart.contains(currentToken) || !parseProduct(addops, cubeProt))
         return false;
     else
-        funProt += (Cube(cubeProt));
+        funProt += cubeProt;
     while(currentToken == orop)
     {
         cubeProt = Cube();
         accept(orop);
         if(parseProduct(factrpt, cubeProt))
-            funProt += (Cube(cubeProt));
+            funProt += cubeProt;
     }
     return true;
 }
@@ -176,7 +176,7 @@ bool Parser::parseProduct(const TokenTypeSet &follow, Cube &cubeProt)
             semanticError(UNDECLARED_VAR);
             return false;
         }
-        cubeProt += (SymbInstance(scn.getSpell(), negative));
+        cubeProt += SymbInstance(scn.getSpell(), negative);
         accept(varname);
     }
     else
@@ -195,7 +195,7 @@ bool Parser::parseProduct(const TokenTypeSet &follow, Cube &cubeProt)
             if(varTable->find(scn.getSpell()) == varTable->end())
                 semanticError(UNDECLARED_VAR);
             else
-                cubeProt += (SymbInstance(scn.getSpell(), negative));
+                cubeProt += SymbInstance(scn.getSpell(), negative);
         }
         accept(varname);
         negative = false;

@@ -440,9 +440,9 @@ FunctionBody CubeTable::redeem(const VarTable& tab) const
             if(row.get(i))
             {
                 if(row.get(i) & 2)
-                    partialResult += (SymbInstance(symbRow[i], false));
+                    partialResult += SymbInstance(symbRow[i], false);
                 if(row.get(i) & 1)
-                    partialResult += (SymbInstance(symbRow[i], true));
+                    partialResult += SymbInstance(symbRow[i], true);
             }
         }
         result.emplace_back(Cube(partialResult));
