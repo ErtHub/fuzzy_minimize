@@ -7,6 +7,57 @@
 using namespace std;
 using namespace std::chrono;
 
+void ExactMinimizer::solveColumnCovering()
+{
+    CubeTableCont uncoveredCompletes = givenFunction.findUncoveredCompletes(essentials);
+
+    if(!uncoveredCompletes.empty())
+    {
+        for(unsigned long i = 0; i < redundants.size(); ++i)
+        {
+            if(!redundants[i].covers(uncoveredCompletes.front()))
+                continue;
+            CubeRow row(redundants.size());
+            row.set(1, i);
+            solutions.append(row);
+        }
+        uncoveredCompletes.pop_front();
+
+        while(!uncoveredCompletes.empty())
+        {
+            CubeTable factor2;
+            for(unsigned long i = 0; i < redundants.size(); ++i)
+            {
+                if(!redundants[i].covers(uncoveredCompletes.front()))
+                    continue;
+                CubeRow row(redundants.size());
+                row.set(1, i);
+                factor2.append(row);
+            }
+            solutions = move(solutions.crossProduct(factor2));
+            uncoveredCompletes.pop_front();
+        }
+    }
+    else
+    {
+        CubeRow row(redundants.size());
+        solutions.append(row);
+    }
+}
+
+void ExactMinimizer::solutionsToFunctions(const VarTablePtr& varTable)
+{
+    while(!solutions.empty())
+    {
+        CubeTable covering(essentials);
+        CubeRow sol = move(solutions.pop_front());
+        for(unsigned long i = 0; i < sol.size(); ++i)
+            if(sol.get(i))
+                covering.append(redundants[i]);
+        coverings.emplace_back(FuzzyFunction(varTable, covering));
+    }
+}
+
 FuzzyFunction ExactMinimizer::minimize(const FuzzyFunction &input)
 {
     clear();
@@ -34,50 +85,10 @@ FuzzyFunction ExactMinimizer::minimize(const FuzzyFunction &input)
     redundants = vector<CubeRow>(tab.size());
     for(auto& i : redundants)
         i = move(tab.pop_front());
-    CubeTableCont uncoveredCompletes = givenFunction.findUncoveredCompletes(essentials);
 
-    if(!uncoveredCompletes.empty())
-    {
-        for(unsigned long i = 0; i < redundants.size(); ++i)
-        {
-            if(!redundants[i].covers(uncoveredCompletes.front()))
-                continue;
-            CubeRow row(redundants.size());
-            row.set(1, i);
-            solutions.append(row);
-        }
-        uncoveredCompletes.pop_front();
-        
-        while(!uncoveredCompletes.empty())
-        {
-            CubeTable factor2;
-            for(unsigned long i = 0; i < redundants.size(); ++i)
-            {
-                if(!redundants[i].covers(uncoveredCompletes.front()))
-                    continue;
-                CubeRow row(redundants.size());
-                row.set(1, i);
-                factor2.append(row);
-            }
-            solutions = move(solutions.crossProduct(factor2));
-            uncoveredCompletes.pop_front();
-        }
-    }
-    else
-    {
-        CubeRow row(redundants.size());
-        solutions.append(row);
-    }
+    solveColumnCovering();
 
-    while(!solutions.empty())
-    {
-        CubeTable covering(essentials);
-        CubeRow sol = move(solutions.pop_front());
-        for(unsigned long i = 0; i < sol.size(); ++i)
-            if(sol.get(i))
-                covering.append(redundants[i]);
-        coverings.emplace_back(FuzzyFunction(input.getVarTable(), covering));
-    }
+    solutionsToFunctions(input.getVarTable());
 
     return result;
 }

@@ -42,6 +42,9 @@ class ExactMinimizer : public Minimizer
     std::vector<CubeRow> redundants;
     CubeTable solutions;
     std::list<FuzzyFunction> coverings;
+
+    void solveColumnCovering();
+    void solutionsToFunctions(const VarTablePtr& varTable);
 public:
     explicit ExactMinimizer(int w = 0, bool x = false) : Minimizer(w, x){};
     ~ExactMinimizer() override = default;
