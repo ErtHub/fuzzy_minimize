@@ -134,13 +134,13 @@ int main(int argc, char* argv[])
     switch(options & ALGORITHM)
     {
         case EXACT:
-            minimizer = MinimizerPtr(new ExactMinimizer((options & WRITER) / VERBOSE, (bool)(options & EXPAND)));
+            minimizer = MinimizerPtr(new ExactMinimizer(options & WRITER, (bool)(options & EXPAND)));
             break;
         case HEURISTIC:
-            minimizer = MinimizerPtr(new HeuristicMinimizer((options & WRITER) / VERBOSE, (bool)(options & EXPAND)));
+            minimizer = MinimizerPtr(new HeuristicMinimizer(options & WRITER, (bool)(options & EXPAND)));
             break;
         case HEURISTIC_MUKAIDONO:
-            minimizer = MinimizerPtr(new MukaidonoMinimizer((options & WRITER) / VERBOSE, (bool)(options & EXPAND)));
+            minimizer = MinimizerPtr(new MukaidonoMinimizer(options & WRITER, (bool)(options & EXPAND)));
             break;
         default:
             cout << "Algorithm option error." << endl;

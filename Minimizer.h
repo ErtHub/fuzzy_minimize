@@ -18,11 +18,6 @@ enum MinimizationFashion
     EXACT = 0, HEURISTIC, HEURISTIC_MUKAIDONO
 };
 
-enum Writers
-{
-    NO_WRITER = 0, VERBOSE = 4, VERY_VERBOSE = 8
-};
-
 class Minimizer
 {
 protected:

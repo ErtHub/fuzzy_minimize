@@ -118,10 +118,10 @@ CubeRow CubeRow::fuzzyConsensus(const CubeRow &another, unsigned long pos, int w
     for(unsigned long i = 0; i < result.size(); ++i)
     {
         result.set(get(i) | another.get(i), i);
-        if(w & 2)
+        if(w & VERY_VERBOSE)
             cout << "(" << (int)get(i) << ", " << (int)another.get(i) << ")";
     }
-    if(w & 2)
+    if(w & VERY_VERBOSE)
         cout << endl;
     result.set(0, pos);
     return result;

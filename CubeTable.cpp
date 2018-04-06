@@ -405,7 +405,7 @@ list<tuple<unsigned long, unsigned long, CubeRow>> CubeTable::findR(CubeRow& r, 
             /*for a given r row, create an r_n set of rows; for each r_n row, count the 0 values, localize the 1-2 value
              * pair with the r row and sort them by the 0 values count*/
             if(seenOnlyOne1_2 && !seenCross3)
-                result.push_back(make_tuple(zeroPairs, pos1_2, rn));
+                result.emplace_back(make_tuple(zeroPairs, pos1_2, rn));
         }
     };
 

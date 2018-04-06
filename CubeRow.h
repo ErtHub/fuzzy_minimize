@@ -17,6 +17,11 @@ enum Covering
     EQUAL,
 };
 
+enum Writers
+{
+    NO_WRITER = 0, VERBOSE = 4, VERY_VERBOSE = 8
+};
+
 using CubeRowCont = std::vector<uint8_t>;
 
 /*this class represents the tetrary-tabular form of a fuzzy expression cube; every position represents a variable of a
