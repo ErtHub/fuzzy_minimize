@@ -57,9 +57,9 @@ CubeTable CubeTable::generateK1() const
 
     for(auto i = content.begin(); i != content.end(); ++i)
     {
-        list<unsigned long> positions1_2 = move(i->localize1_2());
-        if(positions1_2.empty())
+        if(!(i->get_meta_phase_number(1) || i->get_meta_phase_number(2)))
             continue;
+        list<unsigned long> positions1_2 = move(i->localize<1, 2>());
         auto j = i;
         for(++j; j != content.end(); ++j)
         {
@@ -90,12 +90,12 @@ void CubeTable::chooseCoveringSubset()
         CubeRow cube = move(content.front());
         content.pop_front();
         //for every row, if it's complementary and can be Kleen-expanded...
-        if(!cube.get_meta_phase_number(0) || !cube.get_meta_phase_number(3))
+        if(!(cube.get_meta_phase_number(0) && cube.get_meta_phase_number(3)))
         {
             subset.push_back(move(cube));
             continue;
         }
-        list<unsigned long> positions0 = move(cube.localize0());
+        list<unsigned long> positions0 = move(cube.localize<0>());
         auto divisionPos = positions0.begin();
         auto pos0End = positions0.end();
         CubeRow halfCube1 = cube;
@@ -116,13 +116,13 @@ CubeTable CubeTable::separateEssentials()
     for(auto i = content.begin(); i != content.end();)
     {
         //for every row, if it's complementary and can be Kleen-expanded...
-        if(!i->get_meta_phase_number(0) || !i->get_meta_phase_number(3))
+        if(!(i->get_meta_phase_number(0) && i->get_meta_phase_number(3)))
         {
             essentials.push_back(move(*i));
             i = content.erase(i);
             continue;
         }
-        list<unsigned long> positions0 = move(i->localize0());
+        list<unsigned long> positions0 = move(i->localize<0>());
         auto divisionPos = positions0.begin();
         auto pos0End = positions0.end();
         CubeRow halfCube1 = *i;
@@ -237,7 +237,7 @@ void CubeTable::minimizeHeuristic()
                 ki.content.pop_back();
                 continue;
             }
-            if(!rk.get_meta_phase_number(1) && !rk.get_meta_phase_number(2))
+            if(!(rk.get_meta_phase_number(1) || rk.get_meta_phase_number(2)))
                 break;
             if(rLiteralsCount < rk.countLiterals() || rowWasRepeated)
             {
@@ -265,11 +265,11 @@ void CubeTable::minimizeMukaidono()
     sweepCovered();
     for(auto& i : content)
     {
-        if(!i.get_meta_phase_number(3))
+        if(!((i.get_meta_phase_number(1) || i.get_meta_phase_number(2)) && i.get_meta_phase_number(3)))
             continue;
         if(write)
             cout << *this << endl << "---------------" << endl;
-        auto pos1_2List = i.localize1_2();
+        auto pos1_2List = i.localize<1, 2>();
         auto pos1_2 = pos1_2List.begin();
         while(pos1_2 != pos1_2List.end())
         {
@@ -286,7 +286,9 @@ void CubeTable::minimizeMukaidono()
             sweepCovered(i);
             continue;
         }
-        auto pos0List = i.localize0();
+        if(!i.get_meta_phase_number(0))
+            continue;
+        auto pos0List = i.localize<0>();
         auto pos0 = pos0List.begin();
         auto pos0End = pos0List.end();
         pos1_2 = pos1_2List.begin();
@@ -482,7 +484,7 @@ CubeTableCont CubeTable::findUncoveredCompletes(const CubeTable &covering) const
                     result.push_back(i);
                 continue;
             }
-            list<unsigned long> positions0 = move(i.localize0());
+            list<unsigned long> positions0 = move(i.localize<0>());
             auto divisionPos = positions0.begin();
             auto pos0End = positions0.end();
             CubeRow cube1 = i;

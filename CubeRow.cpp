@@ -29,28 +29,6 @@ void CubeRow::set(uint8_t what, unsigned long where)
     ++meta_phase_numbers[content[where]];
 }
 
-list<unsigned long> CubeRow::localize0() const
-{
-    if(!meta_phase_numbers[0])
-        return list<unsigned long>();
-    list<unsigned long> positions0;
-    for(unsigned long i = 0; i < content.size(); ++i)
-        if(!get(i))
-            positions0.push_back(i);
-    return positions0;
-}
-
-list<unsigned long> CubeRow::localize1_2() const
-{
-    if(!meta_phase_numbers[1] && !meta_phase_numbers[2])
-        return list<unsigned long>();
-    list<unsigned long> positions1_2;
-    for(unsigned long i = 0; i < content.size(); ++i)
-        if(content[i] == 1 || content[i] == 2)
-            positions1_2.push_back(i);
-    return positions1_2;
-}
-
 int CubeRow::covers(const CubeRow& covered) const
 {
     int rowsAreEqual = EQUAL;

@@ -24,6 +24,27 @@ enum Writers
 
 using CubeRowCont = std::vector<uint8_t>;
 
+template <uint8_t... Args>
+struct CompareImpl;
+
+template <uint8_t First, uint8_t... Args>
+struct CompareImpl<First, Args...>
+{
+    static bool compare(uint8_t i)
+    {
+        return First == i || CompareImpl<Args...>::compare(i);
+    }
+};
+
+template <>
+struct CompareImpl<>
+{
+    static bool compare(uint8_t i)
+    {
+        return false;
+    }
+};
+
 /*this class represents the tetrary-tabular form of a fuzzy expression cube; every position represents a variable of a
  * function and a value is set as 0 if there is no literal representing the variable, 1 if there is a negative literal
  * 2, if there is a positive one and 3 if there are both*/
@@ -38,10 +59,16 @@ public:
     explicit CubeRow(CubeRowCont& content);
     explicit CubeRow(unsigned long size);
     void set(uint8_t what, unsigned long where);
-    //point all the positions, where the value is 0
-    std::list<unsigned long> localize0() const;
-    //point all the positions, where the value is 1 or 2
-    std::list<unsigned long> localize1_2() const;
+
+    template <uint8_t... Args> std::list<unsigned long> localize() const
+    {
+        std::list<unsigned long> positions;
+        for(unsigned long i = 0; i < content.size(); ++i)
+            if(CompareImpl<Args...>::compare(content[i]))
+                positions.push_back(i);
+        return positions;
+    };
+
     //test if the calling CubeRow object subsumes the one given as 'covered'
     int covers(const CubeRow& covered) const;
     unsigned long long countLiterals() const;
@@ -59,7 +86,6 @@ public:
     }
     friend std::ostream& operator<<(std::ostream& os, const CubeRow& cr);
 };
-
 
 
 
