@@ -68,7 +68,7 @@ public:
     CubeTable crossProduct(const CubeTable& another) const;
     void chooseCoveringSubset();
     //of the given cubes set decide by definition, which are function's essential prime implicants, then separate and return them
-    CubeTable separateEssentials();
+    CubeTable separateEssentials(bool exact = true);
     CubeTableCont findUncoveredCompletes(const CubeTable& covering) const;
 
     friend std::ostream& operator<<(std::ostream& os, const CubeTable& f);
