@@ -9,7 +9,7 @@ using namespace std;
 CubeTable::CubeTable(const CubeTableCont &content, int w) : content(content), write(w)
 {}
 
-CubeTable::CubeTable(const FuzzyFunction &func, int w) : content(func.tabulate()), write(w)
+CubeTable::CubeTable(const FuzzyFunction &func, int w) : content(move(func.tabulate())), write(w)
 {}
 
 void CubeTable::sweepCovered(CubeTable& another, int sweepEqual)

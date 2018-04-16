@@ -11,9 +11,9 @@ double SymbInstance::calc(const VarTable& varTable, const vector<double>& args, 
     return negative ? opImpl->negate(args[varTable.at(varName)]) : args[varTable.at(varName)];
 }
 
-void SymbInstance::appendToTable(const VarTable& varTable, CubeRowCont& target) const
+void SymbInstance::appendToTable(const VarTable& varTable, CubeRow& target) const
 {
-    target[varTable.at(varName)] |= 1 << (1 & !negative);
+    target.set(target.get(varTable.at(varName)) | 1 << (negative ? 0 : 1), varTable.at(varName));
 }
 
 SymbInstance::SymbInstance(string varName, bool negative) : varName(move(varName)), negative(negative)
@@ -40,9 +40,9 @@ double Cube::calc(const VarTable& varTable, const vector<double> &args, Operatio
     return acc;
 }
 
-CubeRowCont Cube::tabulate(const VarTable& varTable) const
+CubeRow Cube::tabulate(const VarTable& varTable) const
 {
-    CubeRowCont res(varTable.size(), 0);
+    CubeRow res(varTable.size());
     for(auto& i : content)
         i.appendToTable(varTable, res);
     return res;
@@ -104,12 +104,8 @@ double FuzzyFunction::calc(const vector<double> &args, OperationImpl* opImpl) co
 CubeTableCont FuzzyFunction::tabulate() const
 {
     CubeTableCont res;
-    CubeRowCont partialRes;
     for(auto& i : body)
-    {
-        partialRes = move(i.tabulate(*varTable));
-        res.emplace_back(CubeRow(partialRes));
-    }
+        res.push_back((i.tabulate(*varTable)));
     return res;
 }
 

@@ -26,7 +26,7 @@ class SymbInstance
     bool negative;
 
     double calc(const VarTable& varTable, const std::vector<double>& args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
-    void appendToTable(const VarTable& varTable, CubeRowCont& target) const;
+    void appendToTable(const VarTable& varTable, CubeRow& target) const;
 public:
     SymbInstance(std::string varName, bool negative);
 
@@ -43,7 +43,7 @@ class Cube
     CubeCont content;
 
     double calc(const VarTable& varTable, const std::vector<double>& args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
-    CubeRowCont tabulate(const VarTable& varTable) const;
+    CubeRow tabulate(const VarTable& varTable) const;
 public:
     bool covers(const Cube& another) const;
     bool hasSymbol(const SymbInstance& symb) const;

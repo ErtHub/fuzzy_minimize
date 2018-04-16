@@ -22,7 +22,7 @@ class TokenTypeSet
 public:
     static const int size = MAXSYMB;
     static const int ubits = sizeof(unsigned) * CHAR_BIT;
-    static const int nwords = (size - 1) / ubits + 1;
+    static const int nwords = (size / ubits) + ((size % ubits) > 0 ? 1 : 0);
 
     TokenTypeSet() : content(std::vector<unsigned>(nwords, 0)) {};
     explicit TokenTypeSet(int elem);

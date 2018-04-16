@@ -120,7 +120,7 @@ int main(int argc, char* argv[])
             genC = genV;
         if(!genF)
             genF = 1;
-        cout << "Generating " << genF << genV << " variable fuzzy functions, " << genC << " cubes each...";
+        cout << "Generating " << genF << " " << genV << "-variable fuzzy functions, " << genC << " cubes each..." << endl;
         FunctionGenerator fg(genV, genC, genF);
         fg.generate();
         if(!fg.writeToFile(filename))

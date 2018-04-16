@@ -9,7 +9,6 @@ using namespace std;
 FuzzyFunction FunctionGenerator::generateOne(unsigned long vCount, unsigned long cCount)
 {
 
-    cout << "3" << endl;
     for(unsigned long i = 0; i < vCount; ++i)
         varTable->insert(make_pair(("z" + to_string(i)), i));
 
@@ -48,7 +47,6 @@ FuzzyFunction FunctionGenerator::generateOne(unsigned long vCount, unsigned long
 
 void FunctionGenerator::generate()
 {
-    cout << "2" << endl;
     if(varCount == 0 || cubeCount == 0)
         return;
     for(unsigned long i = 0; i < funCount; ++i)
@@ -63,7 +61,6 @@ bool FunctionGenerator::writeToFile(const string& fn) const
     for(auto& i : *varTable)
         symbRow[i.second] = i.first;
 
-    cout << "1" << endl;
     ofstream ostr;
 
     ostr.open(fn.c_str());
