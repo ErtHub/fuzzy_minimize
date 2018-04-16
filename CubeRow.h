@@ -50,16 +50,14 @@ struct CompareImpl<>
 /*this class represents the tetrary-tabular form of a fuzzy expression cube; every position represents a variable of a
  * function and a value is set as 0 if there is no literal representing the variable, 1 if there is a negative literal
  * 2, if there is a positive one and 3 if there are both*/
-/*class CubeRow
+class SimpleCubeRow
 {
     CubeRowCont content;
     //counts of every value in the main row
     std::vector<unsigned long> meta_phase_numbers;
 
 public:
-    explicit CubeRow();
-    explicit CubeRow(CubeRowCont& content);
-    explicit CubeRow(unsigned long size);
+    explicit SimpleCubeRow(unsigned long size = 0);
     void set(uint8_t what, unsigned long where);
 
     template <uint8_t... Args> std::list<unsigned long> localize() const
@@ -72,22 +70,22 @@ public:
     };
 
     //test if the calling CubeRow object subsumes the one given as 'covered'
-    int covers(const CubeRow& covered) const;
+    int covers(const SimpleCubeRow& covered) const;
     unsigned long long countLiterals() const;
     uint8_t get(unsigned long where) const;
     unsigned long get_meta_phase_number(uint8_t which) const;
     unsigned long size() const;
-    CubeRow expand(unsigned long by);
+    SimpleCubeRow expand(unsigned long by);
     //used to create a row with a literal designated as 'where' negated
-    CubeRow phaseSwitchedTwin(unsigned long where) const;
-    CubeRow fuzzyConsensus(const CubeRow& another, unsigned long pos, int w = 0) const;
+    SimpleCubeRow phaseSwitchedTwin(unsigned long where) const;
+    SimpleCubeRow fuzzyConsensus(const SimpleCubeRow& another, unsigned long pos, int w = 0) const;
 
-    friend bool operator<(CubeRow& first, CubeRow& second)
+    friend bool operator<(SimpleCubeRow& first, SimpleCubeRow& second)
     {
         return first.countLiterals() < second.countLiterals();
     }
-    friend std::ostream& operator<<(std::ostream& os, const CubeRow& cr);
-};*/
+    friend std::ostream& operator<<(std::ostream& os, const SimpleCubeRow& cr);
+};
 
 class CondensedCubeRow
 {
@@ -131,7 +129,11 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const CondensedCubeRow& cr);
 };
 
+#ifdef CONDENSE_CUBEROWS
 using CubeRow = CondensedCubeRow;
+#else
+using CubeRow = SimpleCubeRow;
+#endif
 
 
 #endif //FUZZY_MINIMIZE_CUBEROW_H

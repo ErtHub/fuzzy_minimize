@@ -7,3 +7,4 @@ set(SOURCE_FILES main.cpp OperationImpl.h FuzzyFunction.cpp FuzzyFunction.h Cube
 add_executable(fuzzy_minimize ${SOURCE_FILES})
 
 add_definitions(-DSORT_TABLES)
+add_definitions(-DCONDENSE_CUBEROWS)
