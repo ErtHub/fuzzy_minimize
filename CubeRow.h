@@ -26,6 +26,8 @@ enum Writers
 using CubeRowCont = std::vector<uint8_t>;
 using CondensedCubeRowCont = std::vector<unsigned>;
 
+/*The three templates below implement a function that tests if a given number is equal to any of the ones specified in
+ * template parameters*/
 template <uint8_t... Args>
 struct CompareImpl;
 
@@ -60,6 +62,8 @@ public:
     explicit SimpleCubeRow(unsigned long size = 0);
     void set(uint8_t what, unsigned long where);
 
+    /*Assemble and return a list of positions where a value is equal to any of the numbers specified in template
+     * parameters*/
     template <uint8_t... Args> std::list<unsigned long> localize() const
     {
         std::list<unsigned long> positions;
@@ -75,6 +79,9 @@ public:
     uint8_t get(unsigned long where) const;
     unsigned long get_meta_phase_number(uint8_t which) const;
     unsigned long size() const;
+    /*Out of the CubeRow, make two CubeRows representing cubes being a result of Kleen expansion of the cube represented
+     * by the original CubeRow, by the variable determined with the 'by' value. The CubeRow with the positive literal is
+     * returned from the function and one with the negative literal is substituted as the calling object*/
     SimpleCubeRow expand(unsigned long by);
     //used to create a row with a literal designated as 'where' negated
     SimpleCubeRow phaseSwitchedTwin(unsigned long where) const;
@@ -87,15 +94,17 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const SimpleCubeRow& cr);
 };
 
+/*Memory-saving version of SimpleCubeRow - stores up to 16 FuzzyFunction variable in every single unsigned int value;
+ * To switch between CubeRow versions, comment/uncomment the "add_definitions(-DCONDENSE_CUBEROWS)" line in
+ * CMakeLists.txt*/
 class CondensedCubeRow
 {
-    unsigned long sizebyvars;
-    static const int vbits = 2;
-    static const int ubitpairs = (sizeof(unsigned) * CHAR_BIT) / vbits;
-    unsigned long nwords;
+    unsigned long sizebyvars; //number of variables that apply for the original fuzzy function
+    static const int vbits = 2; //number of bits required to encode literals of a single variable
+    static const int varsperuint = (sizeof(unsigned) * CHAR_BIT) / vbits; //number of variables that fit on an unsigned
+    unsigned long nwords; //number of unsigned values required to store all given variables
 
     CondensedCubeRowCont content;
-    //counts of every value in the main row
     std::vector<unsigned long> meta_phase_numbers;
 
 public:
@@ -111,14 +120,12 @@ public:
         return positions;
     };
 
-    //test if the calling CubeRow object subsumes the one given as 'covered'
     int covers(const CondensedCubeRow& covered) const;
     unsigned long long countLiterals() const;
     uint8_t get(unsigned long where) const;
     unsigned long get_meta_phase_number(uint8_t which) const;
     unsigned long size() const;
     CondensedCubeRow expand(unsigned long by);
-    //used to create a row with a literal designated as 'where' negated
     CondensedCubeRow phaseSwitchedTwin(unsigned long where) const;
     CondensedCubeRow fuzzyConsensus(const CondensedCubeRow& another, unsigned long pos, int w = 0) const;
 

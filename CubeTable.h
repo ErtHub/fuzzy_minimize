@@ -39,6 +39,7 @@ class CubeTable
     bool recursiveCover(CubeRow& original, CubeRow& cube, std::list<unsigned long>::iterator pos0, std::list<unsigned long>::iterator& pos0End, const CubeTableCont& secondList = CubeTableCont()) const;
     bool omissionAllowed(CubeRow& cube, unsigned long position) const;
     bool omissionAllowedRecursively(CubeRow& cube, unsigned long position, std::list<unsigned long>::iterator pos0, std::list<unsigned long>::iterator& pos0End) const;
+    //for a given CubeRow, find all complete cube CubeRows that this CubeTable does not subsume
     void expandAndFilter(CubeRow& cube, std::list<unsigned long>::iterator pos0, std::list<unsigned long>::iterator& pos0End, CubeTableCont& target) const;
 
 public:

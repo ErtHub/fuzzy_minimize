@@ -6,6 +6,8 @@
 
 using namespace std;
 
+/*A fuzzy function variable can be encoded with four different bit combinations, hence four values in
+ * meta_phase_numbers vector*/
 SimpleCubeRow::SimpleCubeRow(unsigned long size) : content(CubeRowCont(size)), meta_phase_numbers(vector<unsigned long>(4))
 {
     meta_phase_numbers[0] = size;
@@ -102,21 +104,24 @@ ostream& operator<<(ostream& os, const SimpleCubeRow& cr)
     return os;
 }
 
-CondensedCubeRow::CondensedCubeRow(unsigned long size) : sizebyvars(size), nwords(size / ubitpairs + ((size % ubitpairs > 0) ? 1 : 0)), content(CondensedCubeRowCont(nwords)), meta_phase_numbers(vector<unsigned long>(4))
+/*Construct a CondensedCubeRow for a given number of fuzzy function variables; Calculate the number of required unsigned
+ * values as number of variables divided by number of variables encoded on one value and rounded up*/
+CondensedCubeRow::CondensedCubeRow(unsigned long size) : sizebyvars(size), nwords(size / varsperuint + ((size % varsperuint > 0) ? 1 : 0)), content(CondensedCubeRowCont(nwords)), meta_phase_numbers(vector<unsigned long>(4))
 {
     meta_phase_numbers[0] = size;
 }
 
 void CondensedCubeRow::set(uint8_t what, unsigned long where)
 {
-    if(where >= sizebyvars)
+    if(where >= sizebyvars || what >= meta_phase_numbers.size())
         return;
-    unsigned long word = where / ubitpairs;
-    unsigned long offset = (where % ubitpairs) * vbits;
+    unsigned long word = where / varsperuint;
+    unsigned long offset = (where % varsperuint) * vbits; /*since a variable is encoded on two bits, shift the 0th
+    * position in the unsigned value by double the position the variable assumes in it*/
     --meta_phase_numbers[get(where)];
-    content[word] &= (UINT_MAX - (3 << offset));
-    content[word] |= (what << offset);
-    ++meta_phase_numbers[get(where)];
+    content[word] &= (UINT_MAX - (3 << offset)); //erase the previous value stored at 'word' and 'offset'
+    content[word] |= (what << offset); //set new value given as 'what'
+    ++meta_phase_numbers[what];
 }
 
 int CondensedCubeRow::covers(const CondensedCubeRow &covered) const
@@ -124,10 +129,7 @@ int CondensedCubeRow::covers(const CondensedCubeRow &covered) const
     int rowsAreEqual = EQUAL;
     if(meta_phase_numbers[3] > covered.meta_phase_numbers[3] || meta_phase_numbers[0] < covered.meta_phase_numbers[0] || countLiterals() > covered.countLiterals())
         return NO_COVER;
-    /*the c1 cube subsumes the c2 cube if c2 contains all the literals of c1; the numbers put in these CubeRow
-     * objects are in their binary representation exactly the switches designating if a literal exists in the cube -
-     * 01 for a negative literal and 10 for a positive one; therefore, the test for the relationship of subsuming can be
-     * performed as the equality of the subsuming row and the bitwise AND of the subsuming and the subsumed row*/
+
     for(unsigned pos = 0; pos < content.size(); ++pos)
     {
         if(content[pos] != covered.content[pos])
@@ -147,8 +149,10 @@ unsigned long long CondensedCubeRow::countLiterals() const
 
 uint8_t CondensedCubeRow::get(unsigned long where) const
 {
-    unsigned long offset = (where % ubitpairs) * vbits;
-    return (uint8_t)((content[where / ubitpairs] & (3 << offset)) >> offset);
+    /*Pick an unsigned value, where the desired variable is encoded, then extract the code by ANDing it with a mask,
+     * where bits at two positions, at which the code is stored, are set to 1; Then, unapply the offset*/
+    unsigned long offset = (where % varsperuint) * vbits;
+    return (uint8_t)((content[where / varsperuint] & (3 << offset)) >> offset);
 }
 
 unsigned long CondensedCubeRow::get_meta_phase_number(uint8_t which) const
