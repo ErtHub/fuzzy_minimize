@@ -1,7 +1,3 @@
-//
-// Created by hubert on 12.11.17.
-//
-
 #include "CubeRow.h"
 
 using namespace std;

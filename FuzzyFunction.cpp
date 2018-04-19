@@ -1,15 +1,6 @@
-//
-// Created by hubert on 16.07.17.
-//
-
 #include "FuzzyFunction.h"
 
 using namespace std;
-
-double SymbInstance::calc(const VarTable& varTable, const vector<double>& args, OperationImpl* opImpl) const
-{
-    return negative ? opImpl->negate(args[varTable.at(varName)]) : args[varTable.at(varName)];
-}
 
 void SymbInstance::appendToTable(const VarTable& varTable, CubeRow& target) const
 {
@@ -32,36 +23,12 @@ ostream& operator<<(ostream& os, const SymbInstance& s)
     return os;
 }
 
-double Cube::calc(const VarTable& varTable, const vector<double> &args, OperationImpl* opImpl) const
-{
-    double acc = 1;
-    for(auto& i : content)
-        acc = opImpl->t_norm(acc, i.calc(varTable, args, opImpl));
-    return acc;
-}
-
 CubeRow Cube::tabulate(const VarTable& varTable) const
 {
     CubeRow res(varTable.size());
     for(auto& i : content)
         i.appendToTable(varTable, res);
     return res;
-}
-
-bool Cube::covers(const Cube& another) const
-{
-    for(auto& i : content)
-        if(!another.hasSymbol(i))
-            return false;
-    return true;
-}
-
-bool Cube::hasSymbol(const SymbInstance& symb) const
-{
-    for(auto& i : content)
-        if(i == symb)
-            return true;
-    return false;
 }
 
 Cube Cube::operator+=(const SymbInstance &symb)
@@ -91,14 +58,6 @@ void FuzzyFunction::clear()
 {
     varTable.reset();
     body.clear();
-}
-
-double FuzzyFunction::calc(const vector<double> &args, OperationImpl* opImpl) const
-{
-    double acc = 0;
-    for(auto& i : body)
-        acc = opImpl->s_norm(acc, i.calc(*varTable, args, opImpl));
-    return acc;
 }
 
 CubeTableCont FuzzyFunction::tabulate() const

@@ -1,7 +1,3 @@
-//
-// Created by hubert on 11.07.17.
-//
-
 #include <iostream>
 #include <memory>
 #include <getopt.h>

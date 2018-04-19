@@ -1,7 +1,3 @@
-//
-// Created by hubert on 20.12.17.
-//
-
 #include "FunctionGenerator.h"
 
 using namespace std;

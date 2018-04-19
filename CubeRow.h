@@ -1,7 +1,3 @@
-//
-// Created by hubert on 12.11.17.
-//
-
 #ifndef FUZZY_MINIMIZE_CUBEROW_H
 #define FUZZY_MINIMIZE_CUBEROW_H
 

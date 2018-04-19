@@ -1,7 +1,3 @@
-//
-// Created by hubert on 23.07.17.
-//
-
 #include "CubeTable.h"
 
 using namespace std;

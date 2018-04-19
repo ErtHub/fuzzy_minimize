@@ -1,7 +1,3 @@
-//
-// Created by hubert on 23.07.17.
-//
-
 #ifndef FUZZY_MINIMIZE_CUBETABLE_H
 #define FUZZY_MINIMIZE_CUBETABLE_H
 

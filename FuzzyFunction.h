@@ -1,7 +1,3 @@
-//
-// Created by hubert on 16.07.17.
-//
-
 #ifndef FUZZY_MINIMIZE_FUZZYFUNCTION_H
 #define FUZZY_MINIMIZE_FUZZYFUNCTION_H
 
@@ -9,7 +5,6 @@
 #include <vector>
 #include <unordered_map>
 #include <memory>
-#include "OperationImpl.h"
 #include "CubeRow.h"
 #include "CubeTable.h"
 
@@ -25,7 +20,6 @@ class SymbInstance
     std::string varName;
     bool negative;
 
-    double calc(const VarTable& varTable, const std::vector<double>& args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
     void appendToTable(const VarTable& varTable, CubeRow& target) const;
 public:
     SymbInstance(std::string varName, bool negative);
@@ -42,11 +36,8 @@ class Cube
 {
     CubeCont content;
 
-    double calc(const VarTable& varTable, const std::vector<double>& args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
     CubeRow tabulate(const VarTable& varTable) const;
 public:
-    bool covers(const Cube& another) const;
-    bool hasSymbol(const SymbInstance& symb) const;
     Cube operator+=(const SymbInstance& symb);
 
     explicit Cube(const CubeCont &content = CubeCont());
@@ -64,7 +55,6 @@ class FuzzyFunction
 
 public:
     void clear();
-    double calc(const std::vector<double> &args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
     CubeTableCont tabulate() const;
     FuzzyFunction operator+=(const Cube& cube);
 
