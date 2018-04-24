@@ -1,7 +1,3 @@
-//
-// Created by hubert on 08.12.17.
-//
-
 #ifndef FUZZY_MINIMIZE_MINIMIZER_H
 #define FUZZY_MINIMIZE_MINIMIZER_H
 
@@ -16,11 +12,6 @@ class CubeTable;
 enum MinimizationFashion
 {
     EXACT = 0, HEURISTIC, HEURISTIC_MUKAIDONO
-};
-
-enum Writers
-{
-    NO_WRITER = 0, VERBOSE = 4, VERY_VERBOSE = 8
 };
 
 class Minimizer
@@ -47,6 +38,9 @@ class ExactMinimizer : public Minimizer
     std::vector<CubeRow> redundants;
     CubeTable solutions;
     std::list<FuzzyFunction> coverings;
+
+    void solveColumnCovering();
+    void solutionsToFunctions(const VarTablePtr& varTable);
 public:
     explicit ExactMinimizer(int w = 0, bool x = false) : Minimizer(w, x){};
     ~ExactMinimizer() override = default;

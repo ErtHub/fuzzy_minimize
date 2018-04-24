@@ -1,7 +1,3 @@
-//
-// Created by hubert on 16.07.17.
-//
-
 #ifndef FUZZY_MINIMIZE_FUZZYFUNCTION_H
 #define FUZZY_MINIMIZE_FUZZYFUNCTION_H
 
@@ -9,7 +5,6 @@
 #include <vector>
 #include <unordered_map>
 #include <memory>
-#include "OperationImpl.h"
 #include "CubeRow.h"
 #include "CubeTable.h"
 
@@ -25,8 +20,7 @@ class SymbInstance
     std::string varName;
     bool negative;
 
-    double calc(const VarTable& varTable, const std::vector<double>& args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
-    void appendToTable(const VarTable& varTable, CubeRowCont& target) const;
+    void appendToTable(const VarTable& varTable, CubeRow& target) const;
 public:
     SymbInstance(std::string varName, bool negative);
 
@@ -42,13 +36,11 @@ class Cube
 {
     CubeCont content;
 
-    double calc(const VarTable& varTable, const std::vector<double>& args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
-    CubeRowCont tabulate(const VarTable& varTable) const;
+    CubeRow tabulate(const VarTable& varTable) const;
 public:
-    bool covers(const Cube& another) const;
-    bool hasSymbol(const SymbInstance& symb) const;
+    Cube operator+=(const SymbInstance& symb);
 
-    explicit Cube(const CubeCont &content);
+    explicit Cube(const CubeCont &content = CubeCont());
 
     friend class FuzzyFunction;
     friend std::ostream& operator<<(std::ostream& os, const Cube& i);
@@ -63,11 +55,11 @@ class FuzzyFunction
 
 public:
     void clear();
-    double calc(const std::vector<double> &args, OperationImpl* opImpl = &ZADEH_CLASSIC) const;
     CubeTableCont tabulate() const;
+    FuzzyFunction operator+=(const Cube& cube);
 
     FuzzyFunction() = default;
-    FuzzyFunction(VarTablePtr varTable, FunctionBody body);
+    explicit FuzzyFunction(VarTablePtr varTable, FunctionBody body = FunctionBody());
     FuzzyFunction(const VarTablePtr& varTable, const CubeTable& tab);
 
     VarTablePtr getVarTable() const;

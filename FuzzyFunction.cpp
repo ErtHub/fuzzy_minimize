@@ -1,19 +1,10 @@
-//
-// Created by hubert on 16.07.17.
-//
-
 #include "FuzzyFunction.h"
 
 using namespace std;
 
-double SymbInstance::calc(const VarTable& varTable, const vector<double>& args, OperationImpl* opImpl) const
+void SymbInstance::appendToTable(const VarTable& varTable, CubeRow& target) const
 {
-    return negative ? opImpl->negate(args[varTable.at(varName)]) : args[varTable.at(varName)];
-}
-
-void SymbInstance::appendToTable(const VarTable& varTable, CubeRowCont& target) const
-{
-    target[varTable.at(varName)] |= 1 << (1 & !negative);
+    target.set(target.get(varTable.at(varName)) | 1 << (negative ? 0 : 1), varTable.at(varName));
 }
 
 SymbInstance::SymbInstance(string varName, bool negative) : varName(move(varName)), negative(negative)
@@ -32,36 +23,18 @@ ostream& operator<<(ostream& os, const SymbInstance& s)
     return os;
 }
 
-double Cube::calc(const VarTable& varTable, const vector<double> &args, OperationImpl* opImpl) const
+CubeRow Cube::tabulate(const VarTable& varTable) const
 {
-    double acc = 1;
-    for(auto& i : content)
-        acc = opImpl->t_norm(acc, i.calc(varTable, args, opImpl));
-    return acc;
-}
-
-CubeRowCont Cube::tabulate(const VarTable& varTable) const
-{
-    CubeRowCont res(varTable.size(), 0);
+    CubeRow res(varTable.size());
     for(auto& i : content)
         i.appendToTable(varTable, res);
     return res;
 }
 
-bool Cube::covers(const Cube& another) const
+Cube Cube::operator+=(const SymbInstance &symb)
 {
-    for(auto& i : content)
-        if(!another.hasSymbol(i))
-            return false;
-    return true;
-}
-
-bool Cube::hasSymbol(const SymbInstance& symb) const
-{
-    for(auto& i : content)
-        if(i == symb)
-            return true;
-    return false;
+    content.emplace_back(symb);
+    return *this;
 }
 
 Cube::Cube(const CubeCont& content) : content(content)
@@ -87,24 +60,18 @@ void FuzzyFunction::clear()
     body.clear();
 }
 
-double FuzzyFunction::calc(const vector<double> &args, OperationImpl* opImpl) const
-{
-    double acc = 0;
-    for(auto& i : body)
-        acc = opImpl->s_norm(acc, i.calc(*varTable, args, opImpl));
-    return acc;
-}
-
 CubeTableCont FuzzyFunction::tabulate() const
 {
     CubeTableCont res;
-    CubeRowCont partialRes;
     for(auto& i : body)
-    {
-        partialRes = move(i.tabulate(*varTable));
-        res.emplace_back(CubeRow(partialRes));
-    }
+        res.push_back((i.tabulate(*varTable)));
     return res;
+}
+
+FuzzyFunction FuzzyFunction::operator+=(const Cube &cube)
+{
+    body.emplace_back(cube);
+    return *this;
 }
 
 FuzzyFunction::FuzzyFunction(VarTablePtr varTable, FunctionBody body) : varTable(move(varTable)), body(move(body))

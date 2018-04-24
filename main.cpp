@@ -1,7 +1,3 @@
-//
-// Created by hubert on 11.07.17.
-//
-
 #include <iostream>
 #include <memory>
 #include <getopt.h>
@@ -120,7 +116,7 @@ int main(int argc, char* argv[])
             genC = genV;
         if(!genF)
             genF = 1;
-        cout << "Generating " << genF << genV << " variable fuzzy functions, " << genC << " cubes each...";
+        cout << "Generating " << genF << " " << genV << "-variable fuzzy functions, " << genC << " cubes each..." << endl;
         FunctionGenerator fg(genV, genC, genF);
         fg.generate();
         if(!fg.writeToFile(filename))
@@ -134,13 +130,13 @@ int main(int argc, char* argv[])
     switch(options & ALGORITHM)
     {
         case EXACT:
-            minimizer = MinimizerPtr(new ExactMinimizer((options & WRITER) / VERBOSE, (bool)(options & EXPAND)));
+            minimizer = MinimizerPtr(new ExactMinimizer(options & WRITER, (bool)(options & EXPAND)));
             break;
         case HEURISTIC:
-            minimizer = MinimizerPtr(new HeuristicMinimizer((options & WRITER) / VERBOSE, (bool)(options & EXPAND)));
+            minimizer = MinimizerPtr(new HeuristicMinimizer(options & WRITER, (bool)(options & EXPAND)));
             break;
         case HEURISTIC_MUKAIDONO:
-            minimizer = MinimizerPtr(new MukaidonoMinimizer((options & WRITER) / VERBOSE, (bool)(options & EXPAND)));
+            minimizer = MinimizerPtr(new MukaidonoMinimizer(options & WRITER, (bool)(options & EXPAND)));
             break;
         default:
             cout << "Algorithm option error." << endl;

@@ -51,11 +51,11 @@ class Parser
     unsigned long funcount;
     VarTablePtr varTable;
 	std::unordered_map<std::string, bool> funTable;
-    FunctionBody funProt;
+    FuzzyFunction funProt;
 
     std::list<std::pair<std::string, FuzzyFunction>> funDefs;
 
-    TokenTypeSet instart, outstart, funstart, factstart, addops;
+    TokenTypeSet instart, outstart, funstart, factstart, addops, factrpt;
 
     void nexttok();
     void accept(TokenType token);
@@ -67,7 +67,7 @@ class Parser
 	bool parseFunDecl(const TokenTypeSet& follow);
     bool parseFunDef(const TokenTypeSet& follow);
     bool parseSum(const TokenTypeSet& follow);
-    bool parseProduct(const TokenTypeSet& follow, CubeCont& cubeProt);
+    bool parseProduct(const TokenTypeSet& follow, Cube& cubeProt);
 
 public:
 

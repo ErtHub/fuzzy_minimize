@@ -1,7 +1,3 @@
-//
-// Created by hubert on 23.07.17.
-//
-
 #include "CubeTable.h"
 
 using namespace std;
@@ -9,7 +5,7 @@ using namespace std;
 CubeTable::CubeTable(const CubeTableCont &content, int w) : content(content), write(w)
 {}
 
-CubeTable::CubeTable(const FuzzyFunction &func, int w) : content(func.tabulate()), write(w)
+CubeTable::CubeTable(const FuzzyFunction &func, int w) : content(move(func.tabulate())), write(w)
 {}
 
 void CubeTable::sweepCovered(CubeTable& another, int sweepEqual)
@@ -57,9 +53,9 @@ CubeTable CubeTable::generateK1() const
 
     for(auto i = content.begin(); i != content.end(); ++i)
     {
-        list<unsigned long> positions1_2 = move(i->localize1_2());
-        if(positions1_2.empty())
+        if(!(i->get_meta_phase_number(1) || i->get_meta_phase_number(2)))
             continue;
+        list<unsigned long> positions1_2 = move(i->localize<1, 2>());
         auto j = i;
         for(++j; j != content.end(); ++j)
         {
@@ -84,45 +80,23 @@ CubeTable CubeTable::generateK1() const
 
 void CubeTable::chooseCoveringSubset()
 {
-    list<CubeRow> subset;
-    while(!content.empty())
-    {
-        CubeRow cube = move(content.front());
-        content.pop_front();
-        //for every row, if it's complementary and can be Kleen-expanded...
-        if(!cube.get_meta_phase_number(0) || !cube.get_meta_phase_number(3))
-        {
-            subset.push_back(move(cube));
-            continue;
-        }
-        list<unsigned long> positions0 = move(cube.localize0());
-        auto divisionPos = positions0.begin();
-        auto pos0End = positions0.end();
-        CubeRow halfCube1 = cube;
-        //...expand it...
-        CubeRow halfCube2 = move(halfCube1.expand(*divisionPos));
-        /*...until all expansion-derived rows are subsumed by one another row in the function; if a row is not subsumed
-         * and cannot be expanded, it cannot be omitted*/
-        if(!(recursiveCover(cube, halfCube1, ++divisionPos, pos0End, subset) && recursiveCover(cube, halfCube2, divisionPos, pos0End, subset)))
-            subset.push_back(move(cube));
-    }
-    content = move(subset);
+    *this = move(separateEssentials(false));
 }
 
-CubeTable CubeTable::separateEssentials()
+CubeTable CubeTable::separateEssentials(bool exact)
 {
     CubeTableCont essentials;
 
     for(auto i = content.begin(); i != content.end();)
     {
         //for every row, if it's complementary and can be Kleen-expanded...
-        if(!i->get_meta_phase_number(0) || !i->get_meta_phase_number(3))
+        if(!(i->get_meta_phase_number(0) && i->get_meta_phase_number(3)))
         {
             essentials.push_back(move(*i));
             i = content.erase(i);
             continue;
         }
-        list<unsigned long> positions0 = move(i->localize0());
+        list<unsigned long> positions0 = move(i->localize<0>());
         auto divisionPos = positions0.begin();
         auto pos0End = positions0.end();
         CubeRow halfCube1 = *i;
@@ -135,8 +109,10 @@ CubeTable CubeTable::separateEssentials()
             essentials.push_back(move(*i));
             i = content.erase(i);
         }
-        else
+        else if(exact)
             ++i;
+        else
+            i = content.erase(i);
     }
     return CubeTable(essentials);
 }
@@ -237,7 +213,7 @@ void CubeTable::minimizeHeuristic()
                 ki.content.pop_back();
                 continue;
             }
-            if(!rk.get_meta_phase_number(1) && !rk.get_meta_phase_number(2))
+            if(!(rk.get_meta_phase_number(1) || rk.get_meta_phase_number(2)))
                 break;
             if(rLiteralsCount < rk.countLiterals() || rowWasRepeated)
             {
@@ -265,11 +241,11 @@ void CubeTable::minimizeMukaidono()
     sweepCovered();
     for(auto& i : content)
     {
-        if(!i.get_meta_phase_number(3))
+        if(!((i.get_meta_phase_number(1) || i.get_meta_phase_number(2)) && i.get_meta_phase_number(3)))
             continue;
         if(write)
             cout << *this << endl << "---------------" << endl;
-        auto pos1_2List = i.localize1_2();
+        auto pos1_2List = i.localize<1, 2>();
         auto pos1_2 = pos1_2List.begin();
         while(pos1_2 != pos1_2List.end())
         {
@@ -286,7 +262,9 @@ void CubeTable::minimizeMukaidono()
             sweepCovered(i);
             continue;
         }
-        auto pos0List = i.localize0();
+        if(!i.get_meta_phase_number(0))
+            continue;
+        auto pos0List = i.localize<0>();
         auto pos0 = pos0List.begin();
         auto pos0End = pos0List.end();
         pos1_2 = pos1_2List.begin();
@@ -405,7 +383,7 @@ list<tuple<unsigned long, unsigned long, CubeRow>> CubeTable::findR(CubeRow& r, 
             /*for a given r row, create an r_n set of rows; for each r_n row, count the 0 values, localize the 1-2 value
              * pair with the r row and sort them by the 0 values count*/
             if(seenOnlyOne1_2 && !seenCross3)
-                result.push_back(make_tuple(zeroPairs, pos1_2, rn));
+                result.emplace_back(make_tuple(zeroPairs, pos1_2, rn));
         }
     };
 
@@ -434,15 +412,15 @@ FunctionBody CubeTable::redeem(const VarTable& tab) const
 
     for(auto& row : content)
     {
-        CubeCont partialResult;
+        Cube partialResult;
         for(unsigned long i = 0; i < symbRow.size(); ++i)
         {
             if(row.get(i))
             {
                 if(row.get(i) & 2)
-                    partialResult.emplace_back(SymbInstance(symbRow[i], false));
+                    partialResult += SymbInstance(symbRow[i], false);
                 if(row.get(i) & 1)
-                    partialResult.emplace_back(SymbInstance(symbRow[i], true));
+                    partialResult += SymbInstance(symbRow[i], true);
             }
         }
         result.emplace_back(Cube(partialResult));
@@ -482,7 +460,7 @@ CubeTableCont CubeTable::findUncoveredCompletes(const CubeTable &covering) const
                     result.push_back(i);
                 continue;
             }
-            list<unsigned long> positions0 = move(i.localize0());
+            list<unsigned long> positions0 = move(i.localize<0>());
             auto divisionPos = positions0.begin();
             auto pos0End = positions0.end();
             CubeRow cube1 = i;

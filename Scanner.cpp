@@ -11,7 +11,7 @@ unordered_map<string, TokenType> Scanner::keyTable
 TokenTypeSet::TokenTypeSet(int elem) : content(vector<unsigned>(nwords, 0))
 {
     if(elem >= 0 && elem < size)
-        content[elem/ubits] = (unsigned)(1 << (elem % ubits));
+        content[elem/toksperuint] = (unsigned)(1 << (elem % toksperuint));
 }
 
 TokenTypeSet::TokenTypeSet(int elem1, int elem2, ...) : content(vector<unsigned>(nwords, 0))
@@ -20,13 +20,13 @@ TokenTypeSet::TokenTypeSet(int elem1, int elem2, ...) : content(vector<unsigned>
     int e;
 
     if(elem1 >= 0 && elem1 < size)
-        content[elem1/ubits] = (unsigned)(1 << (elem1 % ubits));
+        content[elem1/toksperuint] = (unsigned)(1 << (elem1 % toksperuint));
     e = elem2;
     va_start(ap, elem2);
     while(e >= 0)
     {
         if(e < size)
-            content[e/ubits] |= (1 << (e % ubits));
+            content[e/toksperuint] |= (1 << (e % toksperuint));
         e = va_arg(ap, int);
     }
     va_end(ap);
@@ -44,7 +44,7 @@ bool TokenTypeSet::contains(int elem) const
 {
     if(elem < 0 || elem >= size)
         return false;
-    return ((content[elem/ubits] & (1 << (elem % ubits))) != 0);
+    return ((content[elem/toksperuint] & (1 << (elem % toksperuint))) != 0);
 }
 
 TokenType Scanner::nextToken()
