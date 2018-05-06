@@ -15,7 +15,11 @@ class FunctionGenerator
     FuzzyFunction generateOne(unsigned long vCount, unsigned long cCount);
 
 public:
-    FunctionGenerator(unsigned long vCount, unsigned long cCount, unsigned long fCount) : varCount(vCount), cubeCount(cCount), funCount(fCount), varTable(new std::unordered_map<std::string, unsigned long>()) {};
+    FunctionGenerator(unsigned long vCount, unsigned long cCount, unsigned long fCount) : varCount(vCount), cubeCount(cCount), funCount(fCount), varTable(new std::unordered_map<std::string, unsigned long>())
+    {
+        for(unsigned long i = 0; i < vCount; ++i)
+            varTable->insert(std::make_pair(("z" + std::to_string(i)), i));
+    };
     void generate();
     bool writeToFile(const std::string& fn) const;
 };
