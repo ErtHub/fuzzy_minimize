@@ -11,29 +11,12 @@ Reader::Reader(const string& fname): fileName(fname)
     {
         good = true;
         errcount = 0;
-        nextLine();
     }
 }
 
 Reader::~Reader()
 {
     istr.close();
-}
-
-bool Reader::nextLine()
-{
-    if(istr.eof())
-        return false;
-    getline(istr, line);
-    line.push_back('\n');
-
-    ++pos.lineNumber;
-    pos.columnNumber = 0;
-    while(line[pos.columnNumber] == ' ' || line[pos.columnNumber] == '\t')
-        ++pos.columnNumber;
-
-    firstErrorInLine = true;
-    return true;
 }
 
 void Reader::alert(int errcode, const TextPos &tp, const string &expl, const string& what)
@@ -50,12 +33,16 @@ void Reader::alert(int errcode, const TextPos &tp, const string &expl, const str
 
 char Reader::nextChar()
 {
-    bool r = true;
-    if(pos.columnNumber == line.size())
-        r = nextLine();
-    if(r)
-        return line[pos.columnNumber++];
-    else
+    ++pos.columnNumber;
+    int c;
+    if((c = istr.get()) == '\n')
+    {
+        ++pos.lineNumber;
+        pos.columnNumber = 0;
+        firstErrorInLine = true;
+    }
+    if(c == EOF)
         return EOF;
+    return (char)c;
 }
 

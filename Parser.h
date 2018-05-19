@@ -5,8 +5,6 @@
 #include "FuzzyFunction.h"
 #include <memory>
 
-extern std::vector<std::string> tokenNames;
-
 class Parser;
 
 class Sync

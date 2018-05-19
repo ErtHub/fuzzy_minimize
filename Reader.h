@@ -6,13 +6,11 @@
 #include <string>
 #include <cstdlib>
 
-
-
 struct TextPos
 {
     int lineNumber;
     int columnNumber;
-    explicit TextPos(int l = 0, int c = 0): lineNumber(l), columnNumber(c) {}
+    explicit TextPos(int l = 1, int c = 1): lineNumber(l), columnNumber(c) {}
 };
 
 class Reader
@@ -25,8 +23,6 @@ class Reader
     std::ifstream istr;
     std::string line;
     TextPos pos;
-
-    bool nextLine();
 
 public:
     explicit Reader(const std::string& fname);
