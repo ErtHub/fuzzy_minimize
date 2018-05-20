@@ -17,11 +17,9 @@ class Reader
 {
     bool good = false;
     int errcount;
-    bool firstErrorInLine;
 
     const std::string fileName;
     std::ifstream istr;
-    std::string line;
     TextPos pos;
 
 public:

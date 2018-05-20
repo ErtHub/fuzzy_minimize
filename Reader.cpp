@@ -22,13 +22,7 @@ Reader::~Reader()
 void Reader::alert(int errcode, const TextPos &tp, const string &expl, const string& what)
 {
     ++errcount;
-    if(firstErrorInLine)
-    {
-        firstErrorInLine = false;
-        std::cout << "Line " << pos.lineNumber << ": " << line;
-    }
-
-    cout << what << " #" << errcode << " at column " << tp.columnNumber << ": " << expl << endl;
+    cout << what << " #" << errcode << " at line " << pos.lineNumber << ", column " << tp.columnNumber << ": " << expl << endl;
 }
 
 char Reader::nextChar()
@@ -39,7 +33,6 @@ char Reader::nextChar()
     {
         ++pos.lineNumber;
         pos.columnNumber = 0;
-        firstErrorInLine = true;
     }
     if(c == EOF)
         return EOF;
